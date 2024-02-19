@@ -9,7 +9,14 @@ def main() -> None:
     if user_input.isdigit() and int(user_input) == hand.pot_size:
         logger.info("Correct!")
     else:
-        logger.info(f"WRONG! The pot size is {hand.pot_size}")
+        logger.info(f"WRONG!")
+    hand.show_pot_size()
+    user_input = input("Guess the pot odds: ")
+    if user_input == hand.pot_odds:
+        logger.info("Correct!")
+    else:
+        logger.info(f"WRONG!")
+    hand.show_pot_odds()
 
 
 if __name__ == "__main__":
