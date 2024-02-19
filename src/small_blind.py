@@ -16,11 +16,11 @@ class SmallBlind(Bet):
     def __str__(self):
         return f"Small blind: {self.amount}"
 
-
-def make_random_small_blind():
-    num_increments = random.randint(
-        MIN_SMALL_BLIND // SMALL_BLIND_INCREMENT,
-        MAX_SMALL_BLIND // SMALL_BLIND_INCREMENT,
-    )
-    amount = num_increments * SMALL_BLIND_INCREMENT
-    return SmallBlind(amount)
+    @classmethod
+    def make_random_small_blind(cls):
+        num_increments = random.randint(
+            MIN_SMALL_BLIND // SMALL_BLIND_INCREMENT,
+            MAX_SMALL_BLIND // SMALL_BLIND_INCREMENT,
+        )
+        amount = num_increments * SMALL_BLIND_INCREMENT
+        return cls(amount)

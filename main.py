@@ -1,12 +1,10 @@
-from src.big_blind import BigBlind
-from src.players_ahead_of_you import select_random_n_players_ahead_of_you
-from src.small_blind import make_random_small_blind
+from src.config import logger
+from src.hand import Hand
 
 
 def main() -> None:
-    small_blind = make_random_small_blind()
-    big_blind = BigBlind(small_blind)
-    select_random_n_players_ahead_of_you()
+    hand = Hand()
+    logger.info(f"Pot size = {hand.pot_size}")
 
 
 if __name__ == "__main__":
