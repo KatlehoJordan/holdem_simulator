@@ -16,14 +16,6 @@
             "request": "test", // for pytest - ignore linting warning
             "type": "python",
         },
-        {
-            "console": "integratedTerminal",
-            "justMyCode": true,
-            "name": "Python: Current File",
-            "program": "${file}",
-            "request": "launch",
-            "type": "python",
-        },
     ],
     "version": "0.2.0"
 }

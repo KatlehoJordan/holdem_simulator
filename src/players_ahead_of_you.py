@@ -1,4 +1,4 @@
-import random
+import numpy as np
 
 from src.config import MAX_PLAYERS_AHEAD_OF_YOU, MIN_PLAYERS_AHEAD_OF_YOU, logger
 
@@ -21,8 +21,8 @@ class PlayersAheadOfYou:
 
     @classmethod
     def select_n_players(cls):
-        n_players = random.randint(
-            MIN_PLAYERS_AHEAD_OF_YOU,
-            MAX_PLAYERS_AHEAD_OF_YOU,
-        )
+        players = range(MIN_PLAYERS_AHEAD_OF_YOU, MAX_PLAYERS_AHEAD_OF_YOU + 1)
+        probabilities = [1 / (i**0.75) for i in players]
+        probabilities = [p / sum(probabilities) for p in probabilities]
+        n_players = np.random.choice(players, p=probabilities)
         return cls(n_players)

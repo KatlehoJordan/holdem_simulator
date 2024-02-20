@@ -25,8 +25,13 @@ class Hand:
     ):
         self.max_bet = BigBlind(small_blind).amount
         self.pot_size = small_blind.amount + self.max_bet
-        self.pot_odds = round_up_to_nearest_5_percent(self.max_bet / self.pot_size)
+        self.pot_odds = self.calculate_pot_odds()
         self.simulate_bets_for_players_ahead_of_you(n_players)
+
+    def calculate_pot_odds(self):
+        return round_up_to_nearest_5_percent(
+            self.max_bet / (self.pot_size + self.max_bet)
+        )
 
     def simulate_bets_for_players_ahead_of_you(self, n_players: PlayersAheadOfYou):
         prob_double_max_bet = 1 / n_players.n
@@ -35,15 +40,16 @@ class Hand:
         choices = ["double", "triple", "call"]
         probabilities = [prob_double_max_bet, prob_triple_max_bet, prob_call]
         for _ in range(N_PLAYERS_IN_BLINDS, n_players.n):
+            n_player = _ + 1
             choice = random.choices(choices, probabilities, k=1)[0]
             if choice == "double":
                 self.max_bet *= 2
             elif choice == "triple":
                 self.max_bet *= 3
             ActivePlayer(bet=Bet(self.max_bet))
-            logger.info(f"Player {_ + 1} bets {self.max_bet}")
+            logger.info(f"Player {n_player} bets {self.max_bet}")
             self.pot_size += self.max_bet
-            self.pot_odds = round_up_to_nearest_5_percent(self.max_bet / self.pot_size)
+            self.pot_odds = self.calculate_pot_odds()
 
     def show_pot_size(self):
         logger.info(f"Pot size: {self.pot_size}")
