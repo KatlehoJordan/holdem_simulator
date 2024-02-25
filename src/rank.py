@@ -100,4 +100,4 @@ class Rank:
         )
 
     def __str__(self):
-        return self.rank
+        return f"Rank is: {self.rank}; final rank value is: {self.final_rank_value}"

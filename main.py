@@ -13,10 +13,7 @@ def main() -> None:
     # TODO: Remove the next for block when done since just used for testing
     for rank in VALID_RANKS_DICT.keys():
         this_rank = Rank(rank)
-        print(this_rank.rank)
-        print("Final rank value is:")
-        print(this_rank.final_rank_value)
-        print("\n\n\n")
+        print(this_rank)
 
 
 if __name__ == "__main__":
