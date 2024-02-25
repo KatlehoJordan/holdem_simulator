@@ -1,6 +1,9 @@
 import numpy as np
 
-from src.config import MAX_PLAYERS_AHEAD_OF_YOU, MIN_PLAYERS_AHEAD_OF_YOU, logger
+from src.config import logger
+
+MIN_PLAYERS_AHEAD_OF_YOU = 1
+MAX_PLAYERS_AHEAD_OF_YOU = 9
 
 
 class PlayersAheadOfYou:

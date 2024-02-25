@@ -4,9 +4,11 @@ import random
 from src.active_player import ActivePlayer
 from src.bet import Bet
 from src.big_blind import BigBlind
-from src.config import N_PLAYERS_IN_BLINDS, logger
+from src.config import logger
 from src.players_ahead_of_you import PlayersAheadOfYou
 from src.small_blind import SmallBlind
+
+N_PLAYERS_IN_BLINDS = 2
 
 
 def round_up_to_nearest_5_percent(x: float) -> str:

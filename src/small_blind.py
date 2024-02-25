@@ -1,7 +1,10 @@
 import random
 
 from src.bet import Bet
-from src.config import MAX_SMALL_BLIND, MIN_SMALL_BLIND, SMALL_BLIND_INCREMENT, logger
+from src.config import MIN_SMALL_BLIND, logger
+
+SMALL_BLIND_INCREMENT = 5
+MAX_SMALL_BLIND = 100
 
 
 class SmallBlind(Bet):
