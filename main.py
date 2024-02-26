@@ -8,9 +8,11 @@ def main() -> None:
 
     guess_pot_size(hand)
     guess_pot_odds(hand)
-    # TODO: Start implementing classes cards, and your_hand
+    # TODO: Use the HoleCards class to rebuild the interactive game I previously made in R
+    # TODO: Implement tests that ensure known hands have expected relative ranks, as previously implemented in R
     # TODO: Figure out why players ahead of you is being called just because importing guess_pot_odds or guess_pot_size, but not called twice when importing both
     # TODO: Remove the next for block when done since just used for testing
+    # TODO: Validate math and corrections implemented by src.scaling_constants and used in the HoleCards class
     for rank in VALID_RANKS_DICT.keys():
         this_rank = Rank(rank)
         print(this_rank)
