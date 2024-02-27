@@ -1,3 +1,5 @@
+from click import clear
+
 from src.guess_functions import (
     clear_console,
     guess_hole_cards_base_strength,

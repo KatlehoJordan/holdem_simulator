@@ -15,6 +15,7 @@ YELLOW_COLOR = "\033[93m"
 def clear_console() -> None:
     command = "cls" if os.name == "nt" else "clear"
     os.system(command)
+    os.system(command) # Sometimes necessary to run twice
 
 
 def flexible_input(message: str) -> str:
