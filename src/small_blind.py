@@ -1,4 +1,5 @@
 import random
+from tkinter.tix import MAX
 
 from src.bet import Bet
 from src.config import MIN_SMALL_BLIND, logger
@@ -8,10 +9,15 @@ MAX_SMALL_BLIND = 100
 
 
 class SmallBlind(Bet):
-    def __init__(self, amount: int):
-        if amount > MAX_SMALL_BLIND or amount % SMALL_BLIND_INCREMENT != 0:
+    def __init__(
+        self,
+        amount: int,
+        max_small_blind: int = MAX_SMALL_BLIND,
+        small_blind_increment: int = SMALL_BLIND_INCREMENT,
+    ):
+        if amount > max_small_blind or amount % small_blind_increment != 0:
             raise ValueError(
-                f"Amount must be less than or equal {MAX_SMALL_BLIND} and divisible by {SMALL_BLIND_INCREMENT}"
+                f"Amount must be less than or equal {max_small_blind} and divisible by {small_blind_increment}"
             )
         super().__init__(amount)
         logger.info(f"{self}")
@@ -20,10 +26,15 @@ class SmallBlind(Bet):
         return f"Small blind: {self.amount}"
 
     @classmethod
-    def make_random_small_blind(cls):
+    def select_random_small_blind(
+        cls,
+        min_small_blind: int = MIN_SMALL_BLIND,
+        max_small_blind: int = MAX_SMALL_BLIND,
+        small_blind_increment: int = SMALL_BLIND_INCREMENT,
+    ) -> "SmallBlind":
         num_increments = random.randint(
-            MIN_SMALL_BLIND // SMALL_BLIND_INCREMENT,
-            MAX_SMALL_BLIND // SMALL_BLIND_INCREMENT,
+            min_small_blind // small_blind_increment,
+            max_small_blind // small_blind_increment,
         )
-        amount = num_increments * SMALL_BLIND_INCREMENT
+        amount = num_increments * small_blind_increment
         return cls(amount)

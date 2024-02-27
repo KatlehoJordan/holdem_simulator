@@ -1,4 +1,7 @@
+from typing import Union
+
 from src.card import Card
+from src.config import logger
 from src.scaling_constants import (
     hand_shrink_factor,
     subtraction_constant_after_shrinking,
@@ -15,23 +18,27 @@ class HoleCards:
 
     def __init__(
         self,
-        card1: Card,
-        card2: Card,
+        card1: Union[Card, None] = None,
+        card2: Union[Card, None] = None,
         flush_potential_bonus: float = FLUSH_POTENTIAL_BONUS,
         pocket_pair_bonus: float = POCKET_PAIR_BONUS,
         hand_shrink_factor: float = hand_shrink_factor,
         subtraction_constant_after_shrinking: float = subtraction_constant_after_shrinking,
     ):
+        if card1 is None:
+            card1 = Card()
+        if card2 is None:
+            card2 = Card()
+        while card1.name == card2.name:
+            card2 = Card()
         if not isinstance(card1, Card):
             raise ValueError(f"card1 must be a Card, not {type(card1)}")
         if not isinstance(card2, Card):
             raise ValueError(f"card2 must be a Card, not {type(card2)}")
-        if card1 == card2:
-            raise ValueError(f"card1 and card2 must be different cards")
 
         self.hi_card, self.lo_card = determine_hi_and_lo_cards(card1, card2)
 
-        self.base_hand_strength = self.hi_card.value + self.lo_card.value
+        self.base_strength = self.hi_card.value + self.lo_card.value
 
         self.flush_potential_bonus = 0.0
         self.suit_flavor = "off suit"
@@ -54,21 +61,51 @@ class HoleCards:
             self.pocket_pair_bonus = pocket_pair_bonus
             self.hand_flavor = f"Pair of {self.hi_card.rank}s"
 
-        self.hole_cards_value = (
-            self.base_hand_strength
+        self.summed_value = (
+            self.base_strength
             + self.flush_potential_bonus
             + self.straight_potential_bonus
             + self.pocket_pair_bonus
         )
 
-        self.hole_cards_shrunk_value = self.hole_cards_value * hand_shrink_factor
+        self.hole_cards_shrunk_value = self.summed_value * hand_shrink_factor
 
         self.hole_cards_shrunk_less_constant = (
             self.hole_cards_shrunk_value - subtraction_constant_after_shrinking
         )
+        self.name = f"{self.hi_card.name} and {self.lo_card.name}"
+        logger.info("%s", self)
 
     def __str__(self):
-        return f"{self.hi_card} and {self.lo_card}"
+        return f"\n\nYour hole cards are:\n{self.hi_card.name} and {self.lo_card.name}"
+
+    def show_base_strength(self):
+        logger.info("Base strength:")
+        logger.info("%s", self.base_strength)
+
+    def show_summed_value(self):
+        logger.info("Summed value:")
+        logger.info("%s", self.summed_value)
+
+    def show_hi_card_value(self):
+        logger.info("Hi card value:")
+        logger.info("%s", self.hi_card.value)
+
+    def show_lo_card_value(self):
+        logger.info("Lo card value:")
+        logger.info("%s", self.lo_card.value)
+
+    def show_pair_bonus(self):
+        logger.info("Pair bonus:")
+        logger.info("%s", self.pocket_pair_bonus)
+
+    def show_flush_potential_bonus(self):
+        logger.info("Flush potential bonus:")
+        logger.info("%s", self.flush_potential_bonus)
+
+    def show_straight_potential_bonus(self):
+        logger.info("Straight potential bonus:")
+        logger.info("%s", self.straight_potential_bonus)
 
 
 def determine_hi_and_lo_cards(card1: Card, card2: Card) -> tuple[Card, Card]:

@@ -1,3 +1,4 @@
+import random
 from typing import Dict
 
 RAW_RANK_VALUE_STRING = "raw_rank_value"
@@ -100,4 +101,10 @@ class Rank:
         )
 
     def __str__(self):
-        return f"Rank is: {self.rank}; final rank value is: {self.final_rank_value}"
+        return f"{self.rank}"
+
+    @classmethod
+    def select_random_rank(
+        cls, valid_ranks_dict: Dict[str, Dict[str, int]] = VALID_RANKS_DICT
+    ) -> "Rank":
+        return cls(random.choice(list(valid_ranks_dict.keys())))
