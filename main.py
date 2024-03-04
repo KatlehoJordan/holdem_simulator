@@ -67,8 +67,7 @@ def main(
 
             user_input = input_with_escape_hatch(continuation_prompt)
 
-    # TODO: Check if Queens are coming out to 29 or 30 and compare to R results
-    # TODO: Implement tests that ensure known hands have expected relative ranks, as previously implemented in R
+    # TODO: Improve upon weightings so that the expected relative hand strengths are better (use the pytest tests).
     # TODO: Validate math and corrections implemented by src.scaling_constants and used in the HoleCards class
 
 

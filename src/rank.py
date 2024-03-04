@@ -96,7 +96,7 @@ class Rank:
             n_straights_weight_factor**n_possible_straights_diff
         )
 
-        self.final_rank_value = int(
+        self.final_rank_value = round(
             self.adjusted_raw_rank_value + self.adjusted_n_possible_straights
         )
 

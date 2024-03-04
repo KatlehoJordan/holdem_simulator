@@ -3,8 +3,8 @@ from typing import Union
 from src.card import Card
 from src.config import logger
 from src.scaling_constants import (
-    hand_shrink_factor,
-    subtraction_constant_after_shrinking,
+    HAND_SHRINK_FACTOR,
+    SUBTRACTION_CONSTANT_AFTER_SHRINKING,
 )
 
 FLUSH_POTENTIAL_BONUS = 8.0
@@ -22,8 +22,8 @@ class HoleCards:
         card2: Union[Card, None] = None,
         flush_potential_bonus: float = FLUSH_POTENTIAL_BONUS,
         pocket_pair_bonus: float = POCKET_PAIR_BONUS,
-        hand_shrink_factor: float = hand_shrink_factor,
-        subtraction_constant_after_shrinking: float = subtraction_constant_after_shrinking,
+        hand_shrink_factor: float = HAND_SHRINK_FACTOR,
+        subtraction_constant_after_shrinking: float = SUBTRACTION_CONSTANT_AFTER_SHRINKING,
     ):
         if card1 is None:
             card1 = Card()
@@ -42,7 +42,7 @@ class HoleCards:
 
         self.flush_potential_bonus = 0.0
         self.suit_flavor = "off suit"
-        if self.hi_card.suit == self.lo_card.suit:
+        if self.hi_card.suit.name == self.lo_card.suit.name:
             self.flush_potential_bonus = flush_potential_bonus
             self.suit_flavor = "suited"
 
@@ -73,11 +73,13 @@ class HoleCards:
         self.hole_cards_shrunk_less_constant = (
             self.hole_cards_shrunk_value - subtraction_constant_after_shrinking
         )
-        self.name = f"{self.hi_card.name} and {self.lo_card.name}"
+        hi_card_message = f"Your hi card is: {self.hi_card.name}"
+        lo_card_message = f"Your lo card is: {self.lo_card.name}"
+        self.name = f"{hi_card_message}\n{lo_card_message}"
         logger.info("%s", self)
 
     def __str__(self):
-        return f"\n\nYour hole cards are:\n{self.hi_card.name} and {self.lo_card.name}"
+        return f"\n\n{self.name}"
 
     def show_base_strength(self):
         logger.info("Base strength:")

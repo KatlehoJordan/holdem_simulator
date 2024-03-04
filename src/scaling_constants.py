@@ -9,61 +9,62 @@ PRESUMED_PROB_FOR_WEAKEST_HAND_STILL_IN_TOP_50PCT_TO_WIN_HEADS_UP = 0.5
 
 # 100
 HAND_VALUE_BONUS_FOR_HEADS_UP_BEFORE_CONVERTING_TO_EXPECTED_VALUE = 50 * 2
+
 # 200 * 0.85 = 170
-hand_value_for_aces_before_converting_to_expected_value = (
+HAND_VALUE_FOR_ACES_BEFORE_CONVERTING_TO_EXPECTED_VALUE = (
     MAX_HAND_VALUE_BEFORE_CONVERTING_TO_EXPECTED_VALUE
     * PRESUMED_PROB_FOR_ACES_TO_WIN_HEADS_UP
 )
 
 # 200 * 0.5 = 100
-hand_value_for_weakest_hand_still_in_top_50pct_before_converting_to_expected_value = (
+HAND_VALUE_FOR_WEAKEST_HAND_STILL_IN_TOP_50PCT_BEFORE_CONVERTING_TO_EXPECTED_VALUE = (
     MAX_HAND_VALUE_BEFORE_CONVERTING_TO_EXPECTED_VALUE
     * PRESUMED_PROB_FOR_WEAKEST_HAND_STILL_IN_TOP_50PCT_TO_WIN_HEADS_UP
 )
 
 
 # 170 - 100 = 70
-adjusted_value_for_aces_before_adding_for_player_count = (
-    hand_value_for_aces_before_converting_to_expected_value
+ADJUSTED_VALUE_FOR_ACES_BEFORE_ADDING_FOR_PLAYER_COUNT = (
+    HAND_VALUE_FOR_ACES_BEFORE_CONVERTING_TO_EXPECTED_VALUE
     - HAND_VALUE_BONUS_FOR_HEADS_UP_BEFORE_CONVERTING_TO_EXPECTED_VALUE
 )
 
 # 100 - 100 = 0
-adjusted_value_for_weakest_hand_still_in_top_50pct_before_adding_for_player_count = (
-    hand_value_for_weakest_hand_still_in_top_50pct_before_converting_to_expected_value
+ADJUSTED_VALUE_FOR_WEAKEST_HAND_STILL_IN_TOP_50PCT_BEFORE_ADDING_FOR_PLAYER_COUNT = (
+    HAND_VALUE_FOR_WEAKEST_HAND_STILL_IN_TOP_50PCT_BEFORE_CONVERTING_TO_EXPECTED_VALUE
     - HAND_VALUE_BONUS_FOR_HEADS_UP_BEFORE_CONVERTING_TO_EXPECTED_VALUE
 )
 
 # 150 - 37 = 113
-range_of_top_50pct_of_hands_before_shrinking = (
+RANGE_OF_TOP_50PCT_OF_HANDS_BEFORE_SHRINKING = (
     VALUE_OF_POCKET_ACES_BEFORE_SHRINKING
     - VALUE_OF_WEAKEST_HAND_STILL_IN_TOP_50PCT_OF_HANDS_BEFORE_SHRINKING
 )
 
 # 70 / 113 = 0.619469
-hand_shrink_factor = (
-    adjusted_value_for_aces_before_adding_for_player_count
-    / range_of_top_50pct_of_hands_before_shrinking
+HAND_SHRINK_FACTOR = (
+    ADJUSTED_VALUE_FOR_ACES_BEFORE_ADDING_FOR_PLAYER_COUNT
+    / RANGE_OF_TOP_50PCT_OF_HANDS_BEFORE_SHRINKING
 )
 
 # 150 * 0.619469 = 92L
-shrunk_value_of_aces = np.floor(
-    VALUE_OF_POCKET_ACES_BEFORE_SHRINKING * hand_shrink_factor
+SHRUNK_VALUE_OF_ACES = np.floor(
+    VALUE_OF_POCKET_ACES_BEFORE_SHRINKING * HAND_SHRINK_FACTOR
 )
 
 # 37L * 0.619469 = 22L
-shrunk_value_of_weakest_hand_still_in_top_50pct = np.floor(
+SHRUNK_VALUE_OF_WEAKEST_HAND_STILL_IN_TOP_50PCT = np.floor(
     VALUE_OF_WEAKEST_HAND_STILL_IN_TOP_50PCT_OF_HANDS_BEFORE_SHRINKING
-    * hand_shrink_factor
+    * HAND_SHRINK_FACTOR
 )
 
 # 92L - 70L = 22L
-subtraction_constant_after_shrinking = (
-    shrunk_value_of_aces - adjusted_value_for_aces_before_adding_for_player_count
+SUBTRACTION_CONSTANT_AFTER_SHRINKING = (
+    SHRUNK_VALUE_OF_ACES - ADJUSTED_VALUE_FOR_ACES_BEFORE_ADDING_FOR_PLAYER_COUNT
 )
 
 # 22L - 0L = 22L
-other_subtraction_constant_after_shrinking = (
-    shrunk_value_of_weakest_hand_still_in_top_50pct
-    - adjusted_value_for_weakest_hand_still_in_top_50pct_before_adding_for_player_count
+OTHER_SUBTRACTION_CONSTANT_AFTER_SHRINKING = (
+    SHRUNK_VALUE_OF_WEAKEST_HAND_STILL_IN_TOP_50PCT
+    - ADJUSTED_VALUE_FOR_WEAKEST_HAND_STILL_IN_TOP_50PCT_BEFORE_ADDING_FOR_PLAYER_COUNT
 )
