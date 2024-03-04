@@ -61,7 +61,7 @@ class HoleCards:
             self.pocket_pair_bonus = pocket_pair_bonus
             self.hand_flavor = f"Pair of {self.hi_card.rank}s"
 
-        self.summed_value = (
+        self.summed_value = round(
             self.base_strength
             + self.flush_potential_bonus
             + self.straight_potential_bonus
