@@ -9,30 +9,45 @@ from src.scaling_constants import (
 )
 from src.suit import Suit
 
-ACE_OF_SPADES = Card(rank=Rank("Ace"), suit=Suit("Spades"))
-ACE_OF_DIAMONDS = Card(rank=Rank("Ace"), suit=Suit("Diamonds"))
-PAIR_OF_ACES = HoleCards(card1=ACE_OF_SPADES, card2=ACE_OF_DIAMONDS)
+FIVE_OF_SPADES = Card(rank=Rank("5"), suit=Suit("Spades"))
+FIVE_OF_DIAMONDS = Card(rank=Rank("5"), suit=Suit("Diamonds"))
+PAIR_OF_FIVES = HoleCards(card1=FIVE_OF_SPADES, card2=FIVE_OF_DIAMONDS)
 
-EIGHT_OF_SPADES = Card(rank=Rank("8"), suit=Suit("Spades"))
-EIGHT_OF_DIAMONDS = Card(rank=Rank("8"), suit=Suit("Diamonds"))
-PAIR_OF_EIGHTS = HoleCards(card1=EIGHT_OF_SPADES, card2=EIGHT_OF_DIAMONDS)
+KING_OF_SPADES = Card(rank=Rank("King"), suit=Suit("Spades"))
+QUEEN_OF_SPADES = Card(rank=Rank("Queen"), suit=Suit("Spades"))
+KING_QUEEN_SUITED = HoleCards(card1=KING_OF_SPADES, card2=QUEEN_OF_SPADES)
 
-QUEEN_OF_DIAMONDS = Card(rank=Rank("Queen"), suit=Suit("Diamonds"))
-ACE_QUEEN_OFF_SUIT = HoleCards(card1=ACE_OF_SPADES, card2=QUEEN_OF_DIAMONDS)
-
-JACK_OF_SPADES = Card(rank=Rank("Jack"), suit=Suit("Spades"))
-ACE_JACK_SUITED = HoleCards(card1=ACE_OF_SPADES, card2=JACK_OF_SPADES)
-
-TEN_OF_DIAMONDS = Card(rank=Rank("10"), suit=Suit("Diamonds"))
-ACE_TEN_OFF_SUIT = HoleCards(card1=ACE_OF_SPADES, card2=TEN_OF_DIAMONDS)
-
-NINE_OF_SPADES = Card(rank=Rank("9"), suit=Suit("Spades"))
-ACE_NINE_SUITED = HoleCards(card1=ACE_OF_SPADES, card2=NINE_OF_SPADES)
+FOUR_OF_SPADES = Card(rank=Rank("4"), suit=Suit("Spades"))
+FOUR_OF_DIAMONDS = Card(rank=Rank("4"), suit=Suit("Diamonds"))
+PAIR_OF_FOURS = HoleCards(card1=FOUR_OF_SPADES, card2=FOUR_OF_DIAMONDS)
+FIVE_FOUR_SUITED = HoleCards(card1=FIVE_OF_SPADES, card2=FOUR_OF_SPADES)
 
 TWO_OF_SPADES = Card(rank=Rank("2"), suit=Suit("Spades"))
 TWO_OF_DIAMONDS = Card(rank=Rank("2"), suit=Suit("Diamonds"))
 PAIR_OF_TWOS = HoleCards(card1=TWO_OF_SPADES, card2=TWO_OF_DIAMONDS)
 
+QUEEN_OF_DIAMONDS = Card(rank=Rank("Queen"), suit=Suit("Diamonds"))
+KING_QUEEN_OFF_SUIT = HoleCards(card1=KING_OF_SPADES, card2=QUEEN_OF_DIAMONDS)
+
+THREE_OF_SPADES = Card(rank=Rank("3"), suit=Suit("Spades"))
+FOUR_THREE_SUITED = HoleCards(card1=FOUR_OF_SPADES, card2=THREE_OF_SPADES)
+
+###############
+
+
+ACE_OF_SPADES = Card(rank=Rank("Ace"), suit=Suit("Spades"))
+ACE_OF_DIAMONDS = Card(rank=Rank("Ace"), suit=Suit("Diamonds"))
+PAIR_OF_ACES = HoleCards(card1=ACE_OF_SPADES, card2=ACE_OF_DIAMONDS)
+ACE_QUEEN_OFF_SUIT = HoleCards(card1=ACE_OF_SPADES, card2=QUEEN_OF_DIAMONDS)
+
+JACK_OF_SPADES = Card(rank=Rank("Jack"), suit=Suit("Spades"))
+ACE_JACK_SUITED = HoleCards(card1=ACE_OF_SPADES, card2=JACK_OF_SPADES)
+
+NINE_OF_SPADES = Card(rank=Rank("9"), suit=Suit("Spades"))
+ACE_NINE_SUITED = HoleCards(card1=ACE_OF_SPADES, card2=NINE_OF_SPADES)
+
+
+EIGHT_OF_SPADES = Card(rank=Rank("8"), suit=Suit("Spades"))
 SEVEN_OF_SPADES = Card(rank=Rank("7"), suit=Suit("Spades"))
 EIGHT_SEVEN_SUITED = HoleCards(card1=EIGHT_OF_SPADES, card2=SEVEN_OF_SPADES)
 
@@ -42,23 +57,19 @@ SIX_OF_SPADES = Card(rank=Rank("6"), suit=Suit("Spades"))
 FIVE_OF_DIAMONDS = Card(rank=Rank("5"), suit=Suit("Diamonds"))
 SIX_FIVE_OFF_SUIT = HoleCards(card1=SIX_OF_SPADES, card2=FIVE_OF_DIAMONDS)
 
-FIVE_OF_SPADES = Card(rank=Rank("5"), suit=Suit("Spades"))
-FOUR_OF_SPADES = Card(rank=Rank("4"), suit=Suit("Spades"))
-FIVE_FOUR_SUITED = HoleCards(card1=FIVE_OF_SPADES, card2=FOUR_OF_SPADES)
 
 FOUR_TWO_OFF_SUIT = HoleCards(card1=FOUR_OF_SPADES, card2=TWO_OF_DIAMONDS)
 
-THREE_OF_SPADES = Card(rank=Rank("3"), suit=Suit("Spades"))
-FOUR_THREE_SUITED = HoleCards(card1=FOUR_OF_SPADES, card2=THREE_OF_SPADES)
 
 THREE_OF_SPADES = Card(rank=Rank("3"), suit=Suit("Spades"))
 THREE_TWO_OFF_SUIT = HoleCards(card1=THREE_OF_SPADES, card2=TWO_OF_DIAMONDS)
 
 
 def test_pair_bonus():
-    assert PAIR_OF_EIGHTS.summed_value > ACE_QUEEN_OFF_SUIT.summed_value
+    assert PAIR_OF_FIVES.summed_value > KING_QUEEN_SUITED.summed_value
+    assert KING_QUEEN_SUITED.summed_value > PAIR_OF_FOURS.summed_value
     assert FIVE_FOUR_SUITED.summed_value > PAIR_OF_TWOS.summed_value
-    assert PAIR_OF_TWOS.summed_value > ACE_TEN_OFF_SUIT.summed_value
+    assert PAIR_OF_TWOS.summed_value > KING_QUEEN_OFF_SUIT.summed_value
     assert PAIR_OF_TWOS.summed_value > FOUR_THREE_SUITED.summed_value
 
 

@@ -1,6 +1,6 @@
 import random
 
-VALID_SUITS = ["Clubs", "Diamonds", "Hearts", "Spades"]
+from src.config import VALID_SUITS
 
 
 class Suit:
