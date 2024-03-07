@@ -67,9 +67,7 @@ def main(
 
             user_input = input_with_escape_hatch(continuation_prompt)
 
-    # TODO: Improve upon weightings so that the expected relative hand strengths are better (use the pytest tests). Actually, I think a better way is to simulate 1000s of games with random hands and then figure out the proportion of hands won with any given hold'em cards. Then, use that proportion to determine the relative strength of the hands. This is a Monte Carlo simulation.
-    # TODO: Use deck, hole_cards, and n_players to distribute hole_cards to n_players.
-    # TODO: Create community cards class that has flop, turn, and river.
+    # TODO: Continue developing named_hands.py as per below.
     # TODO: Create player_hand class that has hole_cards and community_cards as well as best hand. Best hand is determined by the best 5 cards out of 7. Best hand can be one of the following: straight flush, four of a kind (plus kicker), full house, flush, straight, three of a kind (with 2 kickers), two pair (with 1 kicker), pair (with 3 kickers), high card (with 4 kickers).
     # Straight flush if there are 5 cards in a row of the same suit
     # Four of a kind if there are 4 cards of the same rank
@@ -80,6 +78,9 @@ def main(
     # Two pair is if there are 2 cards of the same rank and 2 cards of the same rank
     # Pair is if there are 2 cards of the same rank
     # High card is if there are no other combinations
+    # TODO: Improve upon weightings so that the expected relative hand strengths are better (use the pytest tests). Actually, I think a better way is to simulate 1000s of games with random hands and then figure out the proportion of hands won with any given hold'em cards. Then, use that proportion to determine the relative strength of the hands. This is a Monte Carlo simulation.
+    # TODO: Use deck, hole_cards, and n_players to distribute hole_cards to n_players.
+    # TODO: Create community cards class that has flop, turn, and river.
 
     # TODO: (Maybe deprecated) Validate math and corrections implemented by src.scaling_constants and used in the HoleCards class
 

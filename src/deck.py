@@ -28,5 +28,5 @@ class Deck:
             r = random.randint(0, i)
             self.cards[i], self.cards[r] = self.cards[r], self.cards[i]
 
-    def drawCard(self):
+    def draw_card(self):
         return self.cards.pop()
