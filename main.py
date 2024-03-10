@@ -84,6 +84,7 @@ def main(
     # TODO: Create community cards class that has flop, turn, and river.
 
     # TODO: (Maybe deprecated) Validate math and corrections implemented by src.scaling_constants and used in the HoleCards class
+    # TODO: Get python debugger launch.json configuration working for a given file so that do not have to always bake logic into main.py
 
 
 if __name__ == "__main__":

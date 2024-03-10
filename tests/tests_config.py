@@ -2,6 +2,7 @@ from src.card import Card
 from src.rank import Rank
 from src.suit import Suit
 
+
 TWO_OF_SPADES = Card(Suit("Spades"), Rank("2"))
 THREE_OF_SPADES = Card(Suit("Spades"), Rank("3"))
 FOUR_OF_SPADES = Card(Suit("Spades"), Rank("4"))

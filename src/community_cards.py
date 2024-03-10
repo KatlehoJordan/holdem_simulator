@@ -15,9 +15,9 @@ class CommunityCards:
         card4: Union[Card, None] = None,
         card5: Union[Card, None] = None,
     ):
-        self.cards = [card1, card2, card3, card4, card5]
         self.cards = [
-            card if isinstance(card, Card) else deck.draw_card() for card in self.cards
+            card if isinstance(card, Card) else deck.draw_card()
+            for card in [card1, card2, card3, card4, card5]
         ]
 
         card_names = [card.name for card in self.cards]

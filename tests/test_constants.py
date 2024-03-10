@@ -1,3 +1,4 @@
+from src.deck import Deck
 from src.hole_cards import HoleCards
 from src.scaling_constants import (
     OTHER_SUBTRACTION_CONSTANT_AFTER_SHRINKING,
@@ -25,22 +26,32 @@ from tests.tests_config import (
     TWO_OF_SPADES,
 )
 
-PAIR_OF_FIVES = HoleCards(card1=FIVE_OF_SPADES, card2=FIVE_OF_DIAMONDS)
-KING_QUEEN_SUITED = HoleCards(card1=KING_OF_SPADES, card2=QUEEN_OF_SPADES)
-PAIR_OF_FOURS = HoleCards(card1=FOUR_OF_SPADES, card2=FOUR_OF_DIAMONDS)
-FIVE_FOUR_SUITED = HoleCards(card1=FIVE_OF_SPADES, card2=FOUR_OF_SPADES)
-PAIR_OF_TWOS = HoleCards(card1=TWO_OF_SPADES, card2=TWO_OF_DIAMONDS)
-KING_QUEEN_OFF_SUIT = HoleCards(card1=KING_OF_SPADES, card2=QUEEN_OF_DIAMONDS)
-FOUR_THREE_SUITED = HoleCards(card1=FOUR_OF_SPADES, card2=THREE_OF_SPADES)
-PAIR_OF_ACES = HoleCards(card1=ACE_OF_SPADES, card2=ACE_OF_DIAMONDS)
-ACE_QUEEN_OFF_SUIT = HoleCards(card1=ACE_OF_SPADES, card2=QUEEN_OF_DIAMONDS)
-ACE_JACK_SUITED = HoleCards(card1=ACE_OF_SPADES, card2=JACK_OF_SPADES)
-ACE_NINE_SUITED = HoleCards(card1=ACE_OF_SPADES, card2=NINE_OF_SPADES)
-EIGHT_SEVEN_SUITED = HoleCards(card1=EIGHT_OF_SPADES, card2=SEVEN_OF_SPADES)
-SEVEN_TWO_OFF_SUIT = HoleCards(card1=SEVEN_OF_SPADES, card2=TWO_OF_DIAMONDS)
-SIX_FIVE_OFF_SUIT = HoleCards(card1=SIX_OF_SPADES, card2=FIVE_OF_DIAMONDS)
-FOUR_TWO_OFF_SUIT = HoleCards(card1=FOUR_OF_SPADES, card2=TWO_OF_DIAMONDS)
-THREE_TWO_OFF_SUIT = HoleCards(card1=THREE_OF_SPADES, card2=TWO_OF_DIAMONDS)
+PAIR_OF_FIVES = HoleCards(deck=Deck(), card1=FIVE_OF_SPADES, card2=FIVE_OF_DIAMONDS)
+KING_QUEEN_SUITED = HoleCards(deck=Deck(), card1=KING_OF_SPADES, card2=QUEEN_OF_SPADES)
+PAIR_OF_FOURS = HoleCards(deck=Deck(), card1=FOUR_OF_SPADES, card2=FOUR_OF_DIAMONDS)
+FIVE_FOUR_SUITED = HoleCards(deck=Deck(), card1=FIVE_OF_SPADES, card2=FOUR_OF_SPADES)
+PAIR_OF_TWOS = HoleCards(deck=Deck(), card1=TWO_OF_SPADES, card2=TWO_OF_DIAMONDS)
+KING_QUEEN_OFF_SUIT = HoleCards(
+    deck=Deck(), card1=KING_OF_SPADES, card2=QUEEN_OF_DIAMONDS
+)
+FOUR_THREE_SUITED = HoleCards(deck=Deck(), card1=FOUR_OF_SPADES, card2=THREE_OF_SPADES)
+PAIR_OF_ACES = HoleCards(deck=Deck(), card1=ACE_OF_SPADES, card2=ACE_OF_DIAMONDS)
+ACE_QUEEN_OFF_SUIT = HoleCards(
+    deck=Deck(), card1=ACE_OF_SPADES, card2=QUEEN_OF_DIAMONDS
+)
+ACE_JACK_SUITED = HoleCards(deck=Deck(), card1=ACE_OF_SPADES, card2=JACK_OF_SPADES)
+ACE_NINE_SUITED = HoleCards(deck=Deck(), card1=ACE_OF_SPADES, card2=NINE_OF_SPADES)
+EIGHT_SEVEN_SUITED = HoleCards(
+    deck=Deck(), card1=EIGHT_OF_SPADES, card2=SEVEN_OF_SPADES
+)
+SEVEN_TWO_OFF_SUIT = HoleCards(
+    deck=Deck(), card1=SEVEN_OF_SPADES, card2=TWO_OF_DIAMONDS
+)
+SIX_FIVE_OFF_SUIT = HoleCards(deck=Deck(), card1=SIX_OF_SPADES, card2=FIVE_OF_DIAMONDS)
+FOUR_TWO_OFF_SUIT = HoleCards(deck=Deck(), card1=FOUR_OF_SPADES, card2=TWO_OF_DIAMONDS)
+THREE_TWO_OFF_SUIT = HoleCards(
+    deck=Deck(), card1=THREE_OF_SPADES, card2=TWO_OF_DIAMONDS
+)
 
 
 def test_pair_bonus():
