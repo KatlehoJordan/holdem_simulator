@@ -2,15 +2,23 @@ from collections import Counter
 from typing import List, Tuple
 
 from src.card import Card
+from src.community_cards import CommunityCards
 from src.config import logger
+from src.hole_cards import HoleCards
 
 
 # TODO: Modify the implementation of this so that it is a list of cards that includes HoleCards and CommunityCards
 class PlayerHand:
-    def __init__(self, cards: List[Card]):
-        if len(cards) != 7:
-            raise ValueError("A PlayerHand must have exactly 7 cards.")
-        self.cards = cards
+    # def __init__(self, cards: List[Card]):
+    def __init__(self, hole_cards: HoleCards, community_cards: CommunityCards):
+        if not isinstance(hole_cards, HoleCards):
+            raise ValueError(f"hole_cards must be a HoleCards, not {type(hole_cards)}")
+        if not isinstance(community_cards, CommunityCards):
+            raise ValueError(
+                f"community_cards must be a CommunityCards, not {type(community_cards)}"
+            )
+        # self.cards = cards
+        self.cards = [hole_cards.hi_card, hole_cards.lo_card] + [community_cards.cards]
         self.name = ""
 
         try:

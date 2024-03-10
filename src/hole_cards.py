@@ -2,6 +2,7 @@ from typing import Union
 
 from src.card import Card
 from src.config import logger
+from src.deck import Deck
 from src.scaling_constants import (
     HAND_SHRINK_FACTOR,
     SUBTRACTION_CONSTANT_AFTER_SHRINKING,
@@ -18,6 +19,7 @@ class HoleCards:
 
     def __init__(
         self,
+        deck: Deck,
         card1: Union[Card, None] = None,
         card2: Union[Card, None] = None,
         flush_potential_bonus: float = FLUSH_POTENTIAL_BONUS,
@@ -25,16 +27,22 @@ class HoleCards:
         hand_shrink_factor: float = HAND_SHRINK_FACTOR,
         subtraction_constant_after_shrinking: float = SUBTRACTION_CONSTANT_AFTER_SHRINKING,
     ):
-        if card1 is None:
-            card1 = Card()
-        if card2 is None:
-            card2 = Card()
-        while card1.name == card2.name:
-            card2 = Card()
-        if not isinstance(card1, Card):
-            raise ValueError(f"card1 must be a Card, not {type(card1)}")
-        if not isinstance(card2, Card):
-            raise ValueError(f"card2 must be a Card, not {type(card2)}")
+        if not isinstance(deck, Deck):
+            raise ValueError(f"deck must be a Deck, not {type(deck)}")
+        cards = [card1, card2]
+        cards = [card if isinstance(card, Card) else deck.draw_card() for card in cards]
+
+        card_names = [card.name for card in cards]
+        for ith_card, card in enumerate(cards):
+            while card_names.count(card.name) > 1:
+                new_card = deck.draw_card()
+                cards[ith_card] = new_card
+                card_names[ith_card] = new_card.name
+
+        card1, card2 = cards
+        for ith_card, card in enumerate(cards, start=1):
+            if not isinstance(card, Card):
+                raise ValueError(f"card{ith_card} must be a Card, not {type(card)}")
 
         self.hi_card, self.lo_card = determine_hi_and_lo_cards(card1, card2)
 

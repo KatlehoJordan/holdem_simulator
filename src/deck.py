@@ -12,21 +12,21 @@ class Deck:
         self.build()
         self.shuffle()
 
-    def build(self):
+    def build(self) -> None:
         for suit in VALID_SUITS:
             for rank in VALID_RANKS_DICT.keys():
                 self.cards.append(Card(Suit(suit), Rank(rank)))
 
-    def show(self):
+    def show(self) -> None:
         i = 0
         for card in self.cards:
             i += 1
             print(f"Card {i} is {card}")
 
-    def shuffle(self):
+    def shuffle(self) -> None:
         for i in range(len(self.cards) - 1, 0, -1):
             r = random.randint(0, i)
             self.cards[i], self.cards[r] = self.cards[r], self.cards[i]
 
-    def draw_card(self):
+    def draw_card(self) -> Card:
         return self.cards.pop()
