@@ -5,16 +5,16 @@ from src.card import Card
 from src.config import logger
 
 
-class NamedHand:
+# TODO: Modify the implementation of this so that it is a list of cards that includes HoleCards and CommunityCards
+class PlayerHand:
     def __init__(self, cards: List[Card]):
         if len(cards) != 7:
-            raise ValueError("A NamedHand must have exactly 7 cards.")
+            raise ValueError("A PlayerHand must have exactly 7 cards.")
         self.cards = cards
+        self.name = ""
 
         try:
-            self.suit, self.flush_cards = validate_flush(self)
-            self.max_rank = validate_straight(self.flush_cards)
-            self.name = f"Straight Flush, {self.max_rank} high in {self.suit}."
+            self.name = validate_straight_flush(self)
         except ValueError as e:
             logger.error(e)
             raise
@@ -23,14 +23,14 @@ class NamedHand:
         return f"{self.name}"
 
 
-def validate_flush(named_hand: NamedHand) -> Tuple[str, List[Card]]:
-    suits = [card.suit.name for card in named_hand.cards]
+def validate_flush(player_hand: PlayerHand) -> Tuple[str, List[Card]]:
+    suits = [card.suit.name for card in player_hand.cards]
     suit_counts = Counter(suits)
     most_common_suit = suit_counts.most_common(1)[0][0]
     if suit_counts[most_common_suit] < 5:
         raise ValueError("At least 5 cards must have the same suit.")
     flush_cards = [
-        card for card in named_hand.cards if card.suit.name == most_common_suit
+        card for card in player_hand.cards if card.suit.name == most_common_suit
     ]
     suit = most_common_suit
 
@@ -67,33 +67,8 @@ def validate_straight(list_of_cards: List[Card]) -> int:
     return rank_of_max_card_in_straight
 
 
-# TODO: Turn all of these into test cases
-my_low_straight_flush = [
-    Card(Suit("Hearts"), Rank("2")),
-    Card(Suit("Hearts"), Rank("3")),
-    Card(Suit("Hearts"), Rank("4")),
-    Card(Suit("Hearts"), Rank("5")),
-    Card(Suit("Hearts"), Rank("9")),
-    Card(Suit("Hearts"), Rank("10")),
-    Card(Suit("Hearts"), Rank("Ace")),
-]
-
-my_med_straight_flush = [
-    Card(Suit("Hearts"), Rank("2")),
-    Card(Suit("Hearts"), Rank("5")),
-    Card(Suit("Hearts"), Rank("6")),
-    Card(Suit("Hearts"), Rank("7")),
-    Card(Suit("Hearts"), Rank("8")),
-    Card(Suit("Hearts"), Rank("9")),
-    Card(Suit("Hearts"), Rank("Ace")),
-]
-
-my_high_straight_flush = [
-    Card(Suit("Hearts"), Rank("2")),
-    Card(Suit("Hearts"), Rank("3")),
-    Card(Suit("Hearts"), Rank("10")),
-    Card(Suit("Hearts"), Rank("Jack")),
-    Card(Suit("Hearts"), Rank("Queen")),
-    Card(Suit("Hearts"), Rank("King")),
-    Card(Suit("Hearts"), Rank("Ace")),
-]
+def validate_straight_flush(player_hand: PlayerHand) -> str:
+    suit, flush_cards = validate_flush(player_hand)
+    max_rank = validate_straight(flush_cards)
+    name = f"Straight Flush, {max_rank} high in {suit}."
+    return name
