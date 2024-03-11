@@ -4,6 +4,7 @@ from src.community_cards import CommunityCards
 from src.deck import Deck
 from src.hole_cards import HoleCards
 from src.player_hand import PlayerHand
+from src.straight_flush import StraightFlush
 from tests.tests_config import (
     ACE_OF_SPADES,
     EIGHT_OF_SPADES,
@@ -79,13 +80,22 @@ NO_FLUSH_NOR_STRAIGHT = CommunityCards(
 
 
 def test_validate_straight_flush():
-    assert PlayerHand(hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_LOW)
-    assert PlayerHand(hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_MED)
-    assert PlayerHand(hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_HI)
+    test_cases = [
+        (STRAIGHT_FLUSH_LOW, True),
+        (STRAIGHT_FLUSH_MED, True),
+        (STRAIGHT_FLUSH_HI, True),
+        (STRAIGHT_NO_FLUSH, False),
+        (FLUSH_NO_STRAIGHT, False),
+        (NO_FLUSH_NOR_STRAIGHT, False),
+    ]
 
-    with pytest.raises(ValueError):
-        PlayerHand(hole_cards=HOLE_CARDS, community_cards=STRAIGHT_NO_FLUSH)
-    with pytest.raises(ValueError):
-        PlayerHand(hole_cards=HOLE_CARDS, community_cards=FLUSH_NO_STRAIGHT)
-    with pytest.raises(ValueError):
-        PlayerHand(hole_cards=HOLE_CARDS, community_cards=NO_FLUSH_NOR_STRAIGHT)
+    for community_cards, expected in test_cases:
+        assert (
+            isinstance(
+                PlayerHand(
+                    hole_cards=HOLE_CARDS, community_cards=community_cards
+                ).hand_type,
+                StraightFlush,
+            )
+            is expected
+        )
