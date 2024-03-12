@@ -99,3 +99,27 @@ def test_validate_straight_flush():
             )
             is expected
         )
+
+
+def test_straight_flush_winners():
+    straight_flush_low = PlayerHand(
+        hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_LOW
+    ).hand_type
+    straight_flush_med = PlayerHand(
+        hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_MED
+    ).hand_type
+    straight_flush_hi = PlayerHand(
+        hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_HI
+    ).hand_type
+
+    assert straight_flush_low.hand_type_score == straight_flush_med.hand_type_score  # type: ignore
+    assert straight_flush_med.hand_type_score == straight_flush_hi.hand_type_score  # type: ignore
+
+    assert (
+        straight_flush_low.high_card_raw_rank_value  # type: ignore
+        < straight_flush_med.high_card_raw_rank_value  # type: ignore
+    )
+    assert (
+        straight_flush_med.high_card_raw_rank_value  # type: ignore
+        < straight_flush_hi.high_card_raw_rank_value  # type: ignore
+    )

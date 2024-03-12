@@ -35,7 +35,7 @@ class PlayerHand:
         return f"{self.hand_type}"
 
 
-def validate_flush(player_hand: PlayerHand) -> Tuple[bool, str, List[Card]]:
+def validate_flush(player_hand: PlayerHand) -> Tuple[bool, str, List[Card], str]:
     suits = [card.suit.name for card in player_hand.cards]
     suit_counts = Counter(suits)
     most_common_suit = suit_counts.most_common(1)[0][0]
@@ -51,11 +51,15 @@ def validate_flush(player_hand: PlayerHand) -> Tuple[bool, str, List[Card]]:
         flush_found = False
     else:
         flush_found = True
+    sorted_raw_rank_values = sorted(
+        card.rank.raw_rank_value for card in player_hand.cards
+    )
+    name = f"Flush, {sorted_raw_rank_values[-1]}, {sorted_raw_rank_values[-2]}, {sorted_raw_rank_values[-3]}, {sorted_raw_rank_values[-4]}, {sorted_raw_rank_values[-5]}, in {most_common_suit}."
 
-    return flush_found, most_common_suit, flush_cards
+    return flush_found, most_common_suit, flush_cards, name
 
 
-def validate_straight(list_of_cards: List[Card]) -> Tuple[bool, int]:
+def validate_straight(list_of_cards: List[Card]) -> Tuple[bool, int, str]:
     sorted_raw_rank_values = sorted(card.rank.raw_rank_value for card in list_of_cards)
 
     if max(sorted_raw_rank_values) == 14:
@@ -80,18 +84,21 @@ def validate_straight(list_of_cards: List[Card]) -> Tuple[bool, int]:
         straight_found = False
     else:
         straight_found = True
+    name = f"Straight, {rank_of_max_card_in_straight} high."
 
-    return straight_found, rank_of_max_card_in_straight
+    return straight_found, rank_of_max_card_in_straight, name
 
 
 def validate_straight_flush(player_hand: PlayerHand) -> Tuple[bool, int, str]:
-    flush_found, suit, flush_cards = validate_flush(player_hand)
-    straight_found, max_rank = validate_straight(flush_cards)
+    flush_found, suit, flush_cards, _ = validate_flush(player_hand)
+    straight_found, rank_of_max_card_in_straight_flush, _ = validate_straight(
+        flush_cards
+    )
 
     if flush_found and straight_found:
         straight_flush_found = True
     else:
         straight_flush_found = False
 
-    name = f"Straight Flush, {max_rank} high in {suit}."
-    return straight_flush_found, max_rank, name
+    name = f"Straight Flush, {rank_of_max_card_in_straight_flush} high in {suit}."
+    return straight_flush_found, rank_of_max_card_in_straight_flush, name
