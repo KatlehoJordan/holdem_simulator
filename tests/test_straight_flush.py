@@ -42,6 +42,15 @@ STRAIGHT_FLUSH_MULTIPLE = CommunityCards(
     card5=ACE_OF_SPADES,
 )
 
+STRAIGHT_FLUSH_TIE = CommunityCards(
+    deck=Deck(),
+    card1=FOUR_OF_SPADES,
+    card2=FIVE_OF_SPADES,
+    card3=EIGHT_OF_SPADES,
+    card4=NINE_OF_SPADES,
+    card5=ACE_OF_SPADES,
+)
+
 STRAIGHT_FLUSH_MED = CommunityCards(
     deck=Deck(),
     card1=FIVE_OF_SPADES,
@@ -92,6 +101,7 @@ def test_validate_straight_flush():
     test_cases = [
         (STRAIGHT_FLUSH_LOW, True),
         (STRAIGHT_FLUSH_MULTIPLE, True),
+        (STRAIGHT_FLUSH_TIE, True),
         (STRAIGHT_FLUSH_MED, True),
         (STRAIGHT_FLUSH_HI, True),
         (STRAIGHT_NO_FLUSH, False),
@@ -115,6 +125,9 @@ def test_straight_flush_winners():
     straight_flush_low = PlayerHand(
         hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_LOW
     ).hand_type
+    straight_flush_tie = PlayerHand(
+        hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_TIE
+    ).hand_type
     straight_flush_multiple = PlayerHand(
         hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_MULTIPLE
     ).hand_type
@@ -127,6 +140,7 @@ def test_straight_flush_winners():
     # TODO: Remove type: ignore comments after full implementation in player_hand
     hand_type_scores = [
         straight_flush_low.hand_type_score,  # type: ignore
+        straight_flush_tie.hand_type_score,  # type: ignore
         straight_flush_multiple.hand_type_score,  # type: ignore
         straight_flush_med.hand_type_score,  # type: ignore
         straight_flush_hi.hand_type_score,  # type: ignore
@@ -142,3 +156,4 @@ def test_straight_flush_winners():
     ]
 
     assert top_ranks == sorted(top_ranks)
+    assert straight_flush_low.top_ranks == straight_flush_tie.top_ranks  # type: ignore
