@@ -33,6 +33,15 @@ STRAIGHT_FLUSH_LOW = CommunityCards(
     card5=ACE_OF_SPADES,
 )
 
+STRAIGHT_FLUSH_MULTIPLE = CommunityCards(
+    deck=Deck(),
+    card1=FOUR_OF_SPADES,
+    card2=FIVE_OF_SPADES,
+    card3=SIX_OF_SPADES,
+    card4=SEVEN_OF_SPADES,
+    card5=ACE_OF_SPADES,
+)
+
 STRAIGHT_FLUSH_MED = CommunityCards(
     deck=Deck(),
     card1=FIVE_OF_SPADES,
@@ -82,6 +91,7 @@ NO_FLUSH_NOR_STRAIGHT = CommunityCards(
 def test_validate_straight_flush():
     test_cases = [
         (STRAIGHT_FLUSH_LOW, True),
+        (STRAIGHT_FLUSH_MULTIPLE, True),
         (STRAIGHT_FLUSH_MED, True),
         (STRAIGHT_FLUSH_HI, True),
         (STRAIGHT_NO_FLUSH, False),
@@ -105,21 +115,30 @@ def test_straight_flush_winners():
     straight_flush_low = PlayerHand(
         hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_LOW
     ).hand_type
+    straight_flush_multiple = PlayerHand(
+        hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_MULTIPLE
+    ).hand_type
     straight_flush_med = PlayerHand(
         hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_MED
     ).hand_type
     straight_flush_hi = PlayerHand(
         hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_HI
     ).hand_type
+    # TODO: Remove type: ignore comments after full implementation in player_hand
+    hand_type_scores = [
+        straight_flush_low.hand_type_score,  # type: ignore
+        straight_flush_multiple.hand_type_score,  # type: ignore
+        straight_flush_med.hand_type_score,  # type: ignore
+        straight_flush_hi.hand_type_score,  # type: ignore
+    ]
 
-    assert straight_flush_low.hand_type_score == straight_flush_med.hand_type_score  # type: ignore
-    assert straight_flush_med.hand_type_score == straight_flush_hi.hand_type_score  # type: ignore
+    assert all(score == hand_type_scores[0] for score in hand_type_scores)
 
-    assert (
-        straight_flush_low.high_card_raw_rank_value  # type: ignore
-        < straight_flush_med.high_card_raw_rank_value  # type: ignore
-    )
-    assert (
-        straight_flush_med.high_card_raw_rank_value  # type: ignore
-        < straight_flush_hi.high_card_raw_rank_value  # type: ignore
-    )
+    top_ranks = [
+        straight_flush_low.top_ranks[~0],  # type: ignore
+        straight_flush_multiple.top_ranks[~0],  # type: ignore
+        straight_flush_med.top_ranks[~0],  # type: ignore
+        straight_flush_hi.top_ranks[~0],  # type: ignore
+    ]
+
+    assert top_ranks == sorted(top_ranks)

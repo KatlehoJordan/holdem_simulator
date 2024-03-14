@@ -1,7 +1,11 @@
 from typing import Union
 
 from src.card import Card
-from src.config import logger
+from src.config import (
+    ACE_AS_LOW_RAW_RANK_VALUE,
+    NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
+    logger,
+)
 from src.deck import Deck
 from src.scaling_constants import (
     HAND_SHRINK_FACTOR,
@@ -11,8 +15,6 @@ from src.scaling_constants import (
 FLUSH_POTENTIAL_BONUS = 8.0
 POCKET_PAIR_BONUS = 66.0
 STRAIGHT_POTENTIAL_BONUS_FACTOR = 1.0
-NUMBER_OF_CARDS_IN_A_STRAIGHT = 5
-ACE_AS_LOW_RAW_RANK_VALUE = 1
 
 
 class HoleCards:
@@ -142,7 +144,7 @@ def determine_hi_and_lo_cards(card1: Card, card2: Card) -> tuple[Card, Card]:
 def calculate_straight_potential_bonus(
     rank_diff: int,
     straight_potential_bonus_factor: float = STRAIGHT_POTENTIAL_BONUS_FACTOR,
-    number_of_cards_in_a_straight: int = NUMBER_OF_CARDS_IN_A_STRAIGHT,
+    number_of_cards_in_a_straight: int = NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
 ):
     return straight_potential_bonus_factor * abs(
         rank_diff - number_of_cards_in_a_straight
@@ -152,7 +154,7 @@ def calculate_straight_potential_bonus(
 def determine_pocket_pair_or_straight_potential_bonus(
     hi_card: Card,
     lo_card: Card,
-    number_of_cards_in_a_straight: int = NUMBER_OF_CARDS_IN_A_STRAIGHT,
+    number_of_cards_in_a_straight: int = NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
     ace_as_low_raw_rank_value: int = ACE_AS_LOW_RAW_RANK_VALUE,
 ):
     rank_diff = hi_card.rank.raw_rank_value - lo_card.rank.raw_rank_value

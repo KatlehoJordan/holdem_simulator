@@ -16,9 +16,13 @@ class PlayerHand:
         self.cards = [hole_cards.hi_card, hole_cards.lo_card] + community_cards.cards
 
         # TODO: If validate_straight_flush is true, then capture hand type == straight flush, and that straight_flush will have attributes: 1) hand_type_score == 8 and 2) high card raw rank value.
-        straight_flush_found, max_rank, name = validate_straight_flush(self.cards)
+        straight_flush_found, top_ranks_in_straight_flush, name = (
+            validate_straight_flush(self.cards)
+        )
         if straight_flush_found:
-            self.hand_type = StraightFlush(high_card_raw_rank_value=max_rank, name=name)
+            self.hand_type = StraightFlush(
+                top_ranks_in_straight_flush=top_ranks_in_straight_flush, name=name
+            )
         else:
             # TODO: populate with next hand type
             self.hand_type = None
