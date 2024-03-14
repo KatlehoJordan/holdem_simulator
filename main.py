@@ -1,5 +1,6 @@
 from click import clear
 
+from src.deck import Deck
 from src.guess_functions import (
     clear_console,
     guess_hole_cards_base_strength,
@@ -15,7 +16,6 @@ from src.guess_functions import (
 )
 from src.hand import Hand
 from src.hole_cards import HoleCards
-from src.rank import VALID_RANKS_DICT, Rank
 
 COMMON_PROMPT = """
 'y' or enter for yes
@@ -54,7 +54,8 @@ def main(
             # TODO: (Maybe deprecated) Determine how to re-implement the following functions
             # cutoffs = make_cutoffs_based_on_n_players_df()
             # guess_n_players_beat(p_hand, cutoffs)
-            hole_cards = HoleCards()
+            deck = Deck()
+            hole_cards = HoleCards(deck=deck)
             guess_hole_cards_summed_value(hole_cards)
             guess_hole_cards_hi_card_value(hole_cards)
             guess_hole_cards_lo_card_value(hole_cards)
