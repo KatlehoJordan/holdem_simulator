@@ -1,4 +1,5 @@
 from src.community_cards import CommunityCards
+from src.four_of_a_kind import FourOfAKind, validate_four_of_a_kind
 from src.hole_cards import HoleCards
 from src.straight_flush import StraightFlush, validate_straight_flush
 
@@ -19,9 +20,18 @@ class PlayerHand:
         straight_flush_found, top_ranks_in_straight_flush, name = (
             validate_straight_flush(self.cards)
         )
+        four_of_a_kind_found, top_ranks_in_four_of_a_kind, name = (
+            validate_four_of_a_kind(self.cards)
+        )
         if straight_flush_found:
             self.hand_type = StraightFlush(
                 top_ranks_in_straight_flush=top_ranks_in_straight_flush, name=name
+            )
+        elif four_of_a_kind_found:
+            # TODO: test if this is working with tests
+            # TODO: see if can simplify this code so that it only does logic for four_of_a_kind if straight_flush is not found. I think I may not need to create separate classes for each, and can simplify just with validation functions that return a tuple of (bool, List[int], str)... then it would be if first_validation, elif second_validation, elif third_validation, ... else final_validation
+            self.hand_type = FourOfAKind(
+                top_ranks_in_four_of_a_kind=top_ranks_in_four_of_a_kind, name=name
             )
         else:
             # TODO: populate with next hand type
