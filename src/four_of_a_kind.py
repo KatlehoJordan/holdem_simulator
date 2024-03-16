@@ -64,5 +64,5 @@ def validate_four_of_a_kind(
             :n_cards_in_qualifying_hand
         ]
 
-    name = f"Four of a Kind, {top_ranks_in_four_of_a_kind[0]} with {top_ranks_in_four_of_a_kind[-n_kickers:]} kicker."
+    name = f"Four of a Kind, {top_ranks_in_four_of_a_kind[0]}s with {top_ranks_in_four_of_a_kind[-n_kickers:]} kicker."
     return four_of_a_kind_found, top_ranks_in_four_of_a_kind, name

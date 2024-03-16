@@ -1,119 +1,100 @@
-import pytest
-
 from src.community_cards import CommunityCards
 from src.deck import Deck
 from src.hole_cards import HoleCards
 from src.player_hand import PlayerHand
 from src.straight_flush import StraightFlush
-from tests.tests_config import (
-    ACE_OF_SPADES,
-    EIGHT_OF_SPADES,
-    FIVE_OF_DIAMONDS,
-    FIVE_OF_SPADES,
-    FOUR_OF_SPADES,
-    JACK_OF_SPADES,
-    KING_OF_SPADES,
-    NINE_OF_SPADES,
-    QUEEN_OF_SPADES,
-    SEVEN_OF_SPADES,
-    SIX_OF_SPADES,
-    TEN_OF_SPADES,
-    THREE_OF_SPADES,
-    TWO_OF_SPADES,
+from tests.tests_config import CARDS_DICT, HOLE_CARDS_2_3_SPADES
+
+STRAIGHT_FLUSH_5_HI_SPADES = CommunityCards(
+    deck=Deck(),
+    card1=CARDS_DICT["4_OF_SPADES"],
+    card2=CARDS_DICT["5_OF_SPADES"],
+    card3=CARDS_DICT["9_OF_SPADES"],
+    card4=CARDS_DICT["10_OF_SPADES"],
+    card5=CARDS_DICT["ACE_OF_SPADES"],
 )
 
-HOLE_CARDS = HoleCards(deck=Deck(), card1=TWO_OF_SPADES, card2=THREE_OF_SPADES)
-
-STRAIGHT_FLUSH_LOW = CommunityCards(
+STRAIGHT_FLUSH_5_HI_SPADES_ALTERNATE = CommunityCards(
     deck=Deck(),
-    card1=FOUR_OF_SPADES,
-    card2=FIVE_OF_SPADES,
-    card3=NINE_OF_SPADES,
-    card4=TEN_OF_SPADES,
-    card5=ACE_OF_SPADES,
+    card1=CARDS_DICT["4_OF_SPADES"],
+    card2=CARDS_DICT["5_OF_SPADES"],
+    card3=CARDS_DICT["8_OF_SPADES"],
+    card4=CARDS_DICT["9_OF_SPADES"],
+    card5=CARDS_DICT["ACE_OF_SPADES"],
 )
 
-STRAIGHT_FLUSH_MULTIPLE = CommunityCards(
+STRAIGHT_FLUSH_7_HI_SPADES = CommunityCards(
     deck=Deck(),
-    card1=FOUR_OF_SPADES,
-    card2=FIVE_OF_SPADES,
-    card3=SIX_OF_SPADES,
-    card4=SEVEN_OF_SPADES,
-    card5=ACE_OF_SPADES,
+    card1=CARDS_DICT["4_OF_SPADES"],
+    card2=CARDS_DICT["5_OF_SPADES"],
+    card3=CARDS_DICT["6_OF_SPADES"],
+    card4=CARDS_DICT["7_OF_SPADES"],
+    card5=CARDS_DICT["ACE_OF_SPADES"],
 )
 
-STRAIGHT_FLUSH_TIE = CommunityCards(
+STRAIGHT_FLUSH_9_HI_SPADES = CommunityCards(
     deck=Deck(),
-    card1=FOUR_OF_SPADES,
-    card2=FIVE_OF_SPADES,
-    card3=EIGHT_OF_SPADES,
-    card4=NINE_OF_SPADES,
-    card5=ACE_OF_SPADES,
+    card1=CARDS_DICT["5_OF_SPADES"],
+    card2=CARDS_DICT["6_OF_SPADES"],
+    card3=CARDS_DICT["7_OF_SPADES"],
+    card4=CARDS_DICT["8_OF_SPADES"],
+    card5=CARDS_DICT["9_OF_SPADES"],
 )
 
-STRAIGHT_FLUSH_MED = CommunityCards(
+STRAIGHT_FLUSH_ACE_HI_SPADES = CommunityCards(
     deck=Deck(),
-    card1=FIVE_OF_SPADES,
-    card2=SIX_OF_SPADES,
-    card3=SEVEN_OF_SPADES,
-    card4=EIGHT_OF_SPADES,
-    card5=NINE_OF_SPADES,
+    card1=CARDS_DICT["10_OF_SPADES"],
+    card2=CARDS_DICT["JACK_OF_SPADES"],
+    card3=CARDS_DICT["QUEEN_OF_SPADES"],
+    card4=CARDS_DICT["KING_OF_SPADES"],
+    card5=CARDS_DICT["ACE_OF_SPADES"],
 )
 
-STRAIGHT_FLUSH_HI = CommunityCards(
+STRAIGHT_5_HI = CommunityCards(
     deck=Deck(),
-    card1=TEN_OF_SPADES,
-    card2=JACK_OF_SPADES,
-    card3=QUEEN_OF_SPADES,
-    card4=KING_OF_SPADES,
-    card5=ACE_OF_SPADES,
+    card1=CARDS_DICT["4_OF_SPADES"],
+    card2=CARDS_DICT["5_OF_DIAMONDS"],
+    card3=CARDS_DICT["9_OF_SPADES"],
+    card4=CARDS_DICT["10_OF_SPADES"],
+    card5=CARDS_DICT["ACE_OF_SPADES"],
 )
 
-STRAIGHT_NO_FLUSH = CommunityCards(
+FLUSH_9_HI_SPADES = CommunityCards(
     deck=Deck(),
-    card1=FOUR_OF_SPADES,
-    card2=FIVE_OF_DIAMONDS,
-    card3=NINE_OF_SPADES,
-    card4=TEN_OF_SPADES,
-    card5=ACE_OF_SPADES,
+    card1=CARDS_DICT["4_OF_SPADES"],
+    card2=CARDS_DICT["5_OF_SPADES"],
+    card3=CARDS_DICT["7_OF_SPADES"],
+    card4=CARDS_DICT["8_OF_SPADES"],
+    card5=CARDS_DICT["9_OF_SPADES"],
 )
 
-FLUSH_NO_STRAIGHT = CommunityCards(
+HI_CARD_9 = CommunityCards(
     deck=Deck(),
-    card1=FOUR_OF_SPADES,
-    card2=FIVE_OF_SPADES,
-    card3=SEVEN_OF_SPADES,
-    card4=EIGHT_OF_SPADES,
-    card5=NINE_OF_SPADES,
-)
-
-NO_FLUSH_NOR_STRAIGHT = CommunityCards(
-    deck=Deck(),
-    card1=FOUR_OF_SPADES,
-    card2=FIVE_OF_DIAMONDS,
-    card3=SEVEN_OF_SPADES,
-    card4=EIGHT_OF_SPADES,
-    card5=NINE_OF_SPADES,
+    card1=CARDS_DICT["4_OF_DIAMONDS"],
+    card2=CARDS_DICT["5_OF_DIAMONDS"],
+    card3=CARDS_DICT["7_OF_CLUBS"],
+    card4=CARDS_DICT["8_OF_SPADES"],
+    card5=CARDS_DICT["9_OF_SPADES"],
 )
 
 
 def test_validate_straight_flush():
     test_cases = [
-        (STRAIGHT_FLUSH_LOW, True),
-        (STRAIGHT_FLUSH_MULTIPLE, True),
-        (STRAIGHT_FLUSH_TIE, True),
-        (STRAIGHT_FLUSH_MED, True),
-        (STRAIGHT_FLUSH_HI, True),
-        (STRAIGHT_NO_FLUSH, False),
-        (FLUSH_NO_STRAIGHT, False),
-        (NO_FLUSH_NOR_STRAIGHT, False),
+        (STRAIGHT_FLUSH_5_HI_SPADES, True),
+        (STRAIGHT_FLUSH_7_HI_SPADES, True),
+        (STRAIGHT_FLUSH_5_HI_SPADES_ALTERNATE, True),
+        (STRAIGHT_FLUSH_9_HI_SPADES, True),
+        (STRAIGHT_FLUSH_ACE_HI_SPADES, True),
+        (STRAIGHT_5_HI, False),
+        (FLUSH_9_HI_SPADES, False),
+        (HI_CARD_9, False),
     ]
 
     for community_cards, expected in test_cases:
         assert (
             isinstance(
                 PlayerHand(
-                    hole_cards=HOLE_CARDS, community_cards=community_cards
+                    hole_cards=HOLE_CARDS_2_3_SPADES, community_cards=community_cards
                 ).hand_type,
                 StraightFlush,
             )
@@ -122,38 +103,31 @@ def test_validate_straight_flush():
 
 
 def test_straight_flush_winners():
-    straight_flush_low = PlayerHand(
-        hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_LOW
-    ).hand_type
-    straight_flush_tie = PlayerHand(
-        hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_TIE
-    ).hand_type
-    straight_flush_multiple = PlayerHand(
-        hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_MULTIPLE
-    ).hand_type
-    straight_flush_med = PlayerHand(
-        hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_MED
-    ).hand_type
-    straight_flush_hi = PlayerHand(
-        hole_cards=HOLE_CARDS, community_cards=STRAIGHT_FLUSH_HI
-    ).hand_type
-    # TODO: Remove type: ignore comments after full implementation in player_hand
-    hand_type_scores = [
-        straight_flush_low.hand_type_score,  # type: ignore
-        straight_flush_tie.hand_type_score,  # type: ignore
-        straight_flush_multiple.hand_type_score,  # type: ignore
-        straight_flush_med.hand_type_score,  # type: ignore
-        straight_flush_hi.hand_type_score,  # type: ignore
+    community_cards_list = [
+        STRAIGHT_FLUSH_5_HI_SPADES,
+        STRAIGHT_FLUSH_5_HI_SPADES_ALTERNATE,
+        STRAIGHT_FLUSH_7_HI_SPADES,
+        STRAIGHT_FLUSH_9_HI_SPADES,
+        STRAIGHT_FLUSH_ACE_HI_SPADES,
     ]
+
+    hand_types = [
+        PlayerHand(
+            hole_cards=HOLE_CARDS_2_3_SPADES, community_cards=community_cards
+        ).hand_type
+        for community_cards in community_cards_list
+    ]
+
+    # TODO: Remove type ignoring after finished implementing player_hand with all paths
+    hand_type_scores = [hand_type.hand_type_score for hand_type in hand_types]  # type: ignore
+    top_ranks = [hand_type.top_ranks[~0] for hand_type in hand_types]  # type: ignore
 
     assert all(score == hand_type_scores[0] for score in hand_type_scores)
-
-    top_ranks = [
-        straight_flush_low.top_ranks[~0],  # type: ignore
-        straight_flush_multiple.top_ranks[~0],  # type: ignore
-        straight_flush_med.top_ranks[~0],  # type: ignore
-        straight_flush_hi.top_ranks[~0],  # type: ignore
-    ]
-
     assert top_ranks == sorted(top_ranks)
-    assert straight_flush_low.top_ranks == straight_flush_tie.top_ranks  # type: ignore
+
+    assert (
+        hand_types[community_cards_list.index(STRAIGHT_FLUSH_5_HI_SPADES)].top_ranks  # type: ignore
+        == hand_types[
+            community_cards_list.index(STRAIGHT_FLUSH_5_HI_SPADES_ALTERNATE)
+        ].top_ranks  # type: ignore
+    )
