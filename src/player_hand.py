@@ -16,7 +16,6 @@ class PlayerHand:
 
         self.cards = [hole_cards.hi_card, hole_cards.lo_card] + community_cards.cards
 
-        # TODO: If validate_straight_flush is true, then capture hand type == straight flush, and that straight_flush will have attributes: 1) hand_type_score == 8 and 2) high card raw rank value.
         straight_flush_found, top_ranks_in_straight_flush, name = (
             validate_straight_flush(self.cards)
         )
@@ -28,7 +27,6 @@ class PlayerHand:
                 top_ranks_in_straight_flush=top_ranks_in_straight_flush, name=name
             )
         elif four_of_a_kind_found:
-            # TODO: test if this is working with tests
             # TODO: see if can simplify this code so that it only does logic for four_of_a_kind if straight_flush is not found. I think I may not need to create separate classes for each, and can simplify just with validation functions that return a tuple of (bool, List[int], str)... then it would be if first_validation, elif second_validation, elif third_validation, ... else final_validation
             self.hand_type = FourOfAKind(
                 top_ranks_in_four_of_a_kind=top_ranks_in_four_of_a_kind, name=name
@@ -36,7 +34,6 @@ class PlayerHand:
         else:
             # TODO: populate with next hand type
             self.hand_type = None
-            pass
 
     def __str__(self):
         return f"{self.hand_type}"
