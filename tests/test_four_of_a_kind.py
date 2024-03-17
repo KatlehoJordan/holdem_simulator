@@ -101,10 +101,9 @@ def test_four_of_a_kind_winners():
 
     # TODO: Remove type ignoring after finished implementing player_hand with all paths
     hand_type_scores = [hand_type.hand_type_score for hand_type in hand_types]  # type: ignore
-    top_ranks = [hand_type.top_ranks[~0] for hand_type in hand_types]  # type: ignore
+    top_ranks = [hand_type.top_ranks[0] for hand_type in hand_types]  # type: ignore
 
     assert all(score == hand_type_scores[0] for score in hand_type_scores)
-    # TODO: Resolve why this is failing. Consider revising straight, flush, and straight_flush to be sure they are putting everything in the expected order (descending)
     assert top_ranks == sorted(top_ranks)
 
     assert (
