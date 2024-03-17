@@ -1,4 +1,4 @@
-from typing import Union
+from typing import List, Union
 
 from src.config import logger
 from src.rank import Rank
@@ -26,3 +26,7 @@ class Card:
 
     def get_card_value(self):
         return logger.info(f"The card has value {self.value}")
+
+
+def sort_cards_by_raw_rank_value(list_of_7_cards: List[Card]) -> List[int]:
+    return sorted((card.rank.raw_rank_value for card in list_of_7_cards), reverse=True)

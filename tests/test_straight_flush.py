@@ -81,8 +81,8 @@ HI_CARD_9 = CommunityCards(
 def test_validate_straight_flush():
     test_cases = [
         (STRAIGHT_FLUSH_5_HI_SPADES, True),
-        (STRAIGHT_FLUSH_7_HI_SPADES, True),
         (STRAIGHT_FLUSH_5_HI_SPADES_ALTERNATE, True),
+        (STRAIGHT_FLUSH_7_HI_SPADES, True),
         (STRAIGHT_FLUSH_9_HI_SPADES, True),
         (STRAIGHT_FLUSH_ACE_HI_SPADES, True),
         (STRAIGHT_5_HI, False),

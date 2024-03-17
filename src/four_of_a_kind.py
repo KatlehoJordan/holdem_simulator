@@ -1,7 +1,7 @@
 from collections import Counter
 from typing import List, Tuple
 
-from src.card import Card
+from src.card import Card, sort_cards_by_raw_rank_value
 from src.config import NUMBER_OF_CARDS_IN_QUALIFYING_HAND, logger
 
 FOUR_OF_A_KIND_HAND_TYPE_SCORE = 7
@@ -32,9 +32,7 @@ def validate_four_of_a_kind(
     # TODO: generalize this for any N of a kind...g
     raw_rank_values = Counter(card.rank.raw_rank_value for card in list_of_7_cards)
 
-    sorted_raw_rank_values = sorted(
-        (card.rank.raw_rank_value for card in list_of_7_cards), reverse=True
-    )
+    sorted_raw_rank_values = sort_cards_by_raw_rank_value(list_of_7_cards)
 
     four_of_a_kind_found = any(
         count == n_cards_in_a_four_of_a_kind for count in raw_rank_values.values()

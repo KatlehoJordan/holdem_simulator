@@ -1,7 +1,7 @@
 from collections import Counter
 from typing import List, Tuple
 
-from src.card import Card
+from src.card import Card, sort_cards_by_raw_rank_value
 from src.config import NUMBER_OF_CARDS_IN_QUALIFYING_HAND, logger
 
 
@@ -20,8 +20,9 @@ def validate_flush(
     logger.debug(f"Flush suit is {most_common_suit}.")
     logger.debug(f"Flush cards are {', '.join(str(card) for card in flush_cards)}.")
 
-    sorted_raw_rank_values = sorted(card.rank.raw_rank_value for card in flush_cards)
-    top_ranks_in_flush = sorted_raw_rank_values[-n_cards_in_a_flush:]
+    sorted_raw_rank_values = sort_cards_by_raw_rank_value(flush_cards)
+
+    top_ranks_in_flush = sorted_raw_rank_values[:n_cards_in_a_flush]
 
     logger.debug(f"Top ranks in flush are {top_ranks_in_flush}.")
 

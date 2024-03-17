@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from src.card import Card
+from src.card import Card, sort_cards_by_raw_rank_value
 from src.config import (
     ACE_AS_HIGH_RAW_RANK_VALUE,
     ACE_AS_LOW_RAW_RANK_VALUE,
@@ -15,38 +15,36 @@ def validate_straight(
     low_ace_value: int = ACE_AS_LOW_RAW_RANK_VALUE,
     high_ace_value: int = ACE_AS_HIGH_RAW_RANK_VALUE,
 ) -> Tuple[bool, List[int], str]:
-    sorted_raw_rank_values = sorted(
-        card.rank.raw_rank_value for card in list_of_7_cards
-    )
+    sorted_raw_rank_values = sort_cards_by_raw_rank_value(list_of_7_cards)
 
     if max(sorted_raw_rank_values) == high_ace_value:
         logger.debug("Ace can be high or low, so adding a low ace to the list.")
-        sorted_raw_rank_values = [low_ace_value] + sorted_raw_rank_values
+        sorted_raw_rank_values = sorted_raw_rank_values + [low_ace_value]
 
-    longest_n_cards_towards_straight = current_n_cards_towards_a_straight = 1
+    current_n_cards_towards_a_straight = 1
     rank_of_max_card_in_straight = sorted_raw_rank_values[0]
-    for i in range(1, len(sorted_raw_rank_values)):
-        if sorted_raw_rank_values[i] == sorted_raw_rank_values[i - 1] + 1:
+    straight_found = False
+
+    for current_rank, next_rank in zip(
+        sorted_raw_rank_values[0:-1], sorted_raw_rank_values[1:]
+    ):
+        if current_rank == (next_rank + 1):
             current_n_cards_towards_a_straight += 1
-            if current_n_cards_towards_a_straight > longest_n_cards_towards_straight:
-                longest_n_cards_towards_straight = current_n_cards_towards_a_straight
-                rank_of_max_card_in_straight = sorted_raw_rank_values[i]
+            if current_n_cards_towards_a_straight == n_cards_in_a_straight:
+                straight_found = True
+                break
         else:
             current_n_cards_towards_a_straight = 1
+            rank_of_max_card_in_straight = next_rank
 
-    logger.debug(f"Longest straight is {longest_n_cards_towards_straight} cards long.")
     logger.debug(f"Max card in straight is {rank_of_max_card_in_straight}.")
 
     index_of_max_card = sorted_raw_rank_values.index(rank_of_max_card_in_straight)
     top_ranks_in_straight = sorted_raw_rank_values[
-        index_of_max_card - (n_cards_in_a_straight - 1) : index_of_max_card + 1
+        index_of_max_card : n_cards_in_a_straight + 1
     ]
     logger.debug(f"Top ranks in straight are {top_ranks_in_straight}.")
 
-    if longest_n_cards_towards_straight < n_cards_in_a_straight:
-        straight_found = False
-    else:
-        straight_found = True
     name = f"Straight, {rank_of_max_card_in_straight} high."
 
     return straight_found, top_ranks_in_straight, name
