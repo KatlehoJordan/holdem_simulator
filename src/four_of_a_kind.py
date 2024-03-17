@@ -8,27 +8,27 @@ FOUR_OF_A_KIND_HAND_TYPE_SCORE = 7
 N_CARDS_IN_FOUR_OF_A_KIND = 4
 
 
-class FourOfAKind:
+# class FourOfAKind:
+#     def __init__(
+#         self,
+#         top_ranks_in_four_of_a_kind: List[int],
+#         name: str,
+#         four_of_a_kind_hand_type_score: int = FOUR_OF_A_KIND_HAND_TYPE_SCORE,
+#     ):
+#         self.hand_type_score = four_of_a_kind_hand_type_score
+#         self.top_ranks = top_ranks_in_four_of_a_kind
+#         self.name = name
 
-    def __init__(
-        self,
-        top_ranks_in_four_of_a_kind: List[int],
-        name: str,
-        four_of_a_kind_hand_type_score: int = FOUR_OF_A_KIND_HAND_TYPE_SCORE,
-    ):
-        self.hand_type_score = four_of_a_kind_hand_type_score
-        self.top_ranks = top_ranks_in_four_of_a_kind
-        self.name = name
-
-    def __str__(self):
-        return f"{self.name}"
+#     def __str__(self):
+#         return f"{self.name}"
 
 
 def validate_four_of_a_kind(
     list_of_7_cards: List[Card],
+    hand_type_score: int = FOUR_OF_A_KIND_HAND_TYPE_SCORE,
     n_cards_in_a_four_of_a_kind: int = N_CARDS_IN_FOUR_OF_A_KIND,
     n_cards_in_qualifying_hand: int = NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
-) -> Tuple[bool, List[int], str]:
+) -> Tuple[bool, int, List[int], str]:
     # TODO: generalize this for any N of a kind...g
     raw_rank_values = Counter(card.rank.raw_rank_value for card in list_of_7_cards)
 
@@ -63,4 +63,4 @@ def validate_four_of_a_kind(
         ]
 
     name = f"Four of a Kind, {top_ranks_in_four_of_a_kind[0]}s with {top_ranks_in_four_of_a_kind[-n_kickers:]} kicker."
-    return four_of_a_kind_found, top_ranks_in_four_of_a_kind, name
+    return four_of_a_kind_found, hand_type_score, top_ranks_in_four_of_a_kind, name

@@ -1,7 +1,6 @@
 from src.community_cards import CommunityCards
 from src.deck import Deck
-from src.four_of_a_kind import FourOfAKind
-from src.hole_cards import HoleCards
+from src.four_of_a_kind import FOUR_OF_A_KIND_HAND_TYPE_SCORE
 from src.player_hand import PlayerHand
 from tests.tests_config import CARDS_DICT, HOLE_CARDS_2_3_SPADES
 
@@ -60,29 +59,30 @@ FOUR_OF_A_KIND_ACES = CommunityCards(
 )
 
 
-def test_validate_four_of_a_kind():
-    test_cases = [
-        (FOUR_OF_A_KIND_2S, True),
-        (FOUR_OF_A_KIND_2S_ALTERNATE, True),
-        (FOUR_OF_A_KIND_2S_WEAK_KICKERS, True),
-        (FOUR_OF_A_KIND_3S, True),
-        (FOUR_OF_A_KIND_4S, True),
-        (FOUR_OF_A_KIND_ACES, True),
+def test_validate_four_of_a_kind(
+    four_of_a_kind_hand_type_score: int = FOUR_OF_A_KIND_HAND_TYPE_SCORE,
+):
+    valid_cases = [
+        FOUR_OF_A_KIND_2S,
+        FOUR_OF_A_KIND_2S_ALTERNATE,
+        FOUR_OF_A_KIND_2S_WEAK_KICKERS,
+        FOUR_OF_A_KIND_3S,
+        FOUR_OF_A_KIND_4S,
+        FOUR_OF_A_KIND_ACES,
     ]
 
-    for community_cards, expected in test_cases:
+    for community_cards in valid_cases:
         assert (
-            isinstance(
-                PlayerHand(
-                    hole_cards=HOLE_CARDS_2_3_SPADES, community_cards=community_cards
-                ).hand_type,
-                FourOfAKind,
-            )
-            is expected
+            PlayerHand(
+                hole_cards=HOLE_CARDS_2_3_SPADES,
+                community_cards=community_cards,
+                # TODO: Remove type ignoring after finished implementing player_hand with all paths
+            ).hand_type.hand_type_score  # type: ignore
+            == four_of_a_kind_hand_type_score
         )
 
 
-def test_four_of_a_kind_winners():
+def test_four_of_a_kind_tie_breakers():
     community_cards_list = [
         FOUR_OF_A_KIND_2S_WEAK_KICKERS,
         FOUR_OF_A_KIND_2S,
