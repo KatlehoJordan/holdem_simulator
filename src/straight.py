@@ -8,13 +8,16 @@ from src.config import (
     logger,
 )
 
+STRAIGHT_HAND_TYPE_SCORE = 4
+
 
 def validate_straight(
     list_of_7_cards: List[Card],
     n_cards_in_a_straight: int = NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
     low_ace_value: int = ACE_AS_LOW_RAW_RANK_VALUE,
     high_ace_value: int = ACE_AS_HIGH_RAW_RANK_VALUE,
-) -> Tuple[bool, List[int], str]:
+    hand_type_score: int = STRAIGHT_HAND_TYPE_SCORE,
+) -> Tuple[bool, int, List[int], str]:
     sorted_raw_rank_values = sort_cards_by_raw_rank_value(list_of_7_cards)
 
     if max(sorted_raw_rank_values) == high_ace_value:
@@ -47,4 +50,4 @@ def validate_straight(
 
     name = f"Straight, {rank_of_max_card_in_straight} high."
 
-    return straight_found, top_ranks_in_straight, name
+    return straight_found, hand_type_score, top_ranks_in_straight, name

@@ -50,14 +50,6 @@ STRAIGHT_FLUSH_ACE_HI_SPADES = CommunityCards(
 )
 
 # TODO: pull out the test cases written for the test_straight_flush file, and put them with the more appropriate file.
-# FLUSH_9_HI_SPADES = CommunityCards(
-#     deck=Deck(),
-#     card1=CARDS_DICT["4_OF_SPADES"],
-#     card2=CARDS_DICT["5_OF_SPADES"],
-#     card3=CARDS_DICT["7_OF_SPADES"],
-#     card4=CARDS_DICT["8_OF_SPADES"],
-#     card5=CARDS_DICT["9_OF_SPADES"],
-# )
 
 # STRAIGHT_5_HI = CommunityCards(
 #     deck=Deck(),
@@ -102,7 +94,6 @@ def test_straight_flush_hand_type_score(
 
     # TODO: implement this here, or as a separate test, with specific expected values instead of not equal logic, and only implement after all other hand types are implemented
     # invalid_cases = [
-    #     FLUSH_9_HI_SPADES,
     #     STRAIGHT_5_HI,
     #     HI_CARD_9,
     # ]

@@ -1,7 +1,9 @@
 from src.community_cards import CommunityCards
+from src.flush import validate_flush
 from src.four_of_a_kind import validate_four_of_a_kind
 from src.hand_type import HandType
 from src.hole_cards import HoleCards
+from src.straight import validate_straight
 from src.straight_flush import validate_straight_flush
 
 
@@ -20,7 +22,10 @@ class PlayerHand:
         validation_functions = [
             validate_straight_flush,
             validate_four_of_a_kind,
-            # TODO: Add other validation functions here, starting with flush, then straight since those validate functions have been started but must be made robust enough for use within the straight_flush validation function.
+            validate_flush,
+            validate_straight,
+            validate_hi_card,
+            # TODO: Add other validation functions here, starting with  straight then hi card since those validate functions have been started but must be made robust enough for use within the straight_flush validation function.
         ]
 
         for validate in validation_functions:
