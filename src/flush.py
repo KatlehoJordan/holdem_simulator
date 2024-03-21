@@ -9,13 +9,15 @@ FLUSH_HAND_TYPE_SCORE = 5
 
 def validate_flush(
     list_of_7_cards: List[Card],
-    n_cards_in_a_flush: int = NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
     hand_type_score: int = FLUSH_HAND_TYPE_SCORE,
+    n_cards_in_a_flush: int = NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
     validating_for_straight_flush: bool = False,
 ) -> Union[
     Tuple[bool, int, List[int], str], Tuple[bool, int, List[int], str, List[Card], str]
 ]:
-    suit_counts, most_common_suit, flush_cards = get_details_for_validating_flush(list_of_7_cards)
+    suit_counts, most_common_suit, flush_cards = get_details_for_validating_flush(
+        list_of_7_cards
+    )
 
     logger.debug(f"Flush suit is {most_common_suit}.")
     logger.debug(f"Flush cards are {', '.join(str(card) for card in flush_cards)}.")
@@ -45,7 +47,10 @@ def validate_flush(
     else:
         return (flush_found, hand_type_score, top_ranks_in_flush, name)
 
-def get_details_for_validating_flush(list_of_7_cards: List[Card]) -> Tuple[Counter, str, List[Card]]:
+
+def get_details_for_validating_flush(
+    list_of_7_cards: List[Card],
+) -> Tuple[Counter, str, List[Card]]:
     suits = [card.suit.name for card in list_of_7_cards]
     suit_counts = Counter(suits)
     most_common_suit = suit_counts.most_common(1)[0][0]
@@ -53,5 +58,5 @@ def get_details_for_validating_flush(list_of_7_cards: List[Card]) -> Tuple[Count
     flush_cards = [
         card for card in list_of_7_cards if card.suit.name == most_common_suit
     ]
-    
-    return suit_counts,most_common_suit,flush_cards
+
+    return suit_counts, most_common_suit, flush_cards

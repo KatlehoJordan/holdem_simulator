@@ -2,6 +2,7 @@ from src.community_cards import CommunityCards
 from src.flush import validate_flush
 from src.four_of_a_kind import validate_four_of_a_kind
 from src.hand_type import HandType
+from src.hi_card import validate_hi_card
 from src.hole_cards import HoleCards
 from src.straight import validate_straight
 from src.straight_flush import validate_straight_flush
@@ -34,9 +35,6 @@ class PlayerHand:
                 self.hand_type = HandType(
                     hand_type_score=hand_type_score, top_ranks=top_ranks, name=name
                 )
-                break
-        else:
-            self.hand_type = None
 
     def __str__(self):
         return f"{self.hand_type}"

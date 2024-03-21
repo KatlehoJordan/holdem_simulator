@@ -99,16 +99,15 @@ def test_four_of_a_kind_tie_breakers():
         for community_cards in community_cards_list
     ]
 
-    # TODO: Remove type ignoring after finished implementing player_hand with all paths
-    hand_type_scores = [hand_type.hand_type_score for hand_type in hand_types]  # type: ignore
-    top_ranks = [hand_type.top_ranks[0] for hand_type in hand_types]  # type: ignore
+    hand_type_scores = [hand_type.hand_type_score for hand_type in hand_types]  
+    top_ranks = [hand_type.top_ranks[0] for hand_type in hand_types]
 
     assert all(score == hand_type_scores[0] for score in hand_type_scores)
     assert top_ranks == sorted(top_ranks)
 
     assert (
-        hand_types[community_cards_list.index(FOUR_OF_A_KIND_2S)].top_ranks  # type: ignore
+        hand_types[community_cards_list.index(FOUR_OF_A_KIND_2S)].top_ranks
         == hand_types[
             community_cards_list.index(FOUR_OF_A_KIND_2S_ALTERNATE)
-        ].top_ranks  # type: ignore
+        ].top_ranks
     )
