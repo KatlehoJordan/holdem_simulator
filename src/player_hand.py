@@ -31,10 +31,13 @@ class PlayerHand:
 
         for validate in validation_functions:
             hand_found, hand_type_score, top_ranks, name = validate(self.cards)
+            print("hand_found:", hand_found)
+            print("hand name:", name)
             if hand_found:
                 self.hand_type = HandType(
                     hand_type_score=hand_type_score, top_ranks=top_ranks, name=name
                 )
+                break
 
     def __str__(self):
         return f"{self.hand_type}"

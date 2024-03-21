@@ -42,10 +42,11 @@ def validate_four_of_a_kind(
         )
 
         top_ranks_in_four_of_a_kind.append(highest_remaining_rank)
+        name = f"Four of a Kind: {top_ranks_in_four_of_a_kind[0]}s with {top_ranks_in_four_of_a_kind[-n_kickers:]} kicker."
     else:
         top_ranks_in_four_of_a_kind = sorted_raw_rank_values[
             :n_cards_in_qualifying_hand
         ]
+        name = f"No Four of a Kind."
 
-    name = f"Four of a Kind, {top_ranks_in_four_of_a_kind[0]}s with {top_ranks_in_four_of_a_kind[-n_kickers:]} kicker."
     return four_of_a_kind_found, hand_type_score, top_ranks_in_four_of_a_kind, name

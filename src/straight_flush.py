@@ -25,8 +25,11 @@ def validate_straight_flush(
 
     if flush_found and straight_found:
         straight_flush_found = True
+        name = (
+            f"Straight Flush: {top_ranks_in_straight_flush} high in {most_common_suit}."
+        )
     else:
         straight_flush_found = False
+        name = "No Straight Flush."
 
-    name = f"Straight Flush, {top_ranks_in_straight_flush} high in {most_common_suit}."
     return straight_flush_found, hand_type_score, top_ranks_in_straight_flush, name

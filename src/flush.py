@@ -30,10 +30,10 @@ def validate_flush(
 
     if suit_counts[most_common_suit] < n_cards_in_a_flush:
         flush_found = False
+        name = "No flush."
     else:
         flush_found = True
-
-    name = f"Flush, {', '.join(str(rank) for rank in sorted_raw_rank_values[-n_cards_in_a_flush:])}, in {most_common_suit}."
+        name = f"Flush: {', '.join(str(rank) for rank in sorted_raw_rank_values[-n_cards_in_a_flush:])}, in {most_common_suit}."
 
     if validating_for_straight_flush:
         return (

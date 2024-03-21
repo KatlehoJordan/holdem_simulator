@@ -27,6 +27,7 @@ def validate_straight(
     current_n_cards_towards_a_straight = 1
     rank_of_max_card_in_straight = sorted_raw_rank_values[0]
     straight_found = False
+    name = "No straight."
 
     for current_rank, next_rank in zip(
         sorted_raw_rank_values[0:-1], sorted_raw_rank_values[1:]
@@ -35,6 +36,7 @@ def validate_straight(
             current_n_cards_towards_a_straight += 1
             if current_n_cards_towards_a_straight == n_cards_in_a_straight:
                 straight_found = True
+                name = f"Straight: {rank_of_max_card_in_straight} high."
                 break
         else:
             current_n_cards_towards_a_straight = 1
@@ -47,7 +49,5 @@ def validate_straight(
         index_of_max_card : n_cards_in_a_straight + 1
     ]
     logger.debug(f"Top ranks in straight are {top_ranks_in_straight}.")
-
-    name = f"Straight, {rank_of_max_card_in_straight} high."
 
     return straight_found, hand_type_score, top_ranks_in_straight, name

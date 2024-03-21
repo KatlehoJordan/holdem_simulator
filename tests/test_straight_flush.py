@@ -71,19 +71,6 @@ def test_straight_flush_hand_type_score(
             == straight_flush_hand_type_score
         )
 
-    # TODO: implement this here, or as a separate test, with specific expected values instead of not equal logic, and only implement after all other hand types are implemented
-    # invalid_cases = [
-    #     STRAIGHT_5_HI,
-    # ]
-
-    # for community_cards in invalid_cases:
-    #     assert (
-    #         PlayerHand(
-    #             hole_cards=HOLE_CARDS_2_3_SPADES, community_cards=community_cards
-    #         ).hand_type.hand_type_score
-    #         != straight_flush_hand_type_score
-    #     )
-
 
 def test_straight_flush_tie_breakers():
     community_cards_list = [
