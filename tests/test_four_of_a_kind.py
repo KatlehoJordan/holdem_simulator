@@ -67,6 +67,7 @@ VALID_FOUR_OF_A_KIND_CASES_IN_ASCENDING_STRENGTH = [
 ]
 
 
+# TODO: Solve why this is not failing since the weak_kickers case is not being detected as out of order with the others
 def test_four_of_a_kind():
     hand_type_test_builder(
         hand_tested="flush",
