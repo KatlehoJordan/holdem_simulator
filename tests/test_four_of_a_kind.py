@@ -3,6 +3,7 @@ from src.deck import Deck
 from src.four_of_a_kind import FOUR_OF_A_KIND_HAND_TYPE_SCORE
 from tests.tests_config import CARDS_DICT, hand_type_test_builder
 
+# TODO: Simplify this to a function since so much is repeated
 FOUR_OF_A_KIND_2S = CommunityCards(
     deck=Deck(),
     card1=CARDS_DICT["2_OF_DIAMONDS"],

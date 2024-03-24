@@ -12,13 +12,16 @@ STRAIGHT_HAND_TYPE_SCORE = 4
 
 
 def validate_straight(
-    list_of_7_cards: List[Card],
+    list_of_5_to_7_cards: List[Card],
     n_cards_in_a_straight: int = NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
     low_ace_value: int = ACE_AS_LOW_RAW_RANK_VALUE,
     high_ace_value: int = ACE_AS_HIGH_RAW_RANK_VALUE,
     hand_type_score: int = STRAIGHT_HAND_TYPE_SCORE,
 ) -> Tuple[bool, int, List[int], str]:
-    sorted_raw_rank_values = sort_cards_by_raw_rank_value(list_of_7_cards)
+    logger.debug(
+        "This function may be called to validate a straight flush, so it will handle 5 to 7 cards."
+    )
+    sorted_raw_rank_values = sort_cards_by_raw_rank_value(list_of_5_to_7_cards)
 
     if max(sorted_raw_rank_values) == high_ace_value:
         logger.debug("Ace can be high or low, so adding a low ace to the list.")
