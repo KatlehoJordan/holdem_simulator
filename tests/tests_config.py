@@ -46,7 +46,7 @@ def hand_type_test_builder(
         PlayerHand(hole_cards=hole_cards, community_cards=community_cards).hand_type
         for community_cards in valid_cases_in_ascending_strength
     ]
-    top_ranks = [hand_type.top_ranks[0] for hand_type in hand_types]
+    top_ranks = [hand_type.top_ranks for hand_type in hand_types]
     assert top_ranks == sorted(top_ranks)
 
     logger.debug("Test that %s ties are detected", hand_tested)
