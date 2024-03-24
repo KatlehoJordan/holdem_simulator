@@ -8,7 +8,9 @@ STRAIGHT_FLUSH_HAND_TYPE_SCORE = 8
 
 
 def validate_straight_flush(
-    list_of_7_cards: List[Card], hand_type_score: int = STRAIGHT_FLUSH_HAND_TYPE_SCORE
+    list_of_7_cards: List[Card],
+    hand_type_score: int = STRAIGHT_FLUSH_HAND_TYPE_SCORE,
+    hand_name_root: str = "Straight Flush",
 ) -> Tuple[bool, int, List[int], str]:
     result_of_flush_validation = validate_flush(list_of_7_cards)
 
@@ -19,11 +21,9 @@ def validate_straight_flush(
 
     if flush_found and straight_found:
         straight_flush_found = True
-        name = (
-            f"Straight Flush: {top_ranks_in_straight_flush} high in {most_common_suit}."
-        )
+        name = f"{hand_name_root}: {top_ranks_in_straight_flush} high in {most_common_suit}."
     else:
         straight_flush_found = False
-        name = "No Straight Flush."
+        name = f"No {hand_name_root}."
 
     return straight_flush_found, hand_type_score, top_ranks_in_straight_flush, name

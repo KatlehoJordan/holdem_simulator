@@ -1,4 +1,3 @@
-from collections import Counter
 from typing import List, Tuple
 
 from src.card import Card
@@ -9,7 +8,9 @@ FULL_HOUSE_HAND_TYPE_SCORE = 6
 
 
 def validate_full_house(
-    list_of_7_cards: List[Card], hand_type_score: int = FULL_HOUSE_HAND_TYPE_SCORE
+    list_of_7_cards: List[Card],
+    hand_type_score: int = FULL_HOUSE_HAND_TYPE_SCORE,
+    hand_name_root: str = "Full House",
 ) -> Tuple[bool, int, List[int], str]:
     result_of_three_of_a_kind_validation = validate_three_of_a_kind(list_of_7_cards)
 
@@ -32,10 +33,10 @@ def validate_full_house(
             top_ranks_in_three_of_a_kind[0:N_CARDS_IN_THREE_OF_A_KIND]
             + top_ranks_in_pair[0:N_CARDS_IN_PAIR]
         )
-        name = f"Full House: {three_of_a_kind_rank}s over {pair_rank}s."
+        name = f"{hand_name_root}: {three_of_a_kind_rank}s over {pair_rank}s."
     else:
         full_house_found = False
         top_ranks_in_full_house = []
-        name = "No Full House."
+        name = "No {hand_name_root}."
 
     return full_house_found, hand_type_score, top_ranks_in_full_house, name

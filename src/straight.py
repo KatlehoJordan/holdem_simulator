@@ -17,6 +17,7 @@ def validate_straight(
     low_ace_value: int = ACE_AS_LOW_RAW_RANK_VALUE,
     high_ace_value: int = ACE_AS_HIGH_RAW_RANK_VALUE,
     hand_type_score: int = STRAIGHT_HAND_TYPE_SCORE,
+    hand_name_root: str = "Straight",
 ) -> Tuple[bool, int, List[int], str]:
     logger.debug(
         "This function may be called to validate a straight flush, so it will handle 5 to 7 cards."
@@ -30,7 +31,7 @@ def validate_straight(
     current_n_cards_towards_a_straight = 1
     rank_of_max_card_in_straight = sorted_raw_rank_values[0]
     straight_found = False
-    name = "No straight."
+    name = f"No {hand_name_root}."
 
     for current_rank, next_rank in zip(
         sorted_raw_rank_values[0:-1], sorted_raw_rank_values[1:]
@@ -39,7 +40,7 @@ def validate_straight(
             current_n_cards_towards_a_straight += 1
             if current_n_cards_towards_a_straight == n_cards_in_a_straight:
                 straight_found = True
-                name = f"Straight: {rank_of_max_card_in_straight} high."
+                name = f"{hand_name_root}: {rank_of_max_card_in_straight} high."
                 break
         else:
             current_n_cards_towards_a_straight = 1
