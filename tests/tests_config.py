@@ -1,3 +1,5 @@
+from typing import List
+
 from src.card import CARDS_DICT
 from src.community_cards import CommunityCards
 from src.config import logger
@@ -48,4 +50,16 @@ def hand_type_test_builder(
         == PlayerHand(
             hole_cards=hole_cards, community_cards=valid_tie_case_2
         ).hand_type.top_ranks
+    )
+
+
+def make_community_cards_for_testing(list_of_5_cards: List[str]) -> CommunityCards:
+    cards = [CARDS_DICT[card] for card in list_of_5_cards]
+    return CommunityCards(
+        deck=Deck(),
+        card1=cards[0],
+        card2=cards[1],
+        card3=cards[2],
+        card4=cards[3],
+        card5=cards[4],
     )

@@ -1,51 +1,54 @@
-from src.community_cards import CommunityCards
-from src.deck import Deck
 from src.straight_flush import STRAIGHT_FLUSH_HAND_TYPE_SCORE
-from tests.tests_config import CARDS_DICT, hand_type_test_builder
+from tests.tests_config import hand_type_test_builder, make_community_cards_for_testing
 
-STRAIGHT_FLUSH_5_HI_SPADES = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["4_OF_SPADES"],
-    card2=CARDS_DICT["5_OF_SPADES"],
-    card3=CARDS_DICT["9_OF_SPADES"],
-    card4=CARDS_DICT["10_OF_SPADES"],
-    card5=CARDS_DICT["ACE_OF_SPADES"],
+STRAIGHT_FLUSH_5_HI_SPADES = make_community_cards_for_testing(
+    [
+        "4_OF_SPADES",
+        "5_OF_SPADES",
+        "9_OF_SPADES",
+        "10_OF_SPADES",
+        "ACE_OF_SPADES",
+    ]
 )
 
-STRAIGHT_FLUSH_5_HI_SPADES_ALTERNATE = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["4_OF_SPADES"],
-    card2=CARDS_DICT["5_OF_SPADES"],
-    card3=CARDS_DICT["8_OF_SPADES"],
-    card4=CARDS_DICT["9_OF_SPADES"],
-    card5=CARDS_DICT["ACE_OF_SPADES"],
+STRAIGHT_FLUSH_5_HI_SPADES_ALTERNATE = make_community_cards_for_testing(
+    [
+        "4_OF_SPADES",
+        "5_OF_SPADES",
+        "8_OF_SPADES",
+        "9_OF_SPADES",
+        "ACE_OF_SPADES",
+    ]
 )
 
-STRAIGHT_FLUSH_7_HI_SPADES = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["4_OF_SPADES"],
-    card2=CARDS_DICT["5_OF_SPADES"],
-    card3=CARDS_DICT["6_OF_SPADES"],
-    card4=CARDS_DICT["7_OF_SPADES"],
-    card5=CARDS_DICT["ACE_OF_SPADES"],
+STRAIGHT_FLUSH_7_HI_SPADES = make_community_cards_for_testing(
+    [
+        "4_OF_SPADES",
+        "5_OF_SPADES",
+        "6_OF_SPADES",
+        "7_OF_SPADES",
+        "ACE_OF_SPADES",
+    ]
 )
 
-STRAIGHT_FLUSH_9_HI_SPADES = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["5_OF_SPADES"],
-    card2=CARDS_DICT["6_OF_SPADES"],
-    card3=CARDS_DICT["7_OF_SPADES"],
-    card4=CARDS_DICT["8_OF_SPADES"],
-    card5=CARDS_DICT["9_OF_SPADES"],
+STRAIGHT_FLUSH_9_HI_SPADES = make_community_cards_for_testing(
+    [
+        "5_OF_SPADES",
+        "6_OF_SPADES",
+        "7_OF_SPADES",
+        "8_OF_SPADES",
+        "9_OF_SPADES",
+    ]
 )
 
-STRAIGHT_FLUSH_ACE_HI_SPADES = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["10_OF_SPADES"],
-    card2=CARDS_DICT["JACK_OF_SPADES"],
-    card3=CARDS_DICT["QUEEN_OF_SPADES"],
-    card4=CARDS_DICT["KING_OF_SPADES"],
-    card5=CARDS_DICT["ACE_OF_SPADES"],
+STRAIGHT_FLUSH_ACE_HI_SPADES = make_community_cards_for_testing(
+    [
+        "10_OF_SPADES",
+        "JACK_OF_SPADES",
+        "QUEEN_OF_SPADES",
+        "KING_OF_SPADES",
+        "ACE_OF_SPADES",
+    ]
 )
 
 VALID_STRAIGHT_FLUSH_CASES_IN_ASCENDING_STRENGTH = [

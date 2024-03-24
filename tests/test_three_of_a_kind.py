@@ -1,69 +1,74 @@
-from src.community_cards import CommunityCards
-from src.deck import Deck
 from src.three_of_a_kind import THREE_OF_A_KIND_HAND_TYPE_SCORE
-from tests.tests_config import CARDS_DICT, hand_type_test_builder
+from tests.tests_config import hand_type_test_builder, make_community_cards_for_testing
 
-THREE_OF_A_KIND_2S = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["2_OF_DIAMONDS"],
-    card2=CARDS_DICT["2_OF_HEARTS"],
-    card3=CARDS_DICT["4_OF_SPADES"],
-    card4=CARDS_DICT["7_OF_DIAMONDS"],
-    card5=CARDS_DICT["ACE_OF_SPADES"],
+THREE_OF_A_KIND_2S = make_community_cards_for_testing(
+    [
+        "2_OF_DIAMONDS",
+        "2_OF_HEARTS",
+        "4_OF_SPADES",
+        "7_OF_DIAMONDS",
+        "ACE_OF_SPADES",
+    ]
 )
 
-THREE_OF_A_KIND_2S_ALTERNATE = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["2_OF_DIAMONDS"],
-    card2=CARDS_DICT["2_OF_CLUBS"],
-    card3=CARDS_DICT["4_OF_SPADES"],
-    card4=CARDS_DICT["7_OF_DIAMONDS"],
-    card5=CARDS_DICT["ACE_OF_DIAMONDS"],
+THREE_OF_A_KIND_2S_ALTERNATE = make_community_cards_for_testing(
+    [
+        "2_OF_DIAMONDS",
+        "2_OF_CLUBS",
+        "4_OF_SPADES",
+        "7_OF_DIAMONDS",
+        "ACE_OF_DIAMONDS",
+    ]
 )
 
-THREE_OF_A_KIND_2S_WEAKER_KICKERS = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["2_OF_DIAMONDS"],
-    card2=CARDS_DICT["2_OF_HEARTS"],
-    card3=CARDS_DICT["4_OF_SPADES"],
-    card4=CARDS_DICT["7_OF_DIAMONDS"],
-    card5=CARDS_DICT["KING_OF_SPADES"],
+THREE_OF_A_KIND_2S_WEAKER_KICKERS = make_community_cards_for_testing(
+    [
+        "2_OF_DIAMONDS",
+        "2_OF_HEARTS",
+        "4_OF_SPADES",
+        "7_OF_DIAMONDS",
+        "KING_OF_SPADES",
+    ]
 )
 
-THREE_OF_A_KIND_2S_WEAKEST_KICKERS = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["2_OF_DIAMONDS"],
-    card2=CARDS_DICT["2_OF_HEARTS"],
-    card3=CARDS_DICT["4_OF_SPADES"],
-    card4=CARDS_DICT["6_OF_DIAMONDS"],
-    card5=CARDS_DICT["KING_OF_SPADES"],
+THREE_OF_A_KIND_2S_WEAKEST_KICKERS = make_community_cards_for_testing(
+    [
+        "2_OF_DIAMONDS",
+        "2_OF_HEARTS",
+        "4_OF_SPADES",
+        "6_OF_DIAMONDS",
+        "KING_OF_SPADES",
+    ]
 )
 
-THREE_OF_A_KIND_3S = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["3_OF_DIAMONDS"],
-    card2=CARDS_DICT["3_OF_HEARTS"],
-    card3=CARDS_DICT["4_OF_SPADES"],
-    card4=CARDS_DICT["7_OF_DIAMONDS"],
-    card5=CARDS_DICT["ACE_OF_SPADES"],
+THREE_OF_A_KIND_3S = make_community_cards_for_testing(
+    [
+        "3_OF_DIAMONDS",
+        "3_OF_HEARTS",
+        "4_OF_SPADES",
+        "7_OF_DIAMONDS",
+        "ACE_OF_SPADES",
+    ]
 )
 
-THREE_OF_A_KIND_4S = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["4_OF_DIAMONDS"],
-    card2=CARDS_DICT["4_OF_HEARTS"],
-    card3=CARDS_DICT["4_OF_CLUBS"],
-    card4=CARDS_DICT["7_OF_DIAMONDS"],
-    card5=CARDS_DICT["ACE_OF_SPADES"],
+THREE_OF_A_KIND_4S = make_community_cards_for_testing(
+    [
+        "4_OF_DIAMONDS",
+        "4_OF_HEARTS",
+        "4_OF_CLUBS",
+        "7_OF_DIAMONDS",
+        "ACE_OF_SPADES",
+    ]
 )
 
-THREE_OF_A_KIND_ACES = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["ACE_OF_DIAMONDS"],
-    card2=CARDS_DICT["ACE_OF_HEARTS"],
-    card3=CARDS_DICT["ACE_OF_CLUBS"],
-    card4=CARDS_DICT["7_OF_DIAMONDS"],
-    card5=CARDS_DICT["4_OF_SPADES"],
+THREE_OF_A_KIND_ACES = make_community_cards_for_testing(
+    [
+        "ACE_OF_DIAMONDS",
+        "ACE_OF_HEARTS",
+        "ACE_OF_CLUBS",
+        "7_OF_DIAMONDS",
+        "4_OF_SPADES",
+    ]
 )
 
 VALID_THREE_OF_A_KIND_CASES_IN_ASCENDING_STRENGTH = [

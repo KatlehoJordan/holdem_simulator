@@ -1,33 +1,34 @@
-from src.community_cards import CommunityCards
-from src.deck import Deck
 from src.straight import STRAIGHT_HAND_TYPE_SCORE
-from tests.tests_config import CARDS_DICT, hand_type_test_builder
+from tests.tests_config import hand_type_test_builder, make_community_cards_for_testing
 
-STRAIGHT_6_HI = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["4_OF_DIAMONDS"],
-    card2=CARDS_DICT["5_OF_DIAMONDS"],
-    card3=CARDS_DICT["6_OF_DIAMONDS"],
-    card4=CARDS_DICT["10_OF_SPADES"],
-    card5=CARDS_DICT["ACE_OF_SPADES"],
+STRAIGHT_5_HI = make_community_cards_for_testing(
+    [
+        "4_OF_DIAMONDS",
+        "5_OF_DIAMONDS",
+        "9_OF_DIAMONDS",
+        "10_OF_SPADES",
+        "ACE_OF_SPADES",
+    ]
 )
 
-STRAIGHT_5_HI = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["4_OF_DIAMONDS"],
-    card2=CARDS_DICT["5_OF_DIAMONDS"],
-    card3=CARDS_DICT["9_OF_DIAMONDS"],
-    card4=CARDS_DICT["10_OF_SPADES"],
-    card5=CARDS_DICT["ACE_OF_SPADES"],
+STRAIGHT_5_HI_ALTERNATE = make_community_cards_for_testing(
+    [
+        "4_OF_DIAMONDS",
+        "5_OF_DIAMONDS",
+        "9_OF_DIAMONDS",
+        "10_OF_SPADES",
+        "ACE_OF_SPADES",
+    ]
 )
 
-STRAIGHT_5_HI_ALTERNATE = CommunityCards(
-    deck=Deck(),
-    card1=CARDS_DICT["4_OF_DIAMONDS"],
-    card2=CARDS_DICT["5_OF_DIAMONDS"],
-    card3=CARDS_DICT["9_OF_DIAMONDS"],
-    card4=CARDS_DICT["10_OF_SPADES"],
-    card5=CARDS_DICT["ACE_OF_SPADES"],
+STRAIGHT_6_HI = make_community_cards_for_testing(
+    [
+        "4_OF_DIAMONDS",
+        "5_OF_DIAMONDS",
+        "6_OF_DIAMONDS",
+        "10_OF_SPADES",
+        "ACE_OF_SPADES",
+    ]
 )
 
 VALID_STRAIGHT_CASES_IN_ASCENDING_ORDER = [
