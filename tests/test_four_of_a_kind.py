@@ -69,7 +69,7 @@ VALID_FOUR_OF_A_KIND_CASES_IN_ASCENDING_STRENGTH = [
 
 def test_four_of_a_kind():
     hand_type_test_builder(
-        hand_tested="flush",
+        hand_tested="four of a kind",
         valid_cases_in_ascending_strength=VALID_FOUR_OF_A_KIND_CASES_IN_ASCENDING_STRENGTH,
         expected_hand_type_score=FOUR_OF_A_KIND_HAND_TYPE_SCORE,
         valid_tie_case_1=FOUR_OF_A_KIND_2S,
