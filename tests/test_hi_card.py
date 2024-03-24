@@ -1,8 +1,7 @@
 from src.community_cards import CommunityCards
 from src.deck import Deck
 from src.hi_card import HI_CARD_HAND_TYPE_SCORE
-from src.player_hand import PlayerHand
-from tests.tests_config import CARDS_DICT, HOLE_CARDS_2_3_SPADES
+from tests.tests_config import CARDS_DICT, hand_type_test_builder
 
 HI_CARD_9 = CommunityCards(
     deck=Deck(),
@@ -40,49 +39,19 @@ HI_CARD_10_8_ALTERNATE = CommunityCards(
     card5=CARDS_DICT["10_OF_SPADES"],
 )
 
-
-def test_validate_hi_card(
-    hi_card_hand_type_score: int = HI_CARD_HAND_TYPE_SCORE,
-):
-    valid_cases = [
-        HI_CARD_9,
-        HI_CARD_10_9,
-        HI_CARD_10_8,
-        HI_CARD_10_8_ALTERNATE,
-    ]
-
-    for community_cards in valid_cases:
-        assert (
-            PlayerHand(
-                hole_cards=HOLE_CARDS_2_3_SPADES,
-                community_cards=community_cards,
-            ).hand_type.hand_type_score
-            == hi_card_hand_type_score
-        )
+VALID_HI_CARD_CASES_IN_ASCENDING_ORDER = [
+    HI_CARD_9,
+    HI_CARD_10_9,
+    HI_CARD_10_8,
+    HI_CARD_10_8_ALTERNATE,
+]
 
 
-def test_hi_card_tie_breaker():
-    community_cards_list = [
-        HI_CARD_9,
-        HI_CARD_10_9,
-        HI_CARD_10_8,
-        HI_CARD_10_8_ALTERNATE,
-    ]
-
-    hand_types = [
-        PlayerHand(
-            hole_cards=HOLE_CARDS_2_3_SPADES, community_cards=community_cards
-        ).hand_type
-        for community_cards in community_cards_list
-    ]
-
-    hand_type_scores = [hand_type.hand_type_score for hand_type in hand_types]
-    top_ranks = [hand_type.top_ranks[0] for hand_type in hand_types]
-
-    assert all(score == hand_type_scores[0] for score in hand_type_scores)
-    assert top_ranks == sorted(top_ranks)
-
-    assert (
-        hand_types[community_cards_list.index(HI_CARD_10_8)].top_ranks
-        == hand_types[community_cards_list.index(HI_CARD_10_8_ALTERNATE)].top_ranks
+def test_hi_card():
+    hand_type_test_builder(
+        hand_tested="hi card",
+        valid_cases_in_ascending_strength=VALID_HI_CARD_CASES_IN_ASCENDING_ORDER,
+        expected_hand_type_score=HI_CARD_HAND_TYPE_SCORE,
+        valid_tie_case_1=HI_CARD_10_8,
+        valid_tie_case_2=HI_CARD_10_8_ALTERNATE,
     )
