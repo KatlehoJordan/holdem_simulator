@@ -1,9 +1,5 @@
 from typing import List
 
-FOUR_OF_A_KIND_HAND_TYPE_SCORE = 7
-N_CARDS_IN_FOUR_OF_A_KIND = 4
-STRAIGHT_FLUSH_HAND_TYPE_SCORE = 8
-
 
 class HandType:
     def __init__(

@@ -23,10 +23,13 @@ class PlayerHand:
         validation_functions = [
             validate_straight_flush,
             validate_four_of_a_kind,
+            # TODO: add validate_full_house here
             validate_flush,
             validate_straight,
+            # TODO: add validate_three_of_a_kind here
+            # TODO: add validate_two_pair here
+            # TODO: add validate_pair here
             validate_hi_card,
-            # TODO: Add other validation functions here, starting with  straight then hi card since those validate functions have been started but must be made robust enough for use within the straight_flush validation function.
         ]
 
         for validate in validation_functions:
