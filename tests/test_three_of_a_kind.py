@@ -118,7 +118,6 @@ def test_three_of_a_kind():
     )
 
 
-# TODO: Implement all below since not yet implemented
 def test_compare_three_of_a_kinds():
     logger.debug("Test that the stronger three of a kind is always the winner")
     assert_winner_regardless_of_order(
@@ -158,8 +157,3 @@ def test_compare_three_of_a_kind_to_other_hands():
         winning_hole_cards=POCKET_6S,
         losing_hole_cards=HOLE_CARDS_KING_QUEEN_SPADES,
     )
-
-
-# TODO: Continue with tests for three of a kind, then three of a kind, then two pair, then pair
-
-# TODO: Extend this for determining the winner between multiple players, probably by extending the Hand class?
