@@ -6,6 +6,7 @@ from src.player_hand import (
 )
 from tests.test_straight_flush import (
     HOLE_CARDS_2_3_HEARTS,
+    HOLE_CARDS_2_7_SPADES_DIAMONDS,
     HOLE_CARDS_6_7_DIAMONDS,
     HOLE_CARDS_ACE_KING_HEARTS,
     HOLE_CARDS_KING_9_CLUBS,
@@ -210,4 +211,11 @@ def test_compare_four_of_a_kind_to_other_hands():
         community_cards=FOUR_OF_A_KIND_DOMINATING_WEAKER_HANDS,
         winning_hole_cards=POCKET_6S,
         losing_hole_cards=HOLE_CARDS_ACE_KING_HEARTS,
+    )
+
+    logger.debug("Test that a four of a kind beats a high card")
+    assert_winner_regardless_of_order(
+        community_cards=FOUR_OF_A_KIND_DOMINATING_WEAKER_HANDS,
+        winning_hole_cards=POCKET_6S,
+        losing_hole_cards=HOLE_CARDS_2_7_SPADES_DIAMONDS,
     )

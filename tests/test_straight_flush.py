@@ -146,6 +146,13 @@ HOLE_CARDS_6_7_DIAMONDS = make_hole_cards_for_testing(
     ]
 )
 
+HOLE_CARDS_2_7_SPADES_DIAMONDS = make_hole_cards_for_testing(
+    [
+        "2_OF_SPADES",
+        "7_OF_DIAMONDS",
+    ]
+)
+
 
 def test_straight_flush():
     hand_type_test_builder(
@@ -223,4 +230,11 @@ def test_compare_straight_flush_to_other_hands():
         community_cards=STRAIGHT_FLUSH_DOMINATING_ALL_OTHERS,
         winning_hole_cards=HOLE_CARDS_2_3_SPADES,
         losing_hole_cards=HOLE_CARDS_6_7_DIAMONDS,
+    )
+
+    logger.debug("Test that a straight flush beats a high card")
+    assert_winner_regardless_of_order(
+        community_cards=STRAIGHT_FLUSH_DOMINATING_ALL_OTHERS,
+        winning_hole_cards=HOLE_CARDS_2_3_SPADES,
+        losing_hole_cards=HOLE_CARDS_2_7_SPADES_DIAMONDS,
     )

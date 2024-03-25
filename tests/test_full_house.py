@@ -156,3 +156,10 @@ def test_compare_full_house_to_other_hands():
         winning_hole_cards=HOLE_CARDS_2_3_HEARTS,
         losing_hole_cards=HOLE_CARDS_KING_9_CLUBS,
     )
+
+    logger.debug("Test that a full house beats a high card")
+    assert_winner_regardless_of_order(
+        community_cards=FULL_HOUSE_DOMINATING_WEAKER_HANDS,
+        winning_hole_cards=HOLE_CARDS_2_3_HEARTS,
+        losing_hole_cards=HOLE_CARDS_KING_9_CLUBS,
+    )

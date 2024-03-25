@@ -6,6 +6,7 @@ from src.player_hand import (
 from src.straight import STRAIGHT_HAND_TYPE_SCORE
 from tests.test_flush import HOLE_CARDS_4_5_HEARTS, POCKET_4S
 from tests.test_straight_flush import (
+    HOLE_CARDS_2_7_SPADES_DIAMONDS,
     HOLE_CARDS_6_7_DIAMONDS,
     HOLE_CARDS_KING_9_CLUBS,
     POCKET_ACES,
@@ -129,4 +130,11 @@ def test_compare_straight_to_other_hands():
         community_cards=STRAIGHT_DOMINATING_WEAKER_HANDS,
         winning_hole_cards=HOLE_CARDS_6_7_DIAMONDS,
         losing_hole_cards=HOLE_CARDS_KING_9_CLUBS,
+    )
+
+    logger.debug("Test that a straight beats a high card")
+    assert_winner_regardless_of_order(
+        community_cards=STRAIGHT_DOMINATING_WEAKER_HANDS,
+        winning_hole_cards=HOLE_CARDS_6_7_DIAMONDS,
+        losing_hole_cards=HOLE_CARDS_2_7_SPADES_DIAMONDS,
     )

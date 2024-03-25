@@ -6,6 +6,7 @@ from src.player_hand import (
 )
 from tests.test_full_house import HOLE_CARDS_3_6_HEARTS
 from tests.test_straight_flush import (
+    HOLE_CARDS_ACE_KING_HEARTS,
     HOLE_CARDS_KING_9_CLUBS,
     HOLE_CARDS_KING_QUEEN_SPADES,
     POCKET_9S,
@@ -145,4 +146,11 @@ def test_compare_flush_to_other_hands():
         community_cards=FLUSH_DOMINATING_WEAKER_HANDS,
         winning_hole_cards=HOLE_CARDS_2_3_SPADES,
         losing_hole_cards=HOLE_CARDS_KING_9_CLUBS,
+    )
+
+    logger.debug("Test that a flush beats a high card")
+    assert_winner_regardless_of_order(
+        community_cards=FLUSH_DOMINATING_WEAKER_HANDS,
+        winning_hole_cards=HOLE_CARDS_2_3_SPADES,
+        losing_hole_cards=HOLE_CARDS_ACE_KING_HEARTS,
     )
