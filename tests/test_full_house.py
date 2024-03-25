@@ -156,4 +156,3 @@ def test_compare_full_house_to_other_hands():
         winning_hole_cards=HOLE_CARDS_2_3_HEARTS,
         losing_hole_cards=HOLE_CARDS_KING_9_CLUBS,
     )
-

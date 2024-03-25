@@ -211,5 +211,3 @@ def test_compare_four_of_a_kind_to_other_hands():
         winning_hole_cards=POCKET_6S,
         losing_hole_cards=HOLE_CARDS_ACE_KING_HEARTS,
     )
-
-
