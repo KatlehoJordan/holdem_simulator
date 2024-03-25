@@ -43,10 +43,6 @@ class Hand:
         deck = Deck()
         self.community_cards = CommunityCards(deck=deck)
         self.your_hole_cards = HoleCards(deck=deck)
-        self.your_player_hand = PlayerHand(
-            hole_cards=self.your_hole_cards, community_cards=self.community_cards
-        )
-
         self.hole_cards_for_players_ahead_of_you = (
             simulate_hole_cards_for_players_ahead_of_you(
                 n_players_ahead_of_you=n_players_ahead_of_you, deck=deck
@@ -54,7 +50,9 @@ class Hand:
         )
 
         cards_in_the_hand = (
-            [
+            [self.your_hole_cards.hi_card]
+            + [self.your_hole_cards.lo_card]
+            + [
                 hole_card.hi_card
                 for hole_card in self.hole_cards_for_players_ahead_of_you.values()
             ]
@@ -62,13 +60,14 @@ class Hand:
                 hole_card.lo_card
                 for hole_card in self.hole_cards_for_players_ahead_of_you.values()
             ]
-            + [self.your_hole_cards.hi_card]
-            + [self.your_hole_cards.lo_card]
             + self.community_cards.cards
         )
         if len(cards_in_the_hand) != len(set(cards_in_the_hand)):
             raise ValueError("There are non-unique cards in the hand.")
 
+        self.your_player_hand = PlayerHand(
+            hole_cards=self.your_hole_cards, community_cards=self.community_cards
+        )
         self.player_hands_for_players_ahead_of_you = (
             simulate_player_hands_for_players_head_of_you(
                 community_cards=self.community_cards,
@@ -76,8 +75,19 @@ class Hand:
             )
         )
 
-        # TODO: Add logic to this class cycle over the compare_player_hands function to determine the winner and or ties
+        player_hands_in_the_hand = [
+            [self.your_player_hand]
+            + [
+                player_hand
+                for player_hand in self.player_hands_for_players_ahead_of_you.values()
+            ]
+        ]
+        if len(player_hands_in_the_hand) != len(set(player_hands_in_the_hand)):
+            raise ValueError("There are non-unique hands in the hand.")
+        if len(player_hands_in_the_hand) < 2:
+            raise ValueError("There must be at least 2 player's hands in the hand.")
 
+        # TODO: Add logic to this class cycle over the compare_player_hands function to determine the winner and or ties, saving an attribute for the best_hand and the 'hole_cards_flavor'.
         # TODO: Extract result in terms of winning or tying hands, losing hands, and number of players for later tabulating during simulation of 1000s of hands
 
     def show_pot_size(self):

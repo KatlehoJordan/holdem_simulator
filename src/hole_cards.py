@@ -64,12 +64,12 @@ class HoleCards:
 
         if not pocket_pair:
             self.pocket_pair_bonus = 0.0
-            self.hand_flavor = (
+            self.hole_cards_flavor = (
                 f"{self.hi_card.rank}, {self.lo_card.rank} {self.suit_flavor}"
             )
         if pocket_pair:
             self.pocket_pair_bonus = pocket_pair_bonus
-            self.hand_flavor = f"Pair of {self.hi_card.rank}s"
+            self.hole_cards_flavor = f"Pair of {self.hi_card.rank}s"
 
         self.summed_value = round(
             self.base_strength
