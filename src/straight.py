@@ -50,7 +50,7 @@ def validate_straight(
 
     index_of_max_card = sorted_raw_rank_values.index(rank_of_max_card_in_straight)
     top_ranks_in_straight = sorted_raw_rank_values[
-        index_of_max_card : n_cards_in_a_straight + 1
+        index_of_max_card:n_cards_in_a_straight
     ]
     logger.debug(f"Top ranks in straight are {top_ranks_in_straight}.")
 

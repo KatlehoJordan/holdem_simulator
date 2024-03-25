@@ -41,7 +41,7 @@ STRAIGHT_FLUSH_9_HI_SPADES = make_community_cards_for_testing(
     ]
 )
 
-STRAIGHT_FLUSH_ACE_HI_SPADES = make_community_cards_for_testing(
+COMMUNITY_ROYAL_FLUSH = make_community_cards_for_testing(
     [
         "10_OF_SPADES",
         "JACK_OF_SPADES",
@@ -56,7 +56,7 @@ VALID_STRAIGHT_FLUSH_CASES_IN_ASCENDING_STRENGTH = [
     STRAIGHT_FLUSH_5_HI_SPADES_ALTERNATE,
     STRAIGHT_FLUSH_7_HI_SPADES,
     STRAIGHT_FLUSH_9_HI_SPADES,
-    STRAIGHT_FLUSH_ACE_HI_SPADES,
+    COMMUNITY_ROYAL_FLUSH,
 ]
 
 

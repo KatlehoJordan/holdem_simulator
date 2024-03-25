@@ -30,7 +30,7 @@ class HoleCards:
         subtraction_constant_after_shrinking: float = SUBTRACTION_CONSTANT_AFTER_SHRINKING,
     ):
         if not isinstance(deck, Deck):
-            raise ValueError(f"deck must be a Deck, not {type(deck)}")
+            raise ValueError(f"deck must be a Deck type, not {type(deck)}")
         cards = [card1, card2]
         cards = [card if isinstance(card, Card) else deck.draw_card() for card in cards]
 

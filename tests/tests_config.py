@@ -63,3 +63,8 @@ def make_community_cards_for_testing(list_of_5_cards: List[str]) -> CommunityCar
         card4=cards[3],
         card5=cards[4],
     )
+
+
+def make_hole_cards_for_testing(list_of_2_cards: List[str]) -> HoleCards:
+    cards = [CARDS_DICT[card] for card in list_of_2_cards]
+    return HoleCards(deck=Deck(), card1=cards[0], card2=cards[1])
