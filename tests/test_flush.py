@@ -118,7 +118,6 @@ def test_community_flush_ties():
     )
 
 
-# TODO: Implement all below since not yet implemented since building for full houses
 def test_compare_flush_to_other_hands():
     logger.debug("Test that a flush beats a straight")
     assert_winner_regardless_of_order(
@@ -147,8 +146,3 @@ def test_compare_flush_to_other_hands():
         winning_hole_cards=HOLE_CARDS_2_3_SPADES,
         losing_hole_cards=HOLE_CARDS_KING_9_CLUBS,
     )
-
-
-# TODO: Continue with tests for straight, then three of a kind, then two pair, then pair
-
-# TODO: Extend this for determining the winner between multiple players, probably by extending the Hand class?

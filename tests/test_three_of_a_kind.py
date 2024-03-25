@@ -90,3 +90,32 @@ def test_three_of_a_kind():
         valid_tie_case_1=THREE_OF_A_KIND_2S,
         valid_tie_case_2=THREE_OF_A_KIND_2S_ALTERNATE,
     )
+
+
+# TODO: Implement all below since not yet implemented
+def test_compare_straight_to_other_hands():
+    logger.debug("Test that a straight beats a three of a kind")
+    assert_winner_regardless_of_order(
+        community_cards=STRAIGHT_DOMINATING_WEAKER_HANDS,
+        winning_hole_cards=HOLE_CARDS_6_7_DIAMONDS,
+        losing_hole_cards=POCKET_4S,
+    )
+
+    logger.debug("Test that a straight beats a two pair")
+    assert_winner_regardless_of_order(
+        community_cards=STRAIGHT_DOMINATING_WEAKER_HANDS,
+        winning_hole_cards=HOLE_CARDS_6_7_DIAMONDS,
+        losing_hole_cards=HOLE_CARDS_4_5_HEARTS,
+    )
+
+    logger.debug("Test that a straight beats a pair")
+    assert_winner_regardless_of_order(
+        community_cards=STRAIGHT_DOMINATING_WEAKER_HANDS,
+        winning_hole_cards=HOLE_CARDS_6_7_DIAMONDS,
+        losing_hole_cards=HOLE_CARDS_KING_9_CLUBS,
+    )
+
+
+# TODO: Continue with tests for straight, then three of a kind, then two pair, then pair
+
+# TODO: Extend this for determining the winner between multiple players, probably by extending the Hand class?
