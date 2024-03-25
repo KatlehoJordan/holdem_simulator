@@ -76,6 +76,8 @@ class Hand:
             )
         )
 
+        # TODO: Add logic to this class cycle over the compare_player_hands function to determine the winner and or ties
+
         # TODO: Extract result in terms of winning or tying hands, losing hands, and number of players for later tabulating during simulation of 1000s of hands
 
     def show_pot_size(self):

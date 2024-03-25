@@ -4,7 +4,16 @@ from src.player_hand import (
     assert_tie_regardless_of_order,
     assert_winner_regardless_of_order,
 )
-from tests.tests_config import hand_type_test_builder, make_community_cards_for_testing
+from tests.test_straight_flush import (
+    HOLE_CARDS_2_7_SPADES_DIAMONDS,
+    HOLE_CARDS_ACE_KING_HEARTS,
+    HOLE_CARDS_KING_9_CLUBS,
+)
+from tests.tests_config import (
+    HOLE_CARDS_2_3_SPADES,
+    hand_type_test_builder,
+    make_community_cards_for_testing,
+)
 
 PAIR_OF_2S = make_community_cards_for_testing(
     [
@@ -76,10 +85,10 @@ PAIR_OF_4S = make_community_cards_for_testing(
     ]
 )
 
-PAIR_OF_ACES = make_community_cards_for_testing(
+COMMUNITY_PAIR_OF_ACES = make_community_cards_for_testing(
     [
-        "4_OF_SPADES",
-        "6_OF_DIAMONDS",
+        "8_OF_SPADES",
+        "10_OF_DIAMONDS",
         "QUEEN_OF_HEARTS",
         "ACE_OF_DIAMONDS",
         "ACE_OF_SPADES",
@@ -94,8 +103,18 @@ VALID_PAIR_CASES_IN_ASCENDING_STRENGTH = [
     PAIR_OF_2S_ALTERNATE,
     PAIR_OF_3S,
     PAIR_OF_4S,
-    PAIR_OF_ACES,
+    COMMUNITY_PAIR_OF_ACES,
 ]
+
+PAIR_DOMINATING_WEAKER_HANDS = make_community_cards_for_testing(
+    [
+        "4_OF_SPADES",
+        "5_OF_CLUBS",
+        "6_OF_HEARTS",
+        "9_OF_HEARTS",
+        "ACE_OF_SPADES",
+    ]
+)
 
 
 def test_pair():
@@ -108,12 +127,11 @@ def test_pair():
     )
 
 
-# TODO: Implement all below since not yet implemented
 def test_compare_pairs():
     logger.debug("Test that the stronger pair is always the winner")
     assert_winner_regardless_of_order(
-        community_cards=COMMUNITY_TWO_PAIR_ACES_AND_KINGS,
-        winning_hole_cards=HOLE_CARDS_10_JACK_SPADES,
+        community_cards=COMMUNITY_PAIR_OF_ACES,
+        winning_hole_cards=HOLE_CARDS_KING_9_CLUBS,
         losing_hole_cards=HOLE_CARDS_2_7_SPADES_DIAMONDS,
     )
 
@@ -121,7 +139,7 @@ def test_compare_pairs():
 def test_community_pair_ties():
     logger.debug("Test that a community pair is always a tie")
     assert_tie_regardless_of_order(
-        community_cards=COMMUNITY_TWO_PAIR_ACES_AND_KINGS,
+        community_cards=COMMUNITY_PAIR_OF_ACES,
         hole_cards_1=HOLE_CARDS_2_7_SPADES_DIAMONDS,
         hole_cards_2=HOLE_CARDS_2_3_SPADES,
     )
@@ -130,12 +148,7 @@ def test_community_pair_ties():
 def test_compare_pair_to_other_hands():
     logger.debug("Test that a pair beats a high card")
     assert_winner_regardless_of_order(
-        community_cards=TWO_PAIR_DOMINATING_WEAKER_HANDS,
+        community_cards=PAIR_DOMINATING_WEAKER_HANDS,
         winning_hole_cards=HOLE_CARDS_ACE_KING_HEARTS,
         losing_hole_cards=HOLE_CARDS_2_7_SPADES_DIAMONDS,
     )
-
-
-# TODO: Continue with tests for pair, then pair, then pair, then pair
-
-# TODO: Extend this for determining the winner between multiple players, probably by extending the Hand class?
