@@ -213,6 +213,3 @@ def test_compare_four_of_a_kind_to_other_hands():
     )
 
 
-# TODO: Continue with tests for full house, then flush, then straight, then three of a kind, then two pair, then pair
-
-# TODO: Extend this for determining the winner between multiple players, probably by extending the Hand class?

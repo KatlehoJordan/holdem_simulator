@@ -24,7 +24,8 @@ def validate_full_house(
         for card in list_of_7_cards
         if card.rank.raw_rank_value != three_of_a_kind_rank
     ]
-    pair_found, _, top_ranks_in_pair, _ = validate_pair(remaining_cards)
+    result_of_pair_validation = validate_pair(remaining_cards)
+    pair_found, _, top_ranks_in_pair, _ = result_of_pair_validation
     pair_rank = top_ranks_in_pair[0]
 
     if three_of_a_kind_found and pair_found:
