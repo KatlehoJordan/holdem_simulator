@@ -15,6 +15,7 @@ from src.scaling_constants import (
 FLUSH_POTENTIAL_BONUS = 8.0
 POCKET_PAIR_BONUS = 66.0
 STRAIGHT_POTENTIAL_BONUS_FACTOR = 1.0
+DEFAULT_WHOSE_CARDS = "Your"
 
 
 class HoleCards:
@@ -22,6 +23,8 @@ class HoleCards:
     def __init__(
         self,
         deck: Deck,
+        whose_cards: str = DEFAULT_WHOSE_CARDS,
+        default_whose_cards: str = DEFAULT_WHOSE_CARDS,
         card1: Union[Card, None] = None,
         card2: Union[Card, None] = None,
         flush_potential_bonus: float = FLUSH_POTENTIAL_BONUS,
@@ -83,13 +86,16 @@ class HoleCards:
         self.hole_cards_shrunk_less_constant = (
             self.hole_cards_shrunk_value - subtraction_constant_after_shrinking
         )
-        hi_card_message = f"Your hi card is: {self.hi_card.name}"
-        lo_card_message = f"Your lo card is: {self.lo_card.name}"
+        hi_card_message = f"{whose_cards} hi card is: {self.hi_card.name}"
+        lo_card_message = f"{whose_cards} lo card is: {self.lo_card.name}"
         self.name = f"{hi_card_message}\n{lo_card_message}"
-        logger.info("%s", self)
+        if whose_cards == default_whose_cards:
+            logger.info("%s\n", self)
+        else:
+            logger.debug("%s\n", self)
 
     def __str__(self):
-        return f"\n\n{self.name}"
+        return f"\n{self.name}"
 
     def show_base_strength(self):
         logger.info("Base strength:")

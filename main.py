@@ -37,8 +37,12 @@ Do you want to train again?
 def main(
     starting_prompt: str = STARTING_PROMPT,
     continuation_prompt: str = CONTINUATION_PROMPT,
+    simulating_single_hand: bool = False,
 ) -> None:
     clear_console()
+    if simulating_single_hand:
+        hand = Hand()
+        exit()
     user_input = input_with_escape_hatch(starting_prompt)
     if user_input.lower() not in ["y", "", "n", "0"]:
         print("You did not enter a valid response. Please try again.")
@@ -76,4 +80,4 @@ def main(
 
 
 if __name__ == "__main__":
-    main()
+    main(simulating_single_hand=True)

@@ -34,12 +34,14 @@ def validate_two_pair(
             if ((rank != first_pair_rank) and (rank != second_pair_rank))
         ]
 
+        kicker = remaining_ranks[0]
+
         top_ranks_in_two_pair = (
             top_ranks_in_first_pair[0:N_CARDS_IN_PAIR]
             + top_ranks_in_second_pair[0:N_CARDS_IN_PAIR]
-            + [remaining_ranks[0]]
+            + [kicker]
         )
-        name = f"{hand_name_root}: {first_pair_rank}s over {second_pair_rank}s."
+        name = f"{hand_name_root}: {first_pair_rank}s over {second_pair_rank}s with {kicker} kicker."
     else:
         two_pair_found = False
         top_ranks_in_two_pair = []

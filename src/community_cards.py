@@ -32,7 +32,7 @@ class CommunityCards:
                 raise ValueError(f"card{ith_card} must be a Card, not {type(card)}")
 
         self.name = "\n".join(card.name for card in self.cards)
-        logger.info("%s", self)
+        logger.info("%s\n", self)
 
     def __str__(self):
         return f"\nThe community cards are:\n{self.name}"
