@@ -214,12 +214,12 @@ def _ensure_player_hands_are_valid(player_hands_in_the_hand: list[PlayerHand]) -
 
 
 def _determine_winners_and_losers(
-    first_player_wins_string: str,
-    second_player_wins_string: str,
-    players_tie_string: str,
-    hand_winner_flavor: str,
-    hand_tie_flavor: str,
     player_hands_in_the_hand: List[PlayerHand],
+    first_player_wins_string: str = FIRST_PLAYER_WINS_STRING,
+    second_player_wins_string: str = SECOND_PLAYER_WINS_STRING,
+    players_tie_string: str = PLAYERS_TIE_STRING,
+    hand_winner_flavor: str = HAND_WINNER_FLAVOR,
+    hand_tie_flavor: str = HAND_TIE_FLAVOR,
 ) -> Tuple[List[PlayerHand], List[PlayerHand], str]:
     current_best_hand = player_hands_in_the_hand[0]
     winning_hands = []
@@ -311,11 +311,6 @@ def _determine_player_hands(
 def _assign_hand_attributes(
     n_players_ahead_of_you: Union[PlayersAheadOfYou, None] = None,
     small_blind: Union[SmallBlind, None] = None,
-    first_player_wins_string: str = FIRST_PLAYER_WINS_STRING,
-    second_player_wins_string: str = SECOND_PLAYER_WINS_STRING,
-    players_tie_string: str = PLAYERS_TIE_STRING,
-    hand_winner_flavor: str = HAND_WINNER_FLAVOR,
-    hand_tie_flavor: str = HAND_TIE_FLAVOR,
 ) -> Tuple[
     str, int, int, List[PlayerHand], List[PlayerHand], List[PlayerHand], str, str
 ]:
@@ -338,11 +333,6 @@ def _assign_hand_attributes(
     )
 
     winning_hands, losing_hands, winning_type = _determine_winners_and_losers(
-        first_player_wins_string,
-        second_player_wins_string,
-        players_tie_string,
-        hand_winner_flavor,
-        hand_tie_flavor,
         player_hands_in_the_hand,
     )
 
