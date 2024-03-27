@@ -35,46 +35,27 @@ class Hand:
         hand_winner_flavor: str = HAND_WINNER_FLAVOR,
         hand_tie_flavor: str = HAND_TIE_FLAVOR,
     ):
-        n_players_ahead_of_you, small_blind = _init_n_players_and_small_blind(
-            n_players_ahead_of_you, small_blind
-        )
-        self.max_bet = BigBlind(small_blind).amount
-        deck = Deck()
-        self.your_hole_cards = HoleCards(deck=deck)
-        self.pot_size = small_blind.amount + self.max_bet
-        self.pot_odds = _calculate_pot_odds(self.max_bet, self.pot_size)
-        self.pot_size, self.pot_odds = _simulate_bets_for_players_ahead_of_you(
-            n_players_ahead_of_you, self.max_bet, self.pot_size, self.pot_odds
-        )
-        self.community_cards = CommunityCards(deck=deck)
-        self.hole_cards_for_players_ahead_of_you = (
-            _simulate_hole_cards_for_players_ahead_of_you(
-                n_players_ahead_of_you=n_players_ahead_of_you, deck=deck
-            )
+        (
+            self.n_players_ahead_of_you,
+            self.max_bet,
+            self.your_hole_cards,
+            self.pot_size,
+            self.pot_odds,
+            self.community_cards,
+            self.hole_cards_for_players_ahead_of_you,
+        ) = _init_cards_and_bets(
+            n_players_ahead_of_you=n_players_ahead_of_you, small_blind=small_blind
         )
 
-        _ensure_cards_in_hand_are_unique(
+        (
+            self.your_player_hand,
+            self.player_hands_for_players_ahead_of_you,
+            self.player_hands_in_the_hand,
+        ) = _determine_player_hands(
             your_hole_cards=self.your_hole_cards,
-            hole_cards_for_players_ahead_of_you=self.hole_cards_for_players_ahead_of_you,
             community_cards=self.community_cards,
+            hole_cards_for_players_ahead_of_you=self.hole_cards_for_players_ahead_of_you,
         )
-
-        self.your_player_hand = PlayerHand(
-            hole_cards=self.your_hole_cards, community_cards=self.community_cards
-        )
-        self.player_hands_for_players_ahead_of_you = (
-            _simulate_player_hands_for_players_head_of_you(
-                community_cards=self.community_cards,
-                dict_of_hole_cards=self.hole_cards_for_players_ahead_of_you,
-            )
-        )
-
-        player_hands_in_the_hand = [self.your_player_hand] + [
-            player_hand
-            for player_hand in self.player_hands_for_players_ahead_of_you.values()
-        ]
-
-        _ensure_player_hands_are_valid(player_hands_in_the_hand)
 
         self.winning_hands, self.losing_hands, self.winning_type = (
             _determine_winners_and_losers(
@@ -83,14 +64,14 @@ class Hand:
                 players_tie_string,
                 hand_winner_flavor,
                 hand_tie_flavor,
-                player_hands_in_the_hand,
+                self.player_hands_in_the_hand,
             )
         )
 
         # TODO: Add logic to this class cycle over the compare_player_hands function to determine the winner and or ties, saving an attribute for the best_hand and the 'hole_cards_flavor'.
         # TODO: Extract result in terms of winning or tying hands, losing hands, and number of players for later tabulating during simulation of 1000s of hands
         self.name = _make_name_strings(
-            n_players_ahead_of_you,
+            self.n_players_ahead_of_you,
             self.community_cards,
             self.winning_type,
             self.winning_hands,
@@ -298,3 +279,70 @@ def _determine_winners_and_losers(
     ]
 
     return winning_hands, losing_hands, winning_type
+
+
+def _init_cards_and_bets(
+    n_players_ahead_of_you: Union[PlayersAheadOfYou, None] = None,
+    small_blind: Union[SmallBlind, None] = None,
+) -> Tuple[
+    PlayersAheadOfYou, int, HoleCards, int, str, CommunityCards, Dict[str, HoleCards]
+]:
+    n_players_ahead_of_you, small_blind = _init_n_players_and_small_blind(
+        n_players_ahead_of_you, small_blind
+    )
+    max_bet = BigBlind(small_blind).amount
+    deck = Deck()
+    your_hole_cards = HoleCards(deck=deck)
+    pot_size = small_blind.amount + max_bet
+    pot_odds = _calculate_pot_odds(max_bet, pot_size)
+    pot_size, pot_odds = _simulate_bets_for_players_ahead_of_you(
+        n_players_ahead_of_you, max_bet, pot_size, pot_odds
+    )
+    community_cards = CommunityCards(deck=deck)
+    hole_cards_for_players_ahead_of_you = _simulate_hole_cards_for_players_ahead_of_you(
+        n_players_ahead_of_you=n_players_ahead_of_you, deck=deck
+    )
+
+    _ensure_cards_in_hand_are_unique(
+        your_hole_cards=your_hole_cards,
+        hole_cards_for_players_ahead_of_you=hole_cards_for_players_ahead_of_you,
+        community_cards=community_cards,
+    )
+
+    return (
+        n_players_ahead_of_you,
+        max_bet,
+        your_hole_cards,
+        pot_size,
+        pot_odds,
+        community_cards,
+        hole_cards_for_players_ahead_of_you,
+    )
+
+
+def _determine_player_hands(
+    your_hole_cards: HoleCards,
+    community_cards: CommunityCards,
+    hole_cards_for_players_ahead_of_you: Dict[str, HoleCards],
+) -> Tuple[PlayerHand, Dict[str, PlayerHand], List[PlayerHand]]:
+    your_player_hand = PlayerHand(
+        hole_cards=your_hole_cards, community_cards=community_cards
+    )
+    player_hands_for_players_ahead_of_you = (
+        _simulate_player_hands_for_players_head_of_you(
+            community_cards=community_cards,
+            dict_of_hole_cards=hole_cards_for_players_ahead_of_you,
+        )
+    )
+
+    player_hands_in_the_hand = [your_player_hand] + [
+        player_hand for player_hand in player_hands_for_players_ahead_of_you.values()
+    ]
+
+    _ensure_player_hands_are_valid(player_hands_in_the_hand)
+
+    return (
+        your_player_hand,
+        player_hands_for_players_ahead_of_you,
+        player_hands_in_the_hand,
+    )
