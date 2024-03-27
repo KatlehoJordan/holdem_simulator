@@ -1,6 +1,6 @@
 from typing import List
 
-from src.card import CARDS_DICT
+from src.card import VALID_CARDS_DICT
 from src.community_cards import CommunityCards
 from src.config import logger
 from src.deck import Deck
@@ -8,7 +8,9 @@ from src.hole_cards import HoleCards
 from src.player_hand import PlayerHand
 
 HOLE_CARDS_2_3_SPADES = HoleCards(
-    deck=Deck(), card1=CARDS_DICT["2_OF_SPADES"], card2=CARDS_DICT["3_OF_SPADES"]
+    deck=Deck(),
+    card1=VALID_CARDS_DICT["2_OF_SPADES"],
+    card2=VALID_CARDS_DICT["3_OF_SPADES"],
 )
 
 
@@ -54,7 +56,7 @@ def hand_type_test_builder(
 
 
 def make_community_cards_for_testing(list_of_5_cards: List[str]) -> CommunityCards:
-    cards = [CARDS_DICT[card] for card in list_of_5_cards]
+    cards = [VALID_CARDS_DICT[card] for card in list_of_5_cards]
     return CommunityCards(
         deck=Deck(),
         card1=cards[0],
@@ -66,5 +68,5 @@ def make_community_cards_for_testing(list_of_5_cards: List[str]) -> CommunityCar
 
 
 def make_hole_cards_for_testing(list_of_2_cards: List[str]) -> HoleCards:
-    cards = [CARDS_DICT[card] for card in list_of_2_cards]
+    cards = [VALID_CARDS_DICT[card] for card in list_of_2_cards]
     return HoleCards(deck=Deck(), card1=cards[0], card2=cards[1])

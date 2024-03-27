@@ -5,6 +5,7 @@ from typing import Dict, List, Tuple, Union
 from src.active_player import ActivePlayer
 from src.bet import Bet
 from src.big_blind import BigBlind
+from src.card import Card
 from src.community_cards import CommunityCards
 from src.config import logger
 from src.deck import Deck
@@ -34,6 +35,7 @@ class Hand:
             self.pot_odds,
             self.max_bet,
             self.pot_size,
+            self.all_cards_in_the_hand,
             self.player_hands_in_the_hand,
             self.winning_hands,
             self.losing_hands,
@@ -165,7 +167,7 @@ def _simulate_hole_cards_for_players_ahead_of_you(
     return hole_cards
 
 
-def _simulate_player_hands_for_players_head_of_you(
+def _assign_player_hands_for_players_head_of_you(
     community_cards: CommunityCards,
     dict_of_hole_cards: Dict[str, HoleCards],
 ) -> Dict[str, PlayerHand]:
@@ -284,16 +286,30 @@ def _init_cards_and_bets(
     )
 
 
-def _determine_player_hands(
+def _make_list_of_all_cards_and_determine_player_hands(
     your_hole_cards: HoleCards,
     community_cards: CommunityCards,
     hole_cards_for_players_ahead_of_you: Dict[str, HoleCards],
-) -> List[PlayerHand]:
+) -> Tuple[List[Card], List[PlayerHand]]:
+    all_cards_in_the_hand = (
+        [your_hole_cards.hi_card]
+        + [your_hole_cards.lo_card]
+        + [
+            hole_card.hi_card
+            for hole_card in hole_cards_for_players_ahead_of_you.values()
+        ]
+        + [
+            hole_card.lo_card
+            for hole_card in hole_cards_for_players_ahead_of_you.values()
+        ]
+        + community_cards.cards
+    )
+
     your_player_hand = PlayerHand(
         hole_cards=your_hole_cards, community_cards=community_cards
     )
     player_hands_for_players_ahead_of_you = (
-        _simulate_player_hands_for_players_head_of_you(
+        _assign_player_hands_for_players_head_of_you(
             community_cards=community_cards,
             dict_of_hole_cards=hole_cards_for_players_ahead_of_you,
         )
@@ -305,14 +321,22 @@ def _determine_player_hands(
 
     _ensure_player_hands_are_valid(player_hands_in_the_hand)
 
-    return player_hands_in_the_hand
+    return all_cards_in_the_hand, player_hands_in_the_hand
 
 
 def _assign_hand_attributes(
     n_players_ahead_of_you: Union[PlayersAheadOfYou, None] = None,
     small_blind: Union[SmallBlind, None] = None,
 ) -> Tuple[
-    str, int, int, List[PlayerHand], List[PlayerHand], List[PlayerHand], str, str
+    str,
+    int,
+    int,
+    List[Card],
+    List[PlayerHand],
+    List[PlayerHand],
+    List[PlayerHand],
+    str,
+    str,
 ]:
     (
         n_players_in_the_hand,
@@ -326,20 +350,18 @@ def _assign_hand_attributes(
         n_players_ahead_of_you=n_players_ahead_of_you, small_blind=small_blind
     )
 
-    player_hands_in_the_hand = _determine_player_hands(
-        your_hole_cards=your_hole_cards,
-        community_cards=community_cards,
-        hole_cards_for_players_ahead_of_you=hole_cards_for_players_ahead_of_you,
+    all_cards_in_the_hand, player_hands_in_the_hand = (
+        _make_list_of_all_cards_and_determine_player_hands(
+            your_hole_cards=your_hole_cards,
+            community_cards=community_cards,
+            hole_cards_for_players_ahead_of_you=hole_cards_for_players_ahead_of_you,
+        )
     )
 
     winning_hands, losing_hands, winning_type = _determine_winners_and_losers(
         player_hands_in_the_hand,
     )
 
-    # TODO: Add logic to this function to cycle over the compare_player_hands function to determine the winner and or ties, saving an attribute for the best_hand and the 'hole_cards_flavor'.
-    # TODO: Extract result in terms of winning or tying hands, losing hands, and number of players for later tabulating during simulation of 1000s of hands
-    # TODO: Measure how frequently each player wins, ties, or loses (should expect uniform distribution for each player if my random drawing is working correctly)
-    # TODO: Measure how frequently each card appears in a hand (should expect a uniform distribution if my random drawing is working correctly)
     name = _make_name_strings(
         n_players_in_the_hand,
         community_cards,
@@ -352,6 +374,7 @@ def _assign_hand_attributes(
         pot_odds,
         max_bet,
         pot_size,
+        all_cards_in_the_hand,
         player_hands_in_the_hand,
         winning_hands,
         losing_hands,

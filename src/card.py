@@ -4,7 +4,7 @@ from src.config import VALID_RANKS_DICT, VALID_SUITS, logger
 from src.rank import Rank
 from src.suit import Suit
 
-CARDS_DICT = {}
+VALID_CARDS_DICT = {}
 
 
 class Card:
@@ -37,4 +37,4 @@ def sort_cards_by_raw_rank_value(list_of_7_cards: List[Card]) -> List[int]:
 for suit in VALID_SUITS:
     for rank in VALID_RANKS_DICT.keys():
         card_name = f"{rank.upper()}_OF_{suit.upper()}"
-        CARDS_DICT[card_name] = Card(Suit(suit), Rank(rank))
+        VALID_CARDS_DICT[card_name] = Card(Suit(suit), Rank(rank))
