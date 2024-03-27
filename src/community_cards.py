@@ -4,6 +4,8 @@ from src.card import Card
 from src.config import logger
 from src.deck import Deck
 
+N_CARDS_IN_COMMUNITY_CARDS = 5
+
 
 class CommunityCards:
     def __init__(

@@ -3,12 +3,14 @@ from pathlib import Path
 import pandas as pd
 
 from src.card import VALID_CARDS_DICT
+from src.community_cards import N_CARDS_IN_COMMUNITY_CARDS
 from src.config import logger
 from src.hand import Hand
+from src.hole_cards import N_HOLE_CARDS_PER_PLAYER
 from src.players_ahead_of_you import PlayersAheadOfYou
 
-# TODO: increase n_simulations to at least 10000 for 10 players
-# TODO: Simulations for all player counts between 2 and 10.
+# TODO: increase n_simulations to at least 10000 for 10 players. May want to disable logging to make it faster.
+# TODO: Run simulations for all player counts between 2 and 10.
 N_SIMULATIONS = 1
 N_PLAYERS_PER_SIMULATION = 2
 PATH_TO_SIMULATIONS = Path("simulations")
@@ -18,7 +20,6 @@ TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING = 0.1
 def simulate_hands(
     n_simulations: int = N_SIMULATIONS,
     n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
-    tolerance_threshold_for_random_drawing: float = TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING,
 ) -> None:
     logger.info("Initializing empty dataframe")
     df = pd.DataFrame()
@@ -35,8 +36,27 @@ def simulate_hands(
         )
         simulated_data = _extract_results_data(hand, n_players_per_simulation)
         df = pd.concat([df, simulated_data], ignore_index=True)
+        # TODO: Add logic to save the simulated_data to a csv file
 
+    aggregated_wins_df = _aggregate_total_wins(
+        df,
+        n_simulations,
+        n_players_per_simulation,
+    )
+    # TODO: Add logic to save the aggregated_df to a csv file and visualize the results
+
+    # TODO: Add logic to create, validate, save, and visualize an aggregated dataframe for totalling how often different cards appear in the hand, similar to what you've done with _aggregate_total_wins for wins
+    print("Pause here")
+
+
+def _aggregate_total_wins(
+    df: pd.DataFrame,
+    n_simulations: int = N_SIMULATIONS,
+    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+    tolerance_threshold_for_random_drawing: float = TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING,
+) -> pd.DataFrame:
     total_wins = 0.0
+    out_df = pd.DataFrame()
     for player in range(n_players_per_simulation):
         wins_as_float_key = (
             f"player_{player}_wins_as_float" if player != 0 else "you_win_as_float"
@@ -53,10 +73,14 @@ def simulate_hands(
                 f"Player {player}'s wins deviate from the expected number of wins by more than {tolerance_threshold_for_random_drawing:.0%}. A larger sample should be drawn or else the random assignment of cards to players is not working."
             )
         total_wins += this_players_wins
+        out_df = pd.concat(
+            [out_df, pd.DataFrame([{"player": player, "wins": this_players_wins}])],
+            ignore_index=True,
+        )
 
     if total_wins != n_simulations:
         raise ValueError("The sum of wins should equal the number of simulations")
-    print("Pause here")
+    return out_df
 
 
 def _extract_results_data(
@@ -102,26 +126,44 @@ def _extract_results_data(
         )
         data[win_as_float_key] = (1.0 / data["n_winners"]) if data[win_key] else 0.0
 
-    # TODO: Fix this, since it is not yielding True in columns when the cards are present
+    data["n_cards_in_hand"] = 0
     for card in valid_cards_dict.keys():
-        card_key = f"{card}"
-        data[card_key] = card in data["all_cards_in_the_hand"]
+        card_key = valid_cards_dict[card].name
+        data[card_key] = card_key in [
+            card.name for card in data["all_cards_in_the_hand"]
+        ]
+        data["n_cards_in_hand"] += data[card_key]
 
     df = pd.DataFrame([data])
-    df["n_cards_in_hand"] = df[[f"{card}" for card in valid_cards_dict.keys()]].sum(
-        axis=1
+
+    _validate_n_cards_in_hand(
+        df=df,
+        n_players_per_simulation=n_players_per_simulation,
     )
-    # TODO: Replace these magic numbers with constants
-    if not (df["n_cards_in_hand"] == (5 + 2 * n_players_per_simulation)).all():
-        raise ValueError(
-            "n_cards_in_hand is not equal to (5 + 2 * n_players_per_simulation)"
-        )
 
     # TODO: Add columns for all unique_cards and indicate with True or False if they appear in the hand
     # TODO: After the previous, make a summary in order to get %age win for each player, and %age of each unique_card in order to validate your random drawing is working as expected
     # TODO: Add columns for all hole_cards_flavors and indicate with True or False if they appear in the hand
     # TODO: After previous, calculate %age of each hole_cards_flavor
     return df
+
+
+def _validate_n_cards_in_hand(
+    df: pd.DataFrame,
+    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+    n_cards_in_community_cards: int = N_CARDS_IN_COMMUNITY_CARDS,
+    n_hole_cards_per_player: int = N_HOLE_CARDS_PER_PLAYER,
+) -> None:
+    if not (
+        df["n_cards_in_hand"]
+        == (
+            n_cards_in_community_cards
+            + n_hole_cards_per_player * n_players_per_simulation
+        )
+    ).all():
+        raise ValueError(
+            f"n_cards_in_hand is not equal to ({n_cards_in_community_cards} + {n_hole_cards_per_player} * {n_players_per_simulation})"
+        )
 
 
 # TODO: Finish building this function
