@@ -16,6 +16,9 @@ FLUSH_POTENTIAL_BONUS = 8.0
 POCKET_PAIR_BONUS = 66.0
 STRAIGHT_POTENTIAL_BONUS_FACTOR = 1.0
 DEFAULT_WHOSE_CARDS = "Your"
+HOLE_CARDS_SUITED_FLAVOR = "suited"
+HOLE_CARDS_OFF_SUIT_FLAVOR = "off suit"
+HOLE_CARDS_PAIRED_FLAVOR = "s paired"
 
 
 class HoleCards:
@@ -23,76 +26,27 @@ class HoleCards:
     def __init__(
         self,
         deck: Deck,
-        whose_cards: str = DEFAULT_WHOSE_CARDS,
-        default_whose_cards: str = DEFAULT_WHOSE_CARDS,
         card1: Union[Card, None] = None,
         card2: Union[Card, None] = None,
-        flush_potential_bonus: float = FLUSH_POTENTIAL_BONUS,
-        pocket_pair_bonus: float = POCKET_PAIR_BONUS,
-        hand_shrink_factor: float = HAND_SHRINK_FACTOR,
-        subtraction_constant_after_shrinking: float = SUBTRACTION_CONSTANT_AFTER_SHRINKING,
+        whose_cards: str = DEFAULT_WHOSE_CARDS,
     ):
-        if not isinstance(deck, Deck):
-            raise ValueError(f"deck must be a Deck type, not {type(deck)}")
-        cards = [card1, card2]
-        cards = [card if isinstance(card, Card) else deck.draw_card() for card in cards]
-
-        card_names = [card.name for card in cards]
-        for ith_card, card in enumerate(cards):
-            while card_names.count(card.name) > 1:
-                new_card = deck.draw_card()
-                cards[ith_card] = new_card
-                card_names[ith_card] = new_card.name
-
-        card1, card2 = cards
-        for ith_card, card in enumerate(cards, start=1):
-            if not isinstance(card, Card):
-                raise ValueError(f"card{ith_card} must be a Card, not {type(card)}")
-
-        self.hi_card, self.lo_card = determine_hi_and_lo_cards(card1, card2)
-
-        self.base_strength = self.hi_card.value + self.lo_card.value
-
-        self.flush_potential_bonus = 0.0
-        self.suit_flavor = "off suit"
-        if self.hi_card.suit.name == self.lo_card.suit.name:
-            self.flush_potential_bonus = flush_potential_bonus
-            self.suit_flavor = "suited"
-
-        pocket_pair, self.straight_potential_bonus = (
-            determine_pocket_pair_or_straight_potential_bonus(
-                self.hi_card, self.lo_card
-            )
+        self.hi_card, self.lo_card = _extract_hi_and_lo_cards(
+            deck=deck, card1=card1, card2=card2
         )
 
-        if not pocket_pair:
-            self.pocket_pair_bonus = 0.0
-            self.hole_cards_flavor = (
-                f"{self.hi_card.rank}, {self.lo_card.rank} {self.suit_flavor}"
-            )
-        if pocket_pair:
-            self.pocket_pair_bonus = pocket_pair_bonus
-            self.hole_cards_flavor = f"Pair of {self.hi_card.rank}s"
+        (
+            self.hole_cards_flavor,
+            self.base_strength,
+            self.summed_value,
+            self.pocket_pair_bonus,
+            self.flush_potential_bonus,
+            self.straight_potential_bonus,
+            self.hole_cards_shrunk_less_constant,
+        ) = _find_strength_of_hole_cards(hi_card=self.hi_card, lo_card=self.lo_card)
 
-        self.summed_value = round(
-            self.base_strength
-            + self.flush_potential_bonus
-            + self.straight_potential_bonus
-            + self.pocket_pair_bonus
+        self.name = _assign_name(
+            hi_card=self.hi_card, lo_card=self.lo_card, whose_cards=whose_cards
         )
-
-        self.hole_cards_shrunk_value = self.summed_value * hand_shrink_factor
-
-        self.hole_cards_shrunk_less_constant = (
-            self.hole_cards_shrunk_value - subtraction_constant_after_shrinking
-        )
-        hi_card_message = f"{whose_cards} hi card is: {self.hi_card.name}"
-        lo_card_message = f"{whose_cards} lo card is: {self.lo_card.name}"
-        self.name = f"{hi_card_message}\n{lo_card_message}"
-        if whose_cards == default_whose_cards:
-            logger.info("%s\n", self)
-        else:
-            logger.debug("%s\n", self)
 
     def __str__(self):
         return f"\n{self.name}"
@@ -126,7 +80,7 @@ class HoleCards:
         logger.info("%s", self.straight_potential_bonus)
 
 
-def determine_hi_and_lo_cards(card1: Card, card2: Card) -> tuple[Card, Card]:
+def _determine_hi_and_lo_cards(card1: Card, card2: Card) -> tuple[Card, Card]:
     hi_card = card1
     lo_card = card2
     if card1.value > card2.value:
@@ -147,22 +101,48 @@ def determine_hi_and_lo_cards(card1: Card, card2: Card) -> tuple[Card, Card]:
     return hi_card, lo_card
 
 
-def calculate_straight_potential_bonus(
+def _extract_hi_and_lo_cards(
+    deck: Deck,
+    card1: Union[Card, None] = None,
+    card2: Union[Card, None] = None,
+) -> tuple[Card, Card]:
+    if not isinstance(deck, Deck):
+        raise ValueError(f"deck must be a Deck type, not {type(deck)}")
+    cards = [card1, card2]
+    cards = [card if isinstance(card, Card) else deck.draw_card() for card in cards]
+
+    card_names = [card.name for card in cards]
+    for ith_card, card in enumerate(cards):
+        while card_names.count(card.name) > 1:
+            new_card = deck.draw_card()
+            cards[ith_card] = new_card
+            card_names[ith_card] = new_card.name
+
+    card1, card2 = cards
+    for ith_card, card in enumerate(cards, start=1):
+        if not isinstance(card, Card):
+            raise ValueError(f"card{ith_card} must be a Card, not {type(card)}")
+
+    hi_card, lo_card = _determine_hi_and_lo_cards(card1, card2)
+    return hi_card, lo_card
+
+
+def _calculate_straight_potential_bonus(
     rank_diff: int,
     straight_potential_bonus_factor: float = STRAIGHT_POTENTIAL_BONUS_FACTOR,
     number_of_cards_in_a_straight: int = NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
-):
+) -> float:
     return straight_potential_bonus_factor * abs(
         rank_diff - number_of_cards_in_a_straight
     )
 
 
-def determine_pocket_pair_or_straight_potential_bonus(
+def _determine_pocket_pair_or_straight_potential_bonus(
     hi_card: Card,
     lo_card: Card,
     number_of_cards_in_a_straight: int = NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
     ace_as_low_raw_rank_value: int = ACE_AS_LOW_RAW_RANK_VALUE,
-):
+) -> tuple[bool, float]:
     rank_diff = hi_card.rank.raw_rank_value - lo_card.rank.raw_rank_value
     pocket_pair = False
     straight_potential_bonus = 0.0
@@ -170,12 +150,98 @@ def determine_pocket_pair_or_straight_potential_bonus(
         pocket_pair = True
     elif 0 < rank_diff:
         if rank_diff < number_of_cards_in_a_straight:
-            straight_potential_bonus = calculate_straight_potential_bonus(rank_diff)
+            straight_potential_bonus = _calculate_straight_potential_bonus(rank_diff)
         elif hi_card.rank == "Ace":
             alternative_rank_diff = (
                 lo_card.rank.raw_rank_value - ace_as_low_raw_rank_value
             )
-            straight_potential_bonus = calculate_straight_potential_bonus(
+            straight_potential_bonus = _calculate_straight_potential_bonus(
                 alternative_rank_diff
             )
     return pocket_pair, straight_potential_bonus
+
+
+def _assign_bonuses_and_hole_cards_flavor(
+    hi_card,
+    lo_card,
+    flush_potential_bonus: float = FLUSH_POTENTIAL_BONUS,
+    pocket_pair_bonus: float = POCKET_PAIR_BONUS,
+    hole_cards_off_suit_flavor: str = HOLE_CARDS_OFF_SUIT_FLAVOR,
+    hole_cards_suited_flavor: str = HOLE_CARDS_SUITED_FLAVOR,
+    hole_cards_paired_flavor: str = HOLE_CARDS_PAIRED_FLAVOR,
+):
+    suit_flavor = hole_cards_off_suit_flavor
+    if hi_card.suit.name == lo_card.suit.name:
+        suit_flavor = hole_cards_suited_flavor
+    else:
+        flush_potential_bonus = 0.0
+
+    pocket_pair, straight_potential_bonus = (
+        _determine_pocket_pair_or_straight_potential_bonus(hi_card, lo_card)
+    )
+
+    hole_cards_flavor = f"{hi_card.rank}{hole_cards_paired_flavor}"
+    if not pocket_pair:
+        pocket_pair_bonus = 0.0
+        hole_cards_flavor = f"{hi_card.rank}, {lo_card.rank} {suit_flavor}"
+    return (
+        flush_potential_bonus,
+        pocket_pair_bonus,
+        straight_potential_bonus,
+        hole_cards_flavor,
+    )
+
+
+def _find_strength_of_hole_cards(
+    hi_card: Card,
+    lo_card: Card,
+    hand_shrink_factor: float = HAND_SHRINK_FACTOR,
+    subtraction_constant_after_shrinking: float = SUBTRACTION_CONSTANT_AFTER_SHRINKING,
+) -> tuple[str, float, float, float, float, float, float]:
+    base_strength = hi_card.value + lo_card.value
+
+    (
+        flush_potential_bonus,
+        pocket_pair_bonus,
+        straight_potential_bonus,
+        hole_cards_flavor,
+    ) = _assign_bonuses_and_hole_cards_flavor(hi_card, lo_card)
+
+    summed_value = round(
+        base_strength
+        + flush_potential_bonus
+        + straight_potential_bonus
+        + pocket_pair_bonus
+    )
+
+    hole_cards_shrunk_value = summed_value * hand_shrink_factor
+
+    hole_cards_shrunk_less_constant = (
+        hole_cards_shrunk_value - subtraction_constant_after_shrinking
+    )
+
+    return (
+        hole_cards_flavor,
+        base_strength,
+        summed_value,
+        pocket_pair_bonus,
+        flush_potential_bonus,
+        straight_potential_bonus,
+        hole_cards_shrunk_less_constant,
+    )
+
+
+def _assign_name(
+    hi_card: Card,
+    lo_card: Card,
+    whose_cards: str = DEFAULT_WHOSE_CARDS,
+    default_whose_cards: str = DEFAULT_WHOSE_CARDS,
+) -> str:
+    hi_card_message = f"{whose_cards} hi card is: {hi_card.name}"
+    lo_card_message = f"{whose_cards} lo card is: {lo_card.name}"
+    name = f"{hi_card_message}\n{lo_card_message}"
+    if whose_cards == default_whose_cards:
+        logger.info("%s\n", name)
+    else:
+        logger.debug("%s\n", name)
+    return name

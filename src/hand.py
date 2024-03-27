@@ -156,9 +156,9 @@ def _simulate_hole_cards_for_players_ahead_of_you(
         player_n = f"Player {player + 1}"
         player_n_hole_cards = HoleCards(
             deck=deck,
-            whose_cards=f"{player_n}'s",
             card1=deck.draw_card(),
             card2=deck.draw_card(),
+            whose_cards=f"{player_n}'s",
         )
         logger.debug("%s has hole cards: %s", player_n, player_n_hole_cards.name)
         hole_cards[player_n] = player_n_hole_cards
