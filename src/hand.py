@@ -248,9 +248,7 @@ def _determine_winners_and_losers(
 def _init_cards_and_bets(
     n_players_ahead_of_you: Union[PlayersAheadOfYou, None] = None,
     small_blind: Union[SmallBlind, None] = None,
-) -> Tuple[
-    PlayersAheadOfYou, int, HoleCards, int, str, CommunityCards, Dict[str, HoleCards]
-]:
+) -> Tuple[int, int, HoleCards, int, str, CommunityCards, Dict[str, HoleCards]]:
     n_players_ahead_of_you, small_blind = _init_n_players_and_small_blind(
         n_players_ahead_of_you, small_blind
     )
@@ -267,6 +265,8 @@ def _init_cards_and_bets(
         n_players_ahead_of_you=n_players_ahead_of_you, deck=deck
     )
 
+    n_players_in_the_hand = n_players_ahead_of_you.n + 1
+
     _ensure_cards_in_hand_are_unique(
         your_hole_cards=your_hole_cards,
         hole_cards_for_players_ahead_of_you=hole_cards_for_players_ahead_of_you,
@@ -274,7 +274,7 @@ def _init_cards_and_bets(
     )
 
     return (
-        n_players_ahead_of_you,
+        n_players_in_the_hand,
         max_bet,
         your_hole_cards,
         pot_size,
@@ -320,7 +320,7 @@ def _assign_hand_attributes(
     str, int, int, List[PlayerHand], List[PlayerHand], List[PlayerHand], str, str
 ]:
     (
-        n_players_ahead_of_you,
+        n_players_in_the_hand,
         max_bet,
         your_hole_cards,
         pot_size,
@@ -330,8 +330,6 @@ def _assign_hand_attributes(
     ) = _init_cards_and_bets(
         n_players_ahead_of_you=n_players_ahead_of_you, small_blind=small_blind
     )
-
-    n_players_in_the_hand = n_players_ahead_of_you.n + 1
 
     player_hands_in_the_hand = _determine_player_hands(
         your_hole_cards=your_hole_cards,
