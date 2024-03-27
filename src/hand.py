@@ -29,57 +29,21 @@ class Hand:
         self,
         n_players_ahead_of_you: Union[PlayersAheadOfYou, None] = None,
         small_blind: Union[SmallBlind, None] = None,
-        first_player_wins_string: str = FIRST_PLAYER_WINS_STRING,
-        second_player_wins_string: str = SECOND_PLAYER_WINS_STRING,
-        players_tie_string: str = PLAYERS_TIE_STRING,
-        hand_winner_flavor: str = HAND_WINNER_FLAVOR,
-        hand_tie_flavor: str = HAND_TIE_FLAVOR,
     ):
         (
-            self.n_players_ahead_of_you,
-            self.max_bet,
-            self.your_hole_cards,
-            self.pot_size,
             self.pot_odds,
-            self.community_cards,
-            self.hole_cards_for_players_ahead_of_you,
-        ) = _init_cards_and_bets(
-            n_players_ahead_of_you=n_players_ahead_of_you, small_blind=small_blind
-        )
-
-        (
-            self.your_player_hand,
-            self.player_hands_for_players_ahead_of_you,
+            self.max_bet,
+            self.pot_size,
             self.player_hands_in_the_hand,
-        ) = _determine_player_hands(
-            your_hole_cards=self.your_hole_cards,
-            community_cards=self.community_cards,
-            hole_cards_for_players_ahead_of_you=self.hole_cards_for_players_ahead_of_you,
-        )
-
-        self.winning_hands, self.losing_hands, self.winning_type = (
-            _determine_winners_and_losers(
-                first_player_wins_string,
-                second_player_wins_string,
-                players_tie_string,
-                hand_winner_flavor,
-                hand_tie_flavor,
-                self.player_hands_in_the_hand,
-            )
-        )
-
-        # TODO: Add logic to this class cycle over the compare_player_hands function to determine the winner and or ties, saving an attribute for the best_hand and the 'hole_cards_flavor'.
-        # TODO: Extract result in terms of winning or tying hands, losing hands, and number of players for later tabulating during simulation of 1000s of hands
-        self.name = _make_name_strings(
-            self.n_players_ahead_of_you,
-            self.community_cards,
-            self.winning_type,
             self.winning_hands,
             self.losing_hands,
+            self.winning_type,
+            self.name,
+        ) = _assign_hand_attributes(
+            n_players_ahead_of_you=n_players_ahead_of_you,
+            small_blind=small_blind,
         )
         logger.info("%s\n", self)
-
-        # TODO: Refactor this class to be smaller/more modular, easier to maintain in the long run
 
     def __str__(self):
         return f"\n{self.name}"
@@ -218,18 +182,18 @@ def _simulate_player_hands_for_players_head_of_you(
 
 
 def _make_name_strings(
-    n_players_ahead_of_you: PlayersAheadOfYou,
+    n_players_in_the_hand: int,
     community_cards: CommunityCards,
     winning_type: str,
     winning_hands: list[PlayerHand],
     losing_hands: list[PlayerHand],
 ) -> str:
-    n_players_string = f"\nHand with {n_players_ahead_of_you.n + 1} players\n"
-    community_cards_string = f"\nCommunity cards:\n{community_cards.name}.\n"
-    winning_type_string = f"\nWinning type: {winning_type}.\n"
-    winning_hands_string = f"\nWinning hand(s): {winning_hands[0]}\n"
+    n_players_string = f"\nN players in hand:\n{n_players_in_the_hand}\n"
+    community_cards_string = f"\nCommunity cards:\n{community_cards.name}\n"
+    winning_type_string = f"\nWinning type:\n{winning_type}.\n"
+    winning_hands_string = f"\nWinning hand(s):\n{winning_hands[0]}\n"
     losing_hands_string = (
-        "\nLosing hand(s):" + "\n".join(str(hand) for hand in losing_hands) + "\n"
+        "\nLosing hand(s):\n" + "\n".join(str(hand) for hand in losing_hands) + "\n"
     )
     winning_hole_cards_string = (
         f"\nWinning hole cards: {winning_hands[0].hole_cards}.\n"
@@ -324,7 +288,7 @@ def _determine_player_hands(
     your_hole_cards: HoleCards,
     community_cards: CommunityCards,
     hole_cards_for_players_ahead_of_you: Dict[str, HoleCards],
-) -> Tuple[PlayerHand, Dict[str, PlayerHand], List[PlayerHand]]:
+) -> List[PlayerHand]:
     your_player_hand = PlayerHand(
         hole_cards=your_hole_cards, community_cards=community_cards
     )
@@ -341,8 +305,66 @@ def _determine_player_hands(
 
     _ensure_player_hands_are_valid(player_hands_in_the_hand)
 
-    return (
-        your_player_hand,
-        player_hands_for_players_ahead_of_you,
+    return player_hands_in_the_hand
+
+
+def _assign_hand_attributes(
+    n_players_ahead_of_you: Union[PlayersAheadOfYou, None] = None,
+    small_blind: Union[SmallBlind, None] = None,
+    first_player_wins_string: str = FIRST_PLAYER_WINS_STRING,
+    second_player_wins_string: str = SECOND_PLAYER_WINS_STRING,
+    players_tie_string: str = PLAYERS_TIE_STRING,
+    hand_winner_flavor: str = HAND_WINNER_FLAVOR,
+    hand_tie_flavor: str = HAND_TIE_FLAVOR,
+) -> Tuple[
+    str, int, int, List[PlayerHand], List[PlayerHand], List[PlayerHand], str, str
+]:
+    (
+        n_players_ahead_of_you,
+        max_bet,
+        your_hole_cards,
+        pot_size,
+        pot_odds,
+        community_cards,
+        hole_cards_for_players_ahead_of_you,
+    ) = _init_cards_and_bets(
+        n_players_ahead_of_you=n_players_ahead_of_you, small_blind=small_blind
+    )
+
+    n_players_in_the_hand = n_players_ahead_of_you.n + 1
+
+    player_hands_in_the_hand = _determine_player_hands(
+        your_hole_cards=your_hole_cards,
+        community_cards=community_cards,
+        hole_cards_for_players_ahead_of_you=hole_cards_for_players_ahead_of_you,
+    )
+
+    winning_hands, losing_hands, winning_type = _determine_winners_and_losers(
+        first_player_wins_string,
+        second_player_wins_string,
+        players_tie_string,
+        hand_winner_flavor,
+        hand_tie_flavor,
         player_hands_in_the_hand,
+    )
+
+    # TODO: Add logic to this function to cycle over the compare_player_hands function to determine the winner and or ties, saving an attribute for the best_hand and the 'hole_cards_flavor'.
+    # TODO: Extract result in terms of winning or tying hands, losing hands, and number of players for later tabulating during simulation of 1000s of hands
+    name = _make_name_strings(
+        n_players_in_the_hand,
+        community_cards,
+        winning_type,
+        winning_hands,
+        losing_hands,
+    )
+
+    return (
+        pot_odds,
+        max_bet,
+        pot_size,
+        player_hands_in_the_hand,
+        winning_hands,
+        losing_hands,
+        winning_type,
+        name,
     )
