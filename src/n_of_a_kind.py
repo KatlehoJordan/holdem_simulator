@@ -2,7 +2,7 @@ from collections import Counter
 from typing import List, Tuple
 
 from src.card import Card, sort_cards_by_raw_rank_value
-from src.config import NUMBER_OF_CARDS_IN_QUALIFYING_HAND
+from src.config import NUMBER_OF_CARDS_IN_QUALIFYING_HAND, find_key_by_raw_rank_value
 
 
 def validate_n_of_a_kind(
@@ -43,7 +43,13 @@ def validate_n_of_a_kind(
             top_ranks_in_n_of_a_kind.append(highest_remaining_rank)
             remaining_ranks.remove(highest_remaining_rank)
 
-        name = f"{hand_name_root}: {top_ranks_in_n_of_a_kind[0]}s with {top_ranks_in_n_of_a_kind[-n_kickers:]} kicker/s."
+        top_rank_as_string = find_key_by_raw_rank_value(top_ranks_in_n_of_a_kind[0])
+
+        kickers_as_ints = top_ranks_in_n_of_a_kind[-n_kickers:]
+        kickers_as_strings = [
+            find_key_by_raw_rank_value(rank) for rank in kickers_as_ints
+        ]
+        name = f"{hand_name_root}: {top_rank_as_string}s with {kickers_as_strings} kicker/s."
     else:
         top_ranks_in_n_of_a_kind = sorted_raw_rank_values[:n_cards_in_qualifying_hand]
         name = f"No {hand_name_root}."

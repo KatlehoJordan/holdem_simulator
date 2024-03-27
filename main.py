@@ -16,6 +16,7 @@ from src.guess_functions import (
 )
 from src.hand import Hand
 from src.hole_cards import HoleCards
+from src.simulate_hands import simulate_hands
 
 COMMON_PROMPT = """
 'y' or enter for yes
@@ -41,7 +42,7 @@ def main(
 ) -> None:
     clear_console()
     if simulating_single_hand:
-        hand = Hand()
+        simulate_hands()
         exit()
     user_input = input_with_escape_hatch(starting_prompt)
     if user_input.lower() not in ["y", "", "n", "0"]:

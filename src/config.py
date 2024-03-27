@@ -65,5 +65,20 @@ VALID_RANKS_DICT = {
     },
 }
 
+
+def find_key_by_raw_rank_value(
+    input_integer: int,
+    valid_ranks_dict: dict[str, dict[str, int]] = VALID_RANKS_DICT,
+    raw_rank_value_string: str = RAW_RANK_VALUE_STRING,
+) -> str:
+    if input_integer < 2 or input_integer > 14:
+        return "Invalid rank value"
+    else:
+        for key, value in valid_ranks_dict.items():
+            if value[raw_rank_value_string] == input_integer:
+                return key
+    return "Rank not found"
+
+
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger()

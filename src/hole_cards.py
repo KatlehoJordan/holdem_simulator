@@ -169,7 +169,7 @@ def _assign_bonuses_and_hole_cards_flavor(
     hole_cards_off_suit_flavor: str = HOLE_CARDS_OFF_SUIT_FLAVOR,
     hole_cards_suited_flavor: str = HOLE_CARDS_SUITED_FLAVOR,
     hole_cards_paired_flavor: str = HOLE_CARDS_PAIRED_FLAVOR,
-):
+) -> tuple[float, float, float, str]:
     suit_flavor = hole_cards_off_suit_flavor
     if hi_card.suit.name == lo_card.suit.name:
         suit_flavor = hole_cards_suited_flavor

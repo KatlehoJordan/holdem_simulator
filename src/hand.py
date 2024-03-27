@@ -192,13 +192,13 @@ def _make_name_strings(
     community_cards_string = f"\nCommunity cards:\n{community_cards.name}\n"
     winning_type_string = f"\nWinning type:\n{winning_type}.\n"
     winning_hands_string = f"\nWinning hand(s):\n{winning_hands[0]}\n"
-    losing_hands_string = (
-        "\nLosing hand(s):\n" + "\n".join(str(hand) for hand in losing_hands) + "\n"
+    losing_hands_string = "\nLosing hand(s):\n" + "\n".join(
+        str(hand) for hand in losing_hands
     )
-    winning_hole_cards_string = (
-        f"\nWinning hole cards: {winning_hands[0].hole_cards}.\n"
+    winning_hole_cards_string = "\n\nWinning hole cards:" + "\n".join(
+        str(hand.hole_cards) for hand in winning_hands
     )
-    losing_hole_cards_string = "\nLosing hole cards:" + "\n".join(
+    losing_hole_cards_string = "\n\nLosing hole cards:" + "\n".join(
         str(hand.hole_cards) for hand in losing_hands
     )
     name_string = f"{n_players_string}{community_cards_string}{winning_type_string}{winning_hands_string}{losing_hands_string}{winning_hole_cards_string}{losing_hole_cards_string}"
@@ -222,7 +222,7 @@ def _determine_winners_and_losers(
     hand_tie_flavor: str = HAND_TIE_FLAVOR,
 ) -> Tuple[List[PlayerHand], List[PlayerHand], str]:
     current_best_hand = player_hands_in_the_hand[0]
-    winning_hands = []
+    winning_hands = [current_best_hand]
     winning_type = ""
     for player_hand in player_hands_in_the_hand[1:]:
         comparison_result = compare_player_hands(current_best_hand, player_hand)
@@ -338,6 +338,8 @@ def _assign_hand_attributes(
 
     # TODO: Add logic to this function to cycle over the compare_player_hands function to determine the winner and or ties, saving an attribute for the best_hand and the 'hole_cards_flavor'.
     # TODO: Extract result in terms of winning or tying hands, losing hands, and number of players for later tabulating during simulation of 1000s of hands
+    # TODO: Measure how frequently each player wins, ties, or loses (should expect uniform distribution for each player if my random drawing is working correctly)
+    # TODO: Measure how frequently each card appears in a hand (should expect a uniform distribution if my random drawing is working correctly)
     name = _make_name_strings(
         n_players_in_the_hand,
         community_cards,
