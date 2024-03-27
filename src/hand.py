@@ -37,9 +37,11 @@ class Hand:
             self.pot_size,
             self.all_cards_in_the_hand,
             self.player_hands_in_the_hand,
+            self.winning_type,
             self.winning_hands,
             self.losing_hands,
-            self.winning_type,
+            self.winning_hole_type_flavors,
+            self.losing_hole_type_flavors,
             self.name,
         ) = _assign_hand_attributes(
             n_players_ahead_of_you=n_players_ahead_of_you,
@@ -222,29 +224,46 @@ def _determine_winners_and_losers(
     players_tie_string: str = PLAYERS_TIE_STRING,
     hand_winner_flavor: str = HAND_WINNER_FLAVOR,
     hand_tie_flavor: str = HAND_TIE_FLAVOR,
-) -> Tuple[List[PlayerHand], List[PlayerHand], str]:
+) -> Tuple[str, List[PlayerHand], List[PlayerHand], List[str], List[str]]:
+    winning_type = ""
+
     current_best_hand = player_hands_in_the_hand[0]
     winning_hands = [current_best_hand]
-    winning_type = ""
+
+    current_best_hole_cards_flavor = current_best_hand.hole_cards.hole_cards_flavor
+    winning_hole_cards_flavors = [current_best_hole_cards_flavor]
+
     for player_hand in player_hands_in_the_hand[1:]:
         comparison_result = compare_player_hands(current_best_hand, player_hand)
         if comparison_result == first_player_wins_string:
-            winning_hands = [current_best_hand]
             winning_type = hand_winner_flavor
+            winning_hands = [current_best_hand]
+            winning_hole_cards_flavors = [current_best_hole_cards_flavor]
         elif comparison_result == second_player_wins_string:
+            winning_type = hand_winner_flavor
             current_best_hand = player_hand
             winning_hands = [current_best_hand]
-            winning_type = hand_winner_flavor
+            winning_hole_cards_flavors = [current_best_hole_cards_flavor]
         elif comparison_result == players_tie_string:
-            winning_hands.append(player_hand)
             winning_type = hand_tie_flavor
+            winning_hands.append(player_hand)
+            winning_hole_cards_flavors.append(player_hand.hole_cards.hole_cards_flavor)
     losing_hands = [
         player_hand
         for player_hand in player_hands_in_the_hand
         if player_hand not in winning_hands
     ]
+    losing_hole_cards_flavors = [
+        player_hand.hole_cards.hole_cards_flavor for player_hand in losing_hands
+    ]
 
-    return winning_hands, losing_hands, winning_type
+    return (
+        winning_type,
+        winning_hands,
+        losing_hands,
+        winning_hole_cards_flavors,
+        losing_hole_cards_flavors,
+    )
 
 
 def _init_cards_and_bets(
@@ -333,9 +352,11 @@ def _assign_hand_attributes(
     int,
     List[Card],
     List[PlayerHand],
-    List[PlayerHand],
-    List[PlayerHand],
     str,
+    List[PlayerHand],
+    List[PlayerHand],
+    List[str],
+    List[str],
     str,
 ]:
     (
@@ -358,7 +379,13 @@ def _assign_hand_attributes(
         )
     )
 
-    winning_hands, losing_hands, winning_type = _determine_winners_and_losers(
+    (
+        winning_type,
+        winning_hands,
+        losing_hands,
+        winning_hole_cards_flavors,
+        losing_hole_cards_flavors,
+    ) = _determine_winners_and_losers(
         player_hands_in_the_hand,
     )
 
@@ -376,8 +403,10 @@ def _assign_hand_attributes(
         pot_size,
         all_cards_in_the_hand,
         player_hands_in_the_hand,
+        winning_type,
         winning_hands,
         losing_hands,
-        winning_type,
+        winning_hole_cards_flavors,
+        losing_hole_cards_flavors,
         name,
     )

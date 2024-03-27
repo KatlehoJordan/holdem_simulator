@@ -7,15 +7,21 @@ from src.config import logger
 from src.hand import Hand
 from src.players_ahead_of_you import PlayersAheadOfYou
 
+# TODO: increase n_simulations to at least 10000 for 10 players
+# TODO: Simulations for all player counts between 2 and 10.
 N_SIMULATIONS = 1
 N_PLAYERS_PER_SIMULATION = 2
 PATH_TO_SIMULATIONS = Path("simulations")
+TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING = 0.1
 
 
 def simulate_hands(
     n_simulations: int = N_SIMULATIONS,
     n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+    tolerance_threshold_for_random_drawing: float = TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING,
 ) -> None:
+    logger.info("Initializing empty dataframe")
+    df = pd.DataFrame()
     logger.info("Simulating %s hands", n_simulations)
     for simulation in range(n_simulations):
         console_iteration_visualizer = "-" * 80
@@ -27,25 +33,45 @@ def simulate_hands(
         hand = Hand(
             n_players_ahead_of_you=PlayersAheadOfYou(n_players_per_simulation - 1)
         )
-        df = _extract_results_data(hand, n_players_per_simulation)
+        simulated_data = _extract_results_data(hand, n_players_per_simulation)
+        df = pd.concat([df, simulated_data], ignore_index=True)
 
-        print("Pause here")
+    total_wins = 0.0
+    for player in range(n_players_per_simulation):
+        wins_as_float_key = (
+            f"player_{player}_wins_as_float" if player != 0 else "you_win_as_float"
+        )
+        this_players_wins = sum(df[wins_as_float_key])
+        expected_wins = n_simulations / n_players_per_simulation
+        if (
+            abs(this_players_wins - expected_wins)
+            > tolerance_threshold_for_random_drawing * expected_wins
+        ):
+            if player == 0:
+                player = "you"
+            raise ValueError(
+                f"Player {player}'s wins deviate from the expected number of wins by more than {tolerance_threshold_for_random_drawing:.0%}. A larger sample should be drawn or else the random assignment of cards to players is not working."
+            )
+        total_wins += this_players_wins
 
-        # TODO: Add logic to this function to cycle over the compare_player_hands function to determine the winner and or ties, saving an attribute for the best_hand and the 'hole_cards_flavor'.
-        # TODO: Extract result in terms of winning or tying hands, losing hands, and number of players for later tabulating during simulation of 1000s of hands
-        # TODO: Measure how frequently each player wins, ties, or loses (should expect uniform distribution for each player if my random drawing is working correctly)
-        # TODO: Measure how frequently each card appears in a hand (should expect a uniform distribution if my random drawing is working correctly)
+    if total_wins != n_simulations:
+        raise ValueError("The sum of wins should equal the number of simulations")
+    print("Pause here")
 
 
 def _extract_results_data(
-    hand: Hand, n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION
-):
+    hand: Hand,
+    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+    valid_cards_dict: dict = VALID_CARDS_DICT,
+) -> pd.DataFrame:
     logger.info("Extracting info from hand")
     data = {
         "n_players": n_players_per_simulation,
+        "all_cards_in_the_hand": hand.all_cards_in_the_hand,
         "winning_type": hand.winning_type,
         "n_winners": len(hand.winning_hands),
         "winning_hands": hand.winning_hands,
+        "winning_hole_cards_flavors": hand.winning_hole_type_flavors,
         "community_cards": hand.player_hands_in_the_hand[0].community_cards,
         "your_hand": hand.player_hands_in_the_hand[0],
     }
@@ -53,10 +79,20 @@ def _extract_results_data(
         hand_key = f"player_{player}s_hand" if player != 0 else "your_hand"
         data[hand_key] = hand.player_hands_in_the_hand[player]
 
-        hole_cards_key = (
-            f"player_{player}s_hole_cards" if player != 0 else "your_hole_cards"
-        )
-        data[hole_cards_key] = hand.player_hands_in_the_hand[player].hole_cards
+        # TODO: Decide if should remove/deprecate the following block that is commented out
+        # hole_cards_key = (
+        #     f"player_{player}s_hole_cards" if player != 0 else "your_hole_cards"
+        # )
+        # data[hole_cards_key] = hand.player_hands_in_the_hand[player].hole_cards
+
+        # hole_cards_flavor_key = (
+        #     f"player_{player}s_hole_cards_flavor"
+        #     if player != 0
+        #     else "your_hole_cards_flavor"
+        # )
+        # data[hole_cards_flavor_key] = hand.player_hands_in_the_hand[
+        #     player
+        # ].hole_cards.hole_cards_flavor
 
         win_key = f"player_{player}_wins" if player != 0 else "you_win"
         data[win_key] = data[hand_key] in data["winning_hands"]
@@ -66,12 +102,25 @@ def _extract_results_data(
         )
         data[win_as_float_key] = (1.0 / data["n_winners"]) if data[win_key] else 0.0
 
-        # TODO: Add columns for all unique_cards and indicate with True or False if they appear in the hand
-        # TODO: After the previous, make a summary in order to get %age win for each player, and %age of each unique_card in order to validate your random drawing is working as expected
-        # TODO: Add columns for all hole_cards_flavors and indicate with True or False if they appear in the hand
-        # TODO: After previous, calculate %age of each hole_cards_flavor
+    # TODO: Fix this, since it is not yielding True in columns when the cards are present
+    for card in valid_cards_dict.keys():
+        card_key = f"{card}"
+        data[card_key] = card in data["all_cards_in_the_hand"]
 
     df = pd.DataFrame([data])
+    df["n_cards_in_hand"] = df[[f"{card}" for card in valid_cards_dict.keys()]].sum(
+        axis=1
+    )
+    # TODO: Replace these magic numbers with constants
+    if not (df["n_cards_in_hand"] == (5 + 2 * n_players_per_simulation)).all():
+        raise ValueError(
+            "n_cards_in_hand is not equal to (5 + 2 * n_players_per_simulation)"
+        )
+
+    # TODO: Add columns for all unique_cards and indicate with True or False if they appear in the hand
+    # TODO: After the previous, make a summary in order to get %age win for each player, and %age of each unique_card in order to validate your random drawing is working as expected
+    # TODO: Add columns for all hole_cards_flavors and indicate with True or False if they appear in the hand
+    # TODO: After previous, calculate %age of each hole_cards_flavor
     return df
 
 
@@ -94,3 +143,8 @@ def make_simulations_results_file(
     with open(path_to_simulations_results, "w") as f:
         f.write("hand_number,player_number,hand_flavor\n")
     logger.info("Simulations results file created")
+
+
+# TODO: Add logic to cycle over the compare_player_hands function to determine the winner and or ties, saving an attribute for the best_hand and the 'hole_cards_flavor'.
+# TODO: Extract result in terms of winning or tying hands, losing hands, and number of players for later tabulating during simulation of 1000s of hands
+# TODO: Measure how frequently each card appears in a hand (should expect a uniform distribution if my random drawing is working correctly)
