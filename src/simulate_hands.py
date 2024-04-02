@@ -41,8 +41,6 @@ def simulate_hands(
         hand = Hand(
             n_players_ahead_of_you=PlayersAheadOfYou(n_players_per_simulation - 1)
         )
-        # TODO: Modify _extract_results_data so that community cards are included as a single line in the dataframe instead of with new lines
-        # TODO: Modify _extract_results_data so that when it is saved as .csv it does not have a mix of both "" and '' since this can cause problems later as evidenced by CSV linter.
         # TODO: Modify _extract_results_data to include True or False for each type of hole_cards_flavor
         simulated_data = _extract_results_data(hand, n_players_per_simulation)
         simulated_data_df = pd.concat(
@@ -96,68 +94,75 @@ def _aggregate_total_wins(
     return out_df
 
 
-def _extract_results_data(
-    hand: Hand,
-    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
-    valid_cards_dict: dict = VALID_CARDS_DICT,
-) -> pd.DataFrame:
-    logger.info("Extracting info from hand")
+def _initialize_data_dictionary(
+    hand: Hand, n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION
+) -> dict:
+    logger.info("Initializing data dictionary")
     data = {
         "n_players": n_players_per_simulation,
-        "all_cards_in_the_hand": hand.all_cards_in_the_hand,
+        "all_cards_in_the_hand": [card.name for card in hand.all_cards_in_the_hand],
         "winning_type": hand.winning_type,
         "n_winners": len(hand.winning_hands),
-        "winning_hands": hand.winning_hands,
+        "winning_hands": hand.winning_hands[0].hand_type,
         "winning_hole_cards_flavors": hand.winning_hole_type_flavors,
-        "community_cards": hand.player_hands_in_the_hand[0].community_cards,
-        "your_hand": hand.player_hands_in_the_hand[0],
+        "community_cards": [
+            card.name for card in hand.player_hands_in_the_hand[0].community_cards.cards
+        ],
     }
+
+    return data
+
+
+def _add_player_specific_data(
+    hand: Hand, data: dict, n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION
+) -> dict:
+    logger.info("Adding player-specific data to dictionary")
     for player in range(n_players_per_simulation):
-        hand_key = f"player_{player}s_hand" if player != 0 else "your_hand"
-        data[hand_key] = hand.player_hands_in_the_hand[player]
+        hand_type_key = (
+            f"player_{player}s_hand_type" if player != 0 else "your_hand_type"
+        )
+        data[hand_type_key] = hand.player_hands_in_the_hand[player]
 
-        # TODO: Decide if should remove/deprecate the following block that is commented out
-        # hole_cards_key = (
-        #     f"player_{player}s_hole_cards" if player != 0 else "your_hole_cards"
-        # )
-        # data[hole_cards_key] = hand.player_hands_in_the_hand[player].hole_cards
+        hole_cards_key = (
+            f"player_{player}s_hole_cards" if player != 0 else "your_hole_cards"
+        )
+        data[hole_cards_key] = (
+            hand.player_hands_in_the_hand[player].hole_cards.hi_card.name
+            + ", "
+            + hand.player_hands_in_the_hand[player].hole_cards.lo_card.name
+        )
 
-        # hole_cards_flavor_key = (
-        #     f"player_{player}s_hole_cards_flavor"
-        #     if player != 0
-        #     else "your_hole_cards_flavor"
-        # )
-        # data[hole_cards_flavor_key] = hand.player_hands_in_the_hand[
-        #     player
-        # ].hole_cards.hole_cards_flavor
+        hole_cards_flavor_key = (
+            f"player_{player}s_hole_cards_flavor"
+            if player != 0
+            else "your_hole_cards_flavor"
+        )
+        data[hole_cards_flavor_key] = hand.player_hands_in_the_hand[
+            player
+        ].hole_cards.hole_cards_flavor
 
         win_key = f"player_{player}_wins" if player != 0 else "you_win"
-        data[win_key] = data[hand_key] in data["winning_hands"]
+        data[win_key] = data[hand_type_key].hand_type == data["winning_hands"]
 
         win_as_float_key = (
             f"player_{player}_wins_as_float" if player != 0 else "you_win_as_float"
         )
         data[win_as_float_key] = (1.0 / data["n_winners"]) if data[win_key] else 0.0
 
+    return data
+
+
+def _indicate_which_cards_appear_in_hand(
+    data: dict,
+    valid_cards_dict: dict = VALID_CARDS_DICT,
+) -> pd.DataFrame:
     data["n_cards_in_hand"] = 0
     for card in valid_cards_dict.keys():
         card_key = valid_cards_dict[card].name
-        data[card_key] = card_key in [
-            card.name for card in data["all_cards_in_the_hand"]
-        ]
+        data[card_key] = card_key in data["all_cards_in_the_hand"]
         data["n_cards_in_hand"] += data[card_key]
 
     df = pd.DataFrame([data])
-
-    _validate_n_cards_in_hand(
-        df=df,
-        n_players_per_simulation=n_players_per_simulation,
-    )
-
-    # TODO: Add columns for all unique_cards and indicate with True or False if they appear in the hand
-    # TODO: After the previous, make a summary in order to get %age win for each player, and %age of each unique_card in order to validate your random drawing is working as expected
-    # TODO: Add columns for all hole_cards_flavors and indicate with True or False if they appear in the hand
-    # TODO: After previous, calculate %age of each hole_cards_flavor
     return df
 
 
@@ -177,6 +182,31 @@ def _validate_n_cards_in_hand(
         raise ValueError(
             f"n_cards_in_hand is not equal to ({n_cards_in_community_cards} + {n_hole_cards_per_player} * {n_players_per_simulation})"
         )
+
+
+def _extract_results_data(
+    hand: Hand,
+    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+) -> pd.DataFrame:
+    logger.info("Extracting info from hand")
+    data_dict = _initialize_data_dictionary(
+        hand=hand, n_players_per_simulation=n_players_per_simulation
+    )
+    data_dict = _add_player_specific_data(
+        hand=hand, data=data_dict, n_players_per_simulation=n_players_per_simulation
+    )
+    data_frame = _indicate_which_cards_appear_in_hand(data_dict)
+    _validate_n_cards_in_hand(
+        df=data_frame,
+        n_players_per_simulation=n_players_per_simulation,
+    )
+
+    # TODO: Build _indicate_which_hole_card_flavors_appear_in_hand function and implement it here
+
+    # TODO: After the previous, make a summary in order to get %age win for each player, and %age of each unique_card in order to validate your random drawing is working as expected
+    # TODO: Add columns for all hole_cards_flavors and indicate with True or False if they appear in the hand
+    # TODO: After previous, calculate %age of each hole_cards_flavor
+    return data_frame
 
 
 def _make_simulations_results_file(
