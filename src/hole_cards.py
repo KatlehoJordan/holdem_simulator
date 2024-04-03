@@ -1,6 +1,6 @@
 from typing import Union
 
-from src.card import Card
+from src.card import VALID_CARDS_DICT, Card
 from src.config import (
     ACE_AS_LOW_RAW_RANK_VALUE,
     NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
@@ -20,6 +20,8 @@ HOLE_CARDS_SUITED_FLAVOR = "suited"
 HOLE_CARDS_OFF_SUIT_FLAVOR = "off suit"
 HOLE_CARDS_PAIRED_FLAVOR = "s paired"
 N_HOLE_CARDS_PER_PLAYER = 2
+
+VALID_HOLE_CARDS_FLAVORS = []
 
 
 class HoleCards:
@@ -246,3 +248,8 @@ def _assign_name(
     else:
         logger.debug("%s\n", name)
     return name
+
+
+# TODO: Build a dictionary of all possible hole card combinations similar to how you do for all possible cards
+# for card in VALID_CARDS_DICT:
+#     VALID_HOLE_CARDS_FLAVORS.append(f"{rank} of {suit}")

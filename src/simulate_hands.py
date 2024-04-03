@@ -55,7 +55,7 @@ def simulate_hands(
         n_players_per_simulation,
     )
     # TODO: Add logic to save the aggregated_df to a csv file. Current implementation is appending to the previous aggregated file, which is not the desired outcome, so many not be able to use the same function as for the raw simulation data as first thought.
-    _make_simulations_results_file(aggregated_wins_df, aggregated_results=True)
+    # _make_simulations_results_file(aggregated_wins_df, aggregated_results=True)
 
     print("Pause here")
 
@@ -257,6 +257,6 @@ def _make_dir_if_not_exist(path_to_dir: Path) -> None:
         path_to_dir.mkdir(parents=True)
 
 
-# TODO: Add logic to cycle over the compare_player_hands function to determine the winner and or ties, saving an attribute for the best_hand and the 'hole_cards_flavor'.
 # TODO: Extract result in terms of winning or tying hands, losing hands, and number of players for later tabulating during simulation of 1000s of hands
 # TODO: Measure how frequently each card appears in a hand (should expect a uniform distribution if my random drawing is working correctly)
+# TODO: Measure how frequently each player wins a hand (should expect a uniform distribution if my random drawing is working correctly)

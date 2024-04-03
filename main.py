@@ -1,5 +1,6 @@
 from click import clear
 
+from src.card import VALID_CARDS_DICT
 from src.deck import Deck
 from src.guess_functions import (
     clear_console,
@@ -42,7 +43,8 @@ def main(
 ) -> None:
     clear_console()
     if simulating_single_hand:
-        simulate_hands()
+        # simulate_hands()
+        type(VALID_CARDS_DICT)
         exit()
     user_input = input_with_escape_hatch(starting_prompt)
     if user_input.lower() not in ["y", "", "n", "0"]:

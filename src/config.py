@@ -1,4 +1,7 @@
 import logging
+from pathlib import Path
+
+DATA_PATH = Path("data")
 
 MIN_SMALL_BLIND = 10
 VALID_SUITS = ["Clubs", "Diamonds", "Hearts", "Spades"]

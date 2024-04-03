@@ -1,6 +1,8 @@
+import pickle
+from pathlib import Path
 from typing import List, Union
 
-from src.config import VALID_RANKS_DICT, VALID_SUITS, logger
+from src.config import DATA_PATH, VALID_RANKS_DICT, VALID_SUITS, logger
 from src.rank import Rank
 from src.suit import Suit
 
@@ -34,7 +36,26 @@ def sort_cards_by_raw_rank_value(list_of_7_cards: List[Card]) -> List[int]:
     return sorted((card.rank.raw_rank_value for card in list_of_7_cards), reverse=True)
 
 
-for suit in VALID_SUITS:
-    for rank in VALID_RANKS_DICT.keys():
-        card_name = f"{rank.upper()}_OF_{suit.upper()}"
-        VALID_CARDS_DICT[card_name] = Card(Suit(suit), Rank(rank))
+# TODO: Add type hints
+# TODO: FIX THIS, it is apparently not working
+def _make_valid_cards_dict(
+    valid_suits=VALID_SUITS, valid_ranks_dict=VALID_RANKS_DICT, data_path=DATA_PATH
+):
+    pickle_file_path = Path(data_path) / "valid_cards_dict.pkl"
+
+    if pickle_file_path.exists():
+        logger.info(f"Loading valid cards dict from {pickle_file_path}")
+        with open(pickle_file_path, "rb") as f:
+            valid_cards_dict = pickle.load(f)
+        return valid_cards_dict
+    else:
+        logger.info(f"Saving valid cards dict to {pickle_file_path}")
+        valid_cards_dict = {}
+        for suit in valid_suits:
+            for rank in valid_ranks_dict.keys():
+                card_name = f"{rank.upper()}_OF_{suit.upper()}"
+                valid_cards_dict[card_name] = Card(Suit(suit), Rank(rank))
+
+        with open(pickle_file_path, "wb") as f:
+            pickle.dump(valid_cards_dict, f)
+        _make_valid_cards_dict()
