@@ -1,9 +1,14 @@
+import pickle
+from pathlib import Path
 from typing import Union
 
-from src.card import VALID_CARDS_DICT, Card
+from src.card import Card
 from src.config import (
     ACE_AS_LOW_RAW_RANK_VALUE,
+    DATA_PATH,
     NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
+    RAW_RANK_VALUE_STRING,
+    VALID_RANKS_DICT,
     logger,
 )
 from src.deck import Deck
@@ -21,7 +26,8 @@ HOLE_CARDS_OFF_SUIT_FLAVOR = "off suit"
 HOLE_CARDS_PAIRED_FLAVOR = "s paired"
 N_HOLE_CARDS_PER_PLAYER = 2
 
-VALID_HOLE_CARDS_FLAVORS = []
+VALID_HOLE_CARDS_FLAVORS_SET = set()
+VALID_HOLE_CARDS_FLAVORS_SET_FILE_NAME = "valid_hole_cards_set.pkl"
 
 
 class HoleCards:
@@ -250,6 +256,47 @@ def _assign_name(
     return name
 
 
-# TODO: Build a dictionary of all possible hole card combinations similar to how you do for all possible cards
-# for card in VALID_CARDS_DICT:
-#     VALID_HOLE_CARDS_FLAVORS.append(f"{rank} of {suit}")
+def _make_valid_hole_cards_flavors_set(
+    valid_hole_cards_flavors_set: set[str] = VALID_HOLE_CARDS_FLAVORS_SET,
+    valid_ranks_dict: dict[str, dict[str, int]] = VALID_RANKS_DICT,
+    raw_rank_value_string: str = RAW_RANK_VALUE_STRING,
+    hole_cards_paired_flavor: str = HOLE_CARDS_PAIRED_FLAVOR,
+    hole_cards_off_suit_flavor: str = HOLE_CARDS_OFF_SUIT_FLAVOR,
+    hole_cards_suited_flavor: str = HOLE_CARDS_SUITED_FLAVOR,
+    data_path: Path = DATA_PATH,
+    valid_hole_cards_flavors_set_file_name: str = VALID_HOLE_CARDS_FLAVORS_SET_FILE_NAME,
+) -> set[str]:
+    pickle_file_path = Path(data_path) / valid_hole_cards_flavors_set_file_name
+
+    if pickle_file_path.exists():
+        logger.info(f"Loading valid hole cards flavors set from {pickle_file_path}")
+        with open(pickle_file_path, "rb") as f:
+            valid_hole_cards_flavors_set = pickle.load(f)
+        return valid_hole_cards_flavors_set
+    else:
+        logger.info(f"Saving valid hole cards flavors set to {pickle_file_path}")
+        valid_hole_cards_flavors_set = set()
+        for rank_1 in valid_ranks_dict:
+            for rank_2 in valid_ranks_dict:
+                if (
+                    valid_ranks_dict[rank_1][raw_rank_value_string]
+                    < valid_ranks_dict[rank_2][raw_rank_value_string]
+                ):
+                    continue
+                elif rank_1 == rank_2:
+                    valid_hole_cards_flavors_set.add(
+                        f"{rank_1}{hole_cards_paired_flavor}"
+                    )
+                else:
+                    valid_hole_cards_flavors_set.add(
+                        f"{rank_1}, {rank_2} {hole_cards_off_suit_flavor}"
+                    )
+                    valid_hole_cards_flavors_set.add(
+                        f"{rank_1}, {rank_2} {hole_cards_suited_flavor}"
+                    )
+        with open(pickle_file_path, "wb") as f:
+            pickle.dump(valid_hole_cards_flavors_set, f)
+        return valid_hole_cards_flavors_set
+
+
+VALID_HOLE_CARDS_FLAVORS_SET = _make_valid_hole_cards_flavors_set()

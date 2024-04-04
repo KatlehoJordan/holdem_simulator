@@ -7,7 +7,7 @@ from src.card import VALID_CARDS_DICT
 from src.community_cards import N_CARDS_IN_COMMUNITY_CARDS
 from src.config import logger
 from src.hand import Hand
-from src.hole_cards import N_HOLE_CARDS_PER_PLAYER
+from src.hole_cards import N_HOLE_CARDS_PER_PLAYER, VALID_HOLE_CARDS_FLAVORS_SET
 from src.players_ahead_of_you import PlayersAheadOfYou
 
 # TODO: increase n_simulations to at least 10000 for 10 players. May want to disable logging to make it faster.
