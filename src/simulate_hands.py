@@ -7,7 +7,7 @@ from src.card import VALID_CARDS_DICT
 from src.community_cards import N_CARDS_IN_COMMUNITY_CARDS
 from src.config import logger
 from src.hand import Hand
-from src.hole_cards import N_HOLE_CARDS_PER_PLAYER, VALID_HOLE_CARDS_FLAVORS_SET
+from src.hole_cards import N_HOLE_CARDS_PER_PLAYER, VALID_HOLE_CARDS_FLAVORS_LIST
 from src.players_ahead_of_you import PlayersAheadOfYou
 
 # TODO: increase n_simulations to at least 10000 for 10 players. May want to disable logging to make it faster.
@@ -22,6 +22,8 @@ PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS = (
     PATH_TO_SIMULATIONS_DATA_RESULTS / NAME_OF_ARCHIVED_SIMULATIONS_FOLDER
 )
 TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING = 0.1
+N_CARDS_IN_HAND_STRING = "n_cards_in_hand"
+N_HOLE_CARDS_FLAVORS_IN_HAND_STRING = "n_hole_cards_flavors_in_hand"
 
 
 def simulate_hands(
@@ -41,7 +43,6 @@ def simulate_hands(
         hand = Hand(
             n_players_ahead_of_you=PlayersAheadOfYou(n_players_per_simulation - 1)
         )
-        # TODO: Modify _extract_results_data to include True or False for each type of hole_cards_flavor
         simulated_data = _extract_results_data(hand, n_players_per_simulation)
         simulated_data_df = pd.concat(
             [simulated_data_df, simulated_data], ignore_index=True
@@ -56,8 +57,7 @@ def simulate_hands(
     )
     # TODO: Add logic to save the aggregated_df to a csv file. Current implementation is appending to the previous aggregated file, which is not the desired outcome, so many not be able to use the same function as for the raw simulation data as first thought.
     # _make_simulations_results_file(aggregated_wins_df, aggregated_results=True)
-
-    print("Pause here")
+    # TODO: Ensure that the logic you previously built to test that the distribution of wins is uniform is being applied to the aggregated data as a check. Don't know where that logic is at the moment.
 
 
 def _aggregate_total_wins(
@@ -101,10 +101,15 @@ def _initialize_data_dictionary(
     data = {
         "n_players": n_players_per_simulation,
         "all_cards_in_the_hand": [card.name for card in hand.all_cards_in_the_hand],
+        "all_hole_cards_flavors_in_the_hand": [
+            hole_cards_flavors
+            for hole_cards_flavors in hand.losing_hole_cards_flavors
+            + hand.winning_hole_cards_flavors
+        ],
         "winning_type": hand.winning_type,
         "n_winners": len(hand.winning_hands),
         "winning_hands": hand.winning_hands[0].hand_type,
-        "winning_hole_cards_flavors": hand.winning_hole_type_flavors,
+        "winning_hole_cards_flavors": hand.winning_hole_cards_flavors,
         "community_cards": [
             card.name for card in hand.player_hands_in_the_hand[0].community_cards.cards
         ],
@@ -155,12 +160,13 @@ def _add_player_specific_data(
 def _indicate_which_cards_appear_in_hand(
     data: dict,
     valid_cards_dict: dict = VALID_CARDS_DICT,
+    n_cards_in_hand_string: str = N_CARDS_IN_HAND_STRING,
 ) -> pd.DataFrame:
-    data["n_cards_in_hand"] = 0
+    data[n_cards_in_hand_string] = 0
     for card in valid_cards_dict.keys():
         card_key = valid_cards_dict[card].name
-        data[card_key] = card_key in data["all_cards_in_the_hand"]
-        data["n_cards_in_hand"] += data[card_key]
+        data[card_key] = int(card_key in data["all_cards_in_the_hand"])
+        data[n_cards_in_hand_string] += data[card_key]
 
     df = pd.DataFrame([data])
     return df
@@ -171,9 +177,10 @@ def _validate_n_cards_in_hand(
     n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
     n_cards_in_community_cards: int = N_CARDS_IN_COMMUNITY_CARDS,
     n_hole_cards_per_player: int = N_HOLE_CARDS_PER_PLAYER,
+    n_cards_in_hand_string: str = N_CARDS_IN_HAND_STRING,
 ) -> None:
     if not (
-        df["n_cards_in_hand"]
+        df[n_cards_in_hand_string]
         == (
             n_cards_in_community_cards
             + n_hole_cards_per_player * n_players_per_simulation
@@ -181,6 +188,42 @@ def _validate_n_cards_in_hand(
     ).all():
         raise ValueError(
             f"n_cards_in_hand is not equal to ({n_cards_in_community_cards} + {n_hole_cards_per_player} * {n_players_per_simulation})"
+        )
+
+
+def _indicate_which_hole_cards_flavors_appear_in_hand(
+    data_frame: pd.DataFrame,
+    valid_hole_cards_flavors_list: list = VALID_HOLE_CARDS_FLAVORS_LIST,
+    n_hole_cards_flavors_in_hand_string: str = N_HOLE_CARDS_FLAVORS_IN_HAND_STRING,
+) -> pd.DataFrame:
+    data_frame[n_hole_cards_flavors_in_hand_string] = 0
+    new_data = {}
+    for hole_cards_flavor in valid_hole_cards_flavors_list:
+        hole_cards_flavor_key = hole_cards_flavor
+        if hole_cards_flavor_key not in new_data:
+            new_data[hole_cards_flavor_key] = 0
+        new_data[hole_cards_flavor_key] += (
+            hole_cards_flavor in data_frame["all_hole_cards_flavors_in_the_hand"][0]
+        )
+        data_frame[n_hole_cards_flavors_in_hand_string] += new_data[
+            hole_cards_flavor_key
+        ]
+
+    new_df = pd.DataFrame(new_data, index=data_frame.index)
+    data_frame = pd.concat([data_frame, new_df], axis=1)
+    return data_frame
+
+
+def _validate_hole_cards_flavors_tagged(
+    df: pd.DataFrame,
+    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+    n_hole_cards_flavors_in_hand_string: str = N_HOLE_CARDS_FLAVORS_IN_HAND_STRING,
+) -> None:
+    if not (
+        df[n_hole_cards_flavors_in_hand_string] == (n_players_per_simulation)
+    ).all():
+        raise ValueError(
+            f"{n_hole_cards_flavors_in_hand_string} is not equal to {n_players_per_simulation}, indicating not all hole_cards_flavors are being counted correctly!"
         )
 
 
@@ -201,8 +244,11 @@ def _extract_results_data(
         n_players_per_simulation=n_players_per_simulation,
     )
 
-    # TODO: Build _indicate_which_hole_card_flavors_appear_in_hand function and implement it here
-
+    data_frame = _indicate_which_hole_cards_flavors_appear_in_hand(data_frame)
+    _validate_hole_cards_flavors_tagged(
+        df=data_frame,
+        n_players_per_simulation=n_players_per_simulation,
+    )
     # TODO: After the previous, make a summary in order to get %age win for each player, and %age of each unique_card in order to validate your random drawing is working as expected
     # TODO: Add columns for all hole_cards_flavors and indicate with True or False if they appear in the hand
     # TODO: After previous, calculate %age of each hole_cards_flavor

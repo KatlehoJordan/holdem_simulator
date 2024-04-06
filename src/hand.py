@@ -40,8 +40,8 @@ class Hand:
             self.winning_type,
             self.winning_hands,
             self.losing_hands,
-            self.winning_hole_type_flavors,
-            self.losing_hole_type_flavors,
+            self.winning_hole_cards_flavors,
+            self.losing_hole_cards_flavors,
             self.name,
         ) = _assign_hand_attributes(
             n_players_ahead_of_you=n_players_ahead_of_you,
@@ -230,20 +230,19 @@ def _determine_winners_and_losers(
     current_best_hand = player_hands_in_the_hand[0]
     winning_hands = [current_best_hand]
 
-    current_best_hole_cards_flavor = current_best_hand.hole_cards.hole_cards_flavor
-    winning_hole_cards_flavors = [current_best_hole_cards_flavor]
+    winning_hole_cards_flavors = [current_best_hand.hole_cards.hole_cards_flavor]
 
     for player_hand in player_hands_in_the_hand[1:]:
         comparison_result = compare_player_hands(current_best_hand, player_hand)
         if comparison_result == first_player_wins_string:
             winning_type = hand_winner_flavor
             winning_hands = [current_best_hand]
-            winning_hole_cards_flavors = [current_best_hole_cards_flavor]
+            winning_hole_cards_flavors = [winning_hands[0].hole_cards.hole_cards_flavor]
         elif comparison_result == second_player_wins_string:
             winning_type = hand_winner_flavor
             current_best_hand = player_hand
             winning_hands = [current_best_hand]
-            winning_hole_cards_flavors = [current_best_hole_cards_flavor]
+            winning_hole_cards_flavors = [winning_hands[0].hole_cards.hole_cards_flavor]
         elif comparison_result == players_tie_string:
             winning_type = hand_tie_flavor
             winning_hands.append(player_hand)

@@ -26,8 +26,8 @@ HOLE_CARDS_OFF_SUIT_FLAVOR = "off suit"
 HOLE_CARDS_PAIRED_FLAVOR = "s paired"
 N_HOLE_CARDS_PER_PLAYER = 2
 
-VALID_HOLE_CARDS_FLAVORS_SET = set()
-VALID_HOLE_CARDS_FLAVORS_SET_FILE_NAME = "valid_hole_cards_set.pkl"
+VALID_HOLE_CARDS_FLAVORS_LIST = []
+VALID_HOLE_CARDS_FLAVORS_LIST_FILE_NAME = "valid_hole_cards_list.pkl"
 
 
 class HoleCards:
@@ -256,25 +256,25 @@ def _assign_name(
     return name
 
 
-def _make_valid_hole_cards_flavors_set(
-    valid_hole_cards_flavors_set: set[str] = VALID_HOLE_CARDS_FLAVORS_SET,
+def _make_valid_hole_cards_flavors_list(
+    valid_hole_cards_flavors_list: list[str] = VALID_HOLE_CARDS_FLAVORS_LIST,
     valid_ranks_dict: dict[str, dict[str, int]] = VALID_RANKS_DICT,
     raw_rank_value_string: str = RAW_RANK_VALUE_STRING,
     hole_cards_paired_flavor: str = HOLE_CARDS_PAIRED_FLAVOR,
     hole_cards_off_suit_flavor: str = HOLE_CARDS_OFF_SUIT_FLAVOR,
     hole_cards_suited_flavor: str = HOLE_CARDS_SUITED_FLAVOR,
     data_path: Path = DATA_PATH,
-    valid_hole_cards_flavors_set_file_name: str = VALID_HOLE_CARDS_FLAVORS_SET_FILE_NAME,
-) -> set[str]:
-    pickle_file_path = Path(data_path) / valid_hole_cards_flavors_set_file_name
+    valid_hole_cards_flavors_list_file_name: str = VALID_HOLE_CARDS_FLAVORS_LIST_FILE_NAME,
+) -> list[str]:
+    pickle_file_path = Path(data_path) / valid_hole_cards_flavors_list_file_name
 
     if pickle_file_path.exists():
-        logger.info(f"Loading valid hole cards flavors set from {pickle_file_path}")
+        logger.info(f"Loading valid hole cards flavors list from {pickle_file_path}")
         with open(pickle_file_path, "rb") as f:
-            valid_hole_cards_flavors_set = pickle.load(f)
-        return valid_hole_cards_flavors_set
+            valid_hole_cards_flavors_list = pickle.load(f)
+        return valid_hole_cards_flavors_list
     else:
-        logger.info(f"Saving valid hole cards flavors set to {pickle_file_path}")
+        logger.info(f"Saving valid hole cards flavors list to {pickle_file_path}")
         valid_hole_cards_flavors_set = set()
         for rank_1 in valid_ranks_dict:
             for rank_2 in valid_ranks_dict:
@@ -294,9 +294,11 @@ def _make_valid_hole_cards_flavors_set(
                     valid_hole_cards_flavors_set.add(
                         f"{rank_1}, {rank_2} {hole_cards_suited_flavor}"
                     )
+
+        valid_hole_cards_flavors_list = sorted(list(valid_hole_cards_flavors_set))
         with open(pickle_file_path, "wb") as f:
-            pickle.dump(valid_hole_cards_flavors_set, f)
-        return valid_hole_cards_flavors_set
+            pickle.dump(valid_hole_cards_flavors_list, f)
+        return valid_hole_cards_flavors_list
 
 
-VALID_HOLE_CARDS_FLAVORS_SET = _make_valid_hole_cards_flavors_set()
+VALID_HOLE_CARDS_FLAVORS_LIST = _make_valid_hole_cards_flavors_list()
