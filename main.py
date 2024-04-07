@@ -39,7 +39,7 @@ Do you want to train again?
 # TODO: increase n_simulations sufficiently to get below thresholds specified in aggregate_simulations. May want to disable logging to make simulations faster.
 # TODO: Run simulations for all player counts between 2 and 10.
 # TODO: After getting all simulations and aggregations working, build a way to graph the results
-N_SIMS = 10
+N_SIMS = 10000
 N_PLAYERS_TO_SIM_OR_AGGREGATE = 2
 ERRORS_FOR_LOW_SAMPLE_SIZE = False
 
