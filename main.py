@@ -41,6 +41,7 @@ Do you want to train again?
 # TODO: After getting all simulations and aggregations working, build a way to graph the results
 N_SIMS = 10
 N_PLAYERS_TO_SIM_OR_AGGREGATE = 2
+ERRORS_FOR_LOW_SAMPLE_SIZE = False
 
 
 # TODO: Resolve TODOs in other files
@@ -58,7 +59,8 @@ def main(
         exit()
     if purpose == "Aggregating":
         aggregate_simulations(
-            n_players_simulated_to_aggregate=N_PLAYERS_TO_SIM_OR_AGGREGATE
+            n_players_simulated_to_aggregate=N_PLAYERS_TO_SIM_OR_AGGREGATE,
+            errors_for_low_sample_size=ERRORS_FOR_LOW_SAMPLE_SIZE,
         )
         exit()
     if purpose == "Training":

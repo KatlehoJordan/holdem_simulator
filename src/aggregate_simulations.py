@@ -9,6 +9,7 @@ from src.config import (
     PATH_TO_SIMULATIONS_DATA_RESULTS,
     logger,
 )
+from src.hole_cards import VALID_HOLE_CARDS_FLAVORS_LIST
 from src.make_dir_if_does_not_exist import make_dir_if_not_exist
 from src.simulate_hands import (
     N_CARDS_IN_HAND_STRING,
@@ -18,35 +19,44 @@ from src.simulate_hands import (
 PATH_TO_AGGREGATED_DATA_RESULTS = PATH_TO_SIMULATIONS_DATA_RESULTS / "aggregated"
 TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING = 0.1
 N_PLAYERS_SIMULATED_TO_AGGREGATE = 2
+MIN_N_APPEARANCES_EXPECTED_OF_EACH_FLAVOR = 1000
 
 
 def aggregate_simulations(
     n_players_simulated_to_aggregate: int = N_PLAYERS_SIMULATED_TO_AGGREGATE,
+    errors_for_low_sample_size: bool = True,
 ):
     file_path_for_simulations_results = make_file_path_for_unaggregated_simulations(
         n_players_per_simulation=n_players_simulated_to_aggregate
     )
     aggregated_wins_by_player_df = _aggregate_wins_by_player(
         file_path_for_simulations_results,
-        warn_if_deviation_above_tolerable_threshold=False,
+        error_if_deviation_above_tolerable_threshold=errors_for_low_sample_size,
     )
     _make_aggregated_wins_by_player_file(aggregated_wins_by_player_df)
+
     aggregated_card_appearances_df = _aggregate_appearances_by_card(
         file_path_for_simulations_results,
-        warn_if_deviation_above_tolerable_threshold=False,
+        error_if_deviation_above_tolerable_threshold=errors_for_low_sample_size,
     )
     _make_aggregated_card_appearances_file(aggregated_card_appearances_df)
-    # TODO: Implement something similar to aggregate_wins_by_player for each hole_cards_flavor, since this will be needed for determining strength of different hole cards.
-    logger.debug("pause here")
+
+    aggregated_wins_by_hole_cards_flavor_df = _aggregate_wins_by_hole_cards_flavor(
+        file_path_for_simulations_results,
+        error_if_too_few_of_any_given_flavor=errors_for_low_sample_size,
+    )
+    _make_aggregated_wins_by_hole_cards_flavor_file(
+        aggregated_wins_by_hole_cards_flavor_df
+    )
 
 
 def _aggregate_wins_by_player(
     file_for_simulations_results: Path,
     n_players_simulated_to_aggregate: int = N_PLAYERS_SIMULATED_TO_AGGREGATE,
     tolerance_threshold_for_random_drawing: float = TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING,
-    warn_if_deviation_above_tolerable_threshold: bool = True,
+    error_if_deviation_above_tolerable_threshold: bool = True,
 ) -> pd.DataFrame:
-    logger.info("Aggregating total wins")
+    logger.info("Aggregating total wins by player.")
     data_frame = pd.read_csv(file_for_simulations_results)
     results = []
     for player in range(n_players_simulated_to_aggregate):
@@ -71,7 +81,7 @@ def _aggregate_wins_by_player(
             }
         )
     out_df = pd.DataFrame(results)
-    if warn_if_deviation_above_tolerable_threshold:
+    if error_if_deviation_above_tolerable_threshold:
         if out_df["deviation_above_tolerable_threshold"].any():
             raise ValueError(
                 f"At least one player's wins deviate from the expected number of wins by more than {tolerance_threshold_for_random_drawing:.0%}. A larger sample should be drawn or else the random assignment of cards to players is not working."
@@ -85,7 +95,7 @@ def _aggregate_appearances_by_card(
     n_cards_in_hand_string: str = N_CARDS_IN_HAND_STRING,
     valid_cards_dict: dict = VALID_CARDS_DICT,
     tolerance_threshold_for_random_drawing: float = TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING,
-    warn_if_deviation_above_tolerable_threshold: bool = True,
+    error_if_deviation_above_tolerable_threshold: bool = True,
 ) -> pd.DataFrame:
     logger.info("Aggregating appearances of each card")
     data_frame = pd.read_csv(file_for_simulations_results)
@@ -119,7 +129,7 @@ def _aggregate_appearances_by_card(
         )
     out_df = pd.DataFrame(results)
     if (
-        warn_if_deviation_above_tolerable_threshold
+        error_if_deviation_above_tolerable_threshold
         and out_df["deviation_above_tolerable_threshold"].any()
     ):
         raise ValueError(
@@ -129,21 +139,57 @@ def _aggregate_appearances_by_card(
     return out_df
 
 
-def _make_aggregated_wins_by_player_file(
+def _aggregate_wins_by_hole_cards_flavor(
+    file_for_simulations_results: Path,
+    valid_hole_cards_flavors_list: list = VALID_HOLE_CARDS_FLAVORS_LIST,
+    min_n_appearances_expected_of_each_flavor: int = MIN_N_APPEARANCES_EXPECTED_OF_EACH_FLAVOR,
+    error_if_too_few_of_any_given_flavor: bool = True,
+) -> pd.DataFrame:
+    logger.info("Aggregating total wins by hole cards flavor")
+    data_frame = pd.read_csv(file_for_simulations_results)
+    results = []
+    for hole_cards_flavor in valid_hole_cards_flavors_list:
+        this_hole_cards_flavor_appears = sum(data_frame[hole_cards_flavor])
+        this_hole_cards_flavor_wins = data_frame.winning_hole_cards_flavors.apply(
+            lambda x: x.count(hole_cards_flavor)
+        ).sum()
+        win_ratio = this_hole_cards_flavor_wins / this_hole_cards_flavor_appears
+        win_ratio_rounded_down_to_nearest_5_percent = win_ratio // 0.05 * 0.05
+        fewer_than_expected_appearances = (
+            this_hole_cards_flavor_appears < min_n_appearances_expected_of_each_flavor
+        )
+        results.append(
+            {
+                "hole cards flavor": hole_cards_flavor,
+                "appearances": this_hole_cards_flavor_appears,
+                "wins": this_hole_cards_flavor_wins,
+                "win ratio": win_ratio,
+                "win ratio rounded down to nearest 5%": win_ratio_rounded_down_to_nearest_5_percent,
+                "fewer than expected appearances": fewer_than_expected_appearances,
+            }
+        )
+    out_df = pd.DataFrame(results)
+    df_sorted_by_win_ratio = out_df.sort_values("win ratio", ascending=False)
+    if (
+        error_if_too_few_of_any_given_flavor
+        and df_sorted_by_win_ratio["fewer than expected appearances"].any()
+    ):
+        raise ValueError(
+            f"At least one hole_card_flavor's appearances are fewer than the expected appearances of  {min_n_appearances_expected_of_each_flavor}. A larger sample should be drawn to get more representation of all hole_card_flavors."
+        )
+    return df_sorted_by_win_ratio
+
+
+def _make_aggregated_file(
     df: pd.DataFrame,
+    file_name: str,
     path_to_aggregated_directory: Path = PATH_TO_AGGREGATED_DATA_RESULTS,
     path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
-    n_players_simulated_to_aggregate: int = N_PLAYERS_SIMULATED_TO_AGGREGATE,
 ) -> None:
     make_dir_if_not_exist(path_to_archive)
     make_dir_if_not_exist(path_to_aggregated_directory)
 
-    subfolder = path_to_aggregated_directory
-    file_name_prefix = "aggregated"
-    file_path_for_results = (
-        subfolder
-        / f"{file_name_prefix} data for {n_players_simulated_to_aggregate} players.csv"
-    )
+    file_path_for_results = path_to_aggregated_directory / file_name
 
     if file_path_for_results.exists():
         logger.info(
@@ -159,35 +205,27 @@ def _make_aggregated_wins_by_player_file(
     else:
         logger.info("%s does not exist. Creating it now.", file_path_for_results)
     df.to_csv(file_path_for_results, index=False)
+
+
+def _make_aggregated_wins_by_player_file(
+    df: pd.DataFrame,
+    n_players_simulated_to_aggregate: int = N_PLAYERS_SIMULATED_TO_AGGREGATE,
+) -> None:
+    file_name = f"aggregated data for {n_players_simulated_to_aggregate} players.csv"
+    _make_aggregated_file(df, file_name)
 
 
 def _make_aggregated_card_appearances_file(
     df: pd.DataFrame,
-    path_to_aggregated_directory: Path = PATH_TO_AGGREGATED_DATA_RESULTS,
-    path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
     n_players_simulated_to_aggregate: int = N_PLAYERS_SIMULATED_TO_AGGREGATE,
 ) -> None:
-    make_dir_if_not_exist(path_to_archive)
-    make_dir_if_not_exist(path_to_aggregated_directory)
+    file_name = f"aggregated data for appearances of cards with {n_players_simulated_to_aggregate} players.csv"
+    _make_aggregated_file(df, file_name)
 
-    subfolder = path_to_aggregated_directory
-    file_name_prefix = "aggregated"
-    file_path_for_results = (
-        subfolder
-        / f"{file_name_prefix} data for appearances of cards with {n_players_simulated_to_aggregate} players.csv"
-    )
 
-    if file_path_for_results.exists():
-        logger.info(
-            "%s already exists. Copying it to the archive folder with a timestamp.",
-            file_path_for_results,
-        )
-        timestamp = pd.Timestamp.now().strftime("%Y-%m-%d")
-        shutil.copy2(
-            file_path_for_results,
-            path_to_archive / f"{file_path_for_results.stem} dated {timestamp}.csv",
-        )
-
-    else:
-        logger.info("%s does not exist. Creating it now.", file_path_for_results)
-    df.to_csv(file_path_for_results, index=False)
+def _make_aggregated_wins_by_hole_cards_flavor_file(
+    df: pd.DataFrame,
+    n_players_simulated_to_aggregate: int = N_PLAYERS_SIMULATED_TO_AGGREGATE,
+) -> None:
+    file_name = f"aggregated data for wins by hole cards flavor with {n_players_simulated_to_aggregate} players.csv"
+    _make_aggregated_file(df, file_name)
