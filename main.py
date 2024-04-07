@@ -32,12 +32,14 @@ Do you want to train again?
 {COMMON_PROMPT}
 """
 
+# TODO: Found that when multiple players have the same hole_cards flavor (e.g., 9, 5 off suit), they are not being counted correctly and is caught by simulate_hands line 181. Need to fix this. I MAY HAVE FIXED THIS, BUT HAVE NOT CONFIRMED! SHOULD BE CONFIRMED BY LOOKING AT SIMULATED OUTPUT AND LOOKING FOR AT LEAST ONE HOLE_CARD_FLAVOR WHERE THE CELL VALUE IS GREATER THAN 1.
+
 # TODO: Solve why debugger is not working as well (fails to restart often and opens a new terminal instead)
 
 # TODO: increase n_simulations sufficiently to get below thresholds specified in aggregate_simulations. May want to disable logging to make simulations faster.
 # TODO: Run simulations for all player counts between 2 and 10.
 # TODO: After getting all simulations and aggregations working, build a way to graph the results
-N_SIMS = 1000
+N_SIMS = 10
 N_PLAYERS_TO_SIM_OR_AGGREGATE = 2
 
 
@@ -97,4 +99,4 @@ def main(
 
 
 if __name__ == "__main__":
-    main(purpose="Simulating")
+    main(purpose="Aggregating")

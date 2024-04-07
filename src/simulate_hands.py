@@ -158,9 +158,11 @@ def _indicate_which_hole_cards_flavors_appear_in_hand(
         hole_cards_flavor_key = hole_cards_flavor
         if hole_cards_flavor_key not in new_data:
             new_data[hole_cards_flavor_key] = 0
-        new_data[hole_cards_flavor_key] += (
-            hole_cards_flavor in data_frame["all_hole_cards_flavors_in_the_hand"][0]
-        )
+        # new_data[hole_cards_flavor_key] += (
+        #     hole_cards_flavor in data_frame["all_hole_cards_flavors_in_the_hand"][0]
+        new_data[hole_cards_flavor_key] += data_frame[
+            "all_hole_cards_flavors_in_the_hand"
+        ][0].count(hole_cards_flavor)
         data_frame[n_hole_cards_flavors_in_hand_string] += new_data[
             hole_cards_flavor_key
         ]
@@ -227,9 +229,13 @@ def _make_simulations_results_file(
         )
 
         logger.info("Appending new data to %s", file_path_for_simulations_results)
-        df.to_csv(file_path_for_simulations_results, mode="a", header=False, index=False)
+        df.to_csv(
+            file_path_for_simulations_results, mode="a", header=False, index=False
+        )
     else:
-        logger.info("%s does not exist. Creating it now.", file_path_for_simulations_results)
+        logger.info(
+            "%s does not exist. Creating it now.", file_path_for_simulations_results
+        )
         df.to_csv(file_path_for_simulations_results, index=False)
     return file_path_for_simulations_results
 
