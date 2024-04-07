@@ -48,49 +48,60 @@ def simulate_hands(
             [simulated_data_df, simulated_data], ignore_index=True
         )
 
-    _make_simulations_results_file(simulated_data_df)
-    # TODO: Modify _aggregate_total_wins to use the file created by _make_simulations_results_file. It should output a dataframe with a single line of aggregated data instead of many lines. Then, add logic to save the aggregated_df to a csv file and visualize the results. Want to have controls that no obvious bias for any one player to win, and want to ensure that no obvious bias for any specific cards to be drawn.
-    aggregated_wins_df = _aggregate_total_wins(
-        simulated_data_df,
-        n_simulations,
-        n_players_per_simulation,
+    file_for_simulations_results = _make_simulations_results_file(simulated_data_df)
+    aggregated_wins_by_player_df = _aggregate_wins_by_player(
+        file_for_simulations_results,
     )
-    # TODO: Add logic to save the aggregated_df to a csv file. Current implementation is appending to the previous aggregated file, which is not the desired outcome, so many not be able to use the same function as for the raw simulation data as first thought.
-    # _make_simulations_results_file(aggregated_wins_df, aggregated_results=True)
-    # TODO: Ensure that the logic you previously built to test that the distribution of wins is uniform is being applied to the aggregated data as a check. Don't know where that logic is at the moment.
+    # TODO: Save aggregated_wins_by_player_df as a .csv
+    # TODO: Create similar function as _aggregate_wins_by_player, but for each card appearance, in order to verify they are all appearing with equal frequency.
+    logger.debug("pause here")
 
 
-def _aggregate_total_wins(
-    df: pd.DataFrame,
-    n_simulations: int = N_SIMULATIONS,
+def _aggregate_wins_by_player(
+    file_for_simulations_results: Path,
     n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
     tolerance_threshold_for_random_drawing: float = TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING,
 ) -> pd.DataFrame:
+    logger.info("Aggregating total wins")
+    data_frame = pd.read_csv(file_for_simulations_results)
     total_wins = 0.0
     out_df = pd.DataFrame()
     for player in range(n_players_per_simulation):
         wins_as_float_key = (
             f"player_{player}_wins_as_float" if player != 0 else "you_win_as_float"
         )
-        this_players_wins = sum(df[wins_as_float_key])
-        expected_wins = n_simulations / n_players_per_simulation
-        # if (
-        #     abs(this_players_wins - expected_wins)
-        #     > tolerance_threshold_for_random_drawing * expected_wins
-        # ):
-        #     if player == 0:
-        #         player = "you"
-        #     raise ValueError(
-        #         f"Player {player}'s wins deviate from the expected number of wins by more than {tolerance_threshold_for_random_drawing:.0%}. A larger sample should be drawn or else the random assignment of cards to players is not working."
-        #     )
+        this_players_wins = sum(data_frame[wins_as_float_key])
+        expected_wins = len(data_frame) / n_players_per_simulation
+        deviation = this_players_wins - expected_wins
+        percent_deviation = abs(deviation) / expected_wins
+        if percent_deviation > tolerance_threshold_for_random_drawing:
+            deviation_above_tolerable_threshold = True
+        else:
+            deviation_above_tolerable_threshold = False
         total_wins += this_players_wins
         out_df = pd.concat(
-            [out_df, pd.DataFrame([{"player": player, "wins": this_players_wins}])],
+            [
+                out_df,
+                pd.DataFrame(
+                    [
+                        {
+                            "player": player,
+                            "wins": this_players_wins,
+                            "expected_wins": expected_wins,
+                            "deviation": deviation,
+                            "percent_deviation": percent_deviation,
+                            "deviation_above_tolerable_threshold": deviation_above_tolerable_threshold,
+                        }
+                    ]
+                ),
+            ],
             ignore_index=True,
         )
+    if out_df["deviation_above_tolerable_threshold"].any():
+        raise ValueError(
+            f"At least one player's wins deviate from the expected number of wins by more than {tolerance_threshold_for_random_drawing:.0%}. A larger sample should be drawn or else the random assignment of cards to players is not working."
+        )
 
-    # if total_wins != n_simulations:
-    #     raise ValueError("The sum of wins should equal the number of simulations")
     return out_df
 
 
@@ -257,22 +268,15 @@ def _extract_results_data(
 
 def _make_simulations_results_file(
     df: pd.DataFrame,
-    aggregated_results: bool = False,
-    path_to_aggregated_directory: Path = PATH_TO_AGGREGATED_DATA_RESULTS,
     path_to_unaggregated_directory: Path = PATH_TO_UNAGGREGATED_DATA_RESULTS,
     path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
     n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
-) -> None:
+) -> Path:
     _make_dir_if_not_exist(path_to_archive)
-    _make_dir_if_not_exist(path_to_aggregated_directory)
     _make_dir_if_not_exist(path_to_unaggregated_directory)
 
-    if aggregated_results:
-        subfolder = path_to_aggregated_directory
-        file_name_prefix = "aggregated"
-    else:
-        subfolder = path_to_unaggregated_directory
-        file_name_prefix = "unaggregated"
+    subfolder = path_to_unaggregated_directory
+    file_name_prefix = "unaggregated"
     file_for_simulations_results = (
         subfolder
         / f"{file_name_prefix} data for {n_players_per_simulation} players.csv"
@@ -295,6 +299,7 @@ def _make_simulations_results_file(
     else:
         logger.info("%s does not exist. Creating it now.", file_for_simulations_results)
         df.to_csv(file_for_simulations_results, index=False)
+    return file_for_simulations_results
 
 
 def _make_dir_if_not_exist(path_to_dir: Path) -> None:
