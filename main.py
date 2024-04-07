@@ -32,7 +32,6 @@ Do you want to train again?
 {COMMON_PROMPT}
 """
 
-# TODO: Found that when multiple players have the same hole_cards flavor (e.g., 9, 5 off suit), they are not being counted correctly and is caught by simulate_hands line 181. Need to fix this. I MAY HAVE FIXED THIS, BUT HAVE NOT CONFIRMED! SHOULD BE CONFIRMED BY LOOKING AT SIMULATED OUTPUT AND LOOKING FOR AT LEAST ONE HOLE_CARD_FLAVOR WHERE THE CELL VALUE IS GREATER THAN 1.
 
 # TODO: Solve why debugger is not working as well (fails to restart often and opens a new terminal instead)
 
@@ -51,7 +50,6 @@ def main(
     purpose: str = "Training",
 ) -> None:
     clear_console()
-    # TODO: After done simulating and finalizing everything, remove all the if clauses and 'purpose' in order to only use this for training.
     if purpose == "Simulating":
         simulate_hands(
             n_simulations=N_SIMS, n_players_per_simulation=N_PLAYERS_TO_SIM_OR_AGGREGATE
