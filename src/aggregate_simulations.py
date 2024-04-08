@@ -1,3 +1,4 @@
+import math
 import shutil
 from pathlib import Path
 
@@ -81,6 +82,16 @@ def _aggregate_wins_by_player(
             }
         )
     out_df = pd.DataFrame(results)
+    if not math.isclose(
+        out_df["wins"].sum(), out_df["expected_wins"].sum(), rel_tol=1e-9
+    ):
+        raise ValueError(
+            "The total number of wins is not equal to the total number of expected wins. This indicates that perhaps ties are not being handled correctly."
+        )
+    if not math.isclose(out_df["deviation"].sum(), 0, abs_tol=1e-9):
+        raise ValueError(
+            "The total deviation is not equal to 0. This indicates that perhaps ties are not being handled correctly."
+        )
     if error_if_deviation_above_tolerable_threshold:
         if out_df["deviation_above_tolerable_threshold"].any():
             raise ValueError(
@@ -128,6 +139,16 @@ def _aggregate_appearances_by_card(
             }
         )
     out_df = pd.DataFrame(results)
+    if not math.isclose(
+        out_df["appearances"].sum(), out_df["expected_appearances"].sum(), rel_tol=1e-9
+    ):
+        raise ValueError(
+            "The total number of appearances is not equal to the total number of expected appearances. This indicates that perhaps expected appearances are not being calculated correctly."
+        )
+    if not math.isclose(out_df["deviation"].sum(), 0, abs_tol=1e-9):
+        raise ValueError(
+            "The total deviation is not equal to 0. This indicates that perhaps expected appearances are not being calculated correctly."
+        )
     if (
         error_if_deviation_above_tolerable_threshold
         and out_df["deviation_above_tolerable_threshold"].any()

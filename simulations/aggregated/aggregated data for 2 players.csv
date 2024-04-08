@@ -1,3 +1,0 @@
-player,wins,expected_wins,deviation,percent_deviation,deviation_above_tolerable_threshold
-0,5580.5,5550.0,30.5,0.005495495495495496,False
-1,5301.0,5550.0,-249.0,0.044864864864864865,False

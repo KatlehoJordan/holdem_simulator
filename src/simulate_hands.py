@@ -30,6 +30,8 @@ def simulate_hands(
     simulated_data_df = pd.DataFrame()
     logger.info("Simulating %s hands", n_simulations)
     for simulation in range(n_simulations):
+        # TODO: Take away this warning when done with simulations
+        logger.warn("Simulation number %s", simulation + 1)
         console_iteration_visualizer = "-" * 80
         logger.info(console_iteration_visualizer)
         iter = simulation + 1
@@ -103,7 +105,7 @@ def _add_player_specific_data(
         ].hole_cards.hole_cards_flavor
 
         win_key = f"player_{player}_wins" if player != 0 else "you_win"
-        data[win_key] = data[hand_type_key].hand_type == data["winning_hands"]
+        data[win_key] = data[hand_type_key].hand_type.name == data["winning_hands"].name
 
         win_as_float_key = (
             f"player_{player}_wins_as_float" if player != 0 else "you_win_as_float"

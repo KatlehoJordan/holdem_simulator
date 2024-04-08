@@ -88,5 +88,6 @@ def find_key_by_raw_rank_value(
     return "Rank not found"
 
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+# TODO: Change logging level to INFO for when training
+logging.basicConfig(level=logging.WARN, format="%(levelname)s: %(message)s")
 logger = logging.getLogger()
