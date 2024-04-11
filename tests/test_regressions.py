@@ -7,7 +7,8 @@ from tests.tests_config import (
 
 # TODO: Rename these unit tests and update the doc string to use case 01, 02, etc.
 
-"""Regression tests for previously identified issues.
+"""
+Regression tests for previously identified issues.
 
 These tests are for cases where the logic was previously incorrect and has since been fixed.
 
