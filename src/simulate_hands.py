@@ -1,3 +1,4 @@
+import math
 import shutil
 from pathlib import Path
 
@@ -32,11 +33,6 @@ def simulate_hands(
     for simulation in range(n_simulations):
         # TODO: Take away this warning when done with simulations
         logger.warn("Simulation number %s", simulation + 1)
-        console_iteration_visualizer = "-" * 80
-        logger.info(console_iteration_visualizer)
-        iter = simulation + 1
-        logger.info("Iteration: %s", iter)
-        logger.info(console_iteration_visualizer)
         logger.info("Simulating %s players", n_players_per_simulation)
         hand = Hand(
             n_players_ahead_of_you=PlayersAheadOfYou(n_players_per_simulation - 1)
@@ -77,19 +73,23 @@ def _initialize_data_dictionary(
 
 
 def _add_player_specific_data(
-    hand: Hand, data: dict, n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION
+    hand: Hand,
+    data_dict: dict,
+    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
 ) -> dict:
     logger.info("Adding player-specific data to dictionary")
+    sum_of_wins_as_float = 0.0
+    count_winners = 0
     for player in range(n_players_per_simulation):
         hand_type_key = (
             f"player_{player}s_hand_type" if player != 0 else "your_hand_type"
         )
-        data[hand_type_key] = hand.player_hands_in_the_hand[player]
+        data_dict[hand_type_key] = hand.player_hands_in_the_hand[player]
 
         hole_cards_key = (
             f"player_{player}s_hole_cards" if player != 0 else "your_hole_cards"
         )
-        data[hole_cards_key] = (
+        data_dict[hole_cards_key] = (
             hand.player_hands_in_the_hand[player].hole_cards.hi_card.name
             + ", "
             + hand.player_hands_in_the_hand[player].hole_cards.lo_card.name
@@ -100,19 +100,34 @@ def _add_player_specific_data(
             if player != 0
             else "your_hole_cards_flavor"
         )
-        data[hole_cards_flavor_key] = hand.player_hands_in_the_hand[
+        data_dict[hole_cards_flavor_key] = hand.player_hands_in_the_hand[
             player
         ].hole_cards.hole_cards_flavor
 
         win_key = f"player_{player}_wins" if player != 0 else "you_win"
-        data[win_key] = data[hand_type_key].hand_type.name == data["winning_hands"].name
+        data_dict[win_key] = (
+            data_dict[hand_type_key].hand_type.name == data_dict["winning_hands"].name
+        )
 
         win_as_float_key = (
             f"player_{player}_wins_as_float" if player != 0 else "you_win_as_float"
         )
-        data[win_as_float_key] = (1.0 / data["n_winners"]) if data[win_key] else 0.0
+        data_dict[win_as_float_key] = (
+            (1.0 / data_dict["n_winners"]) if data_dict[win_key] else 0.0
+        )
+        sum_of_wins_as_float += data_dict[win_as_float_key]
+        if data_dict[win_key]:
+            count_winners += 1
+    if not math.isclose(sum_of_wins_as_float, 1.0, rel_tol=1e-9):
+        raise ValueError(
+            f"Sum of wins as float is not close to 1.0, indicating some wins are being tallied incorrectly: {sum_of_wins_as_float}"
+        )
+    if hand.winning_type == "Single winner" and count_winners != 1:
+        raise ValueError(
+            f"Winning type is Single winner, but count_winners is not 1: {count_winners}, indicating some wins are being tallied incorrectly!"
+        )
 
-    return data
+    return data_dict
 
 
 def _indicate_which_cards_appear_in_hand(
@@ -196,7 +211,9 @@ def _extract_results_data(
         hand=hand, n_players_per_simulation=n_players_per_simulation
     )
     data_dict = _add_player_specific_data(
-        hand=hand, data=data_dict, n_players_per_simulation=n_players_per_simulation
+        hand=hand,
+        data_dict=data_dict,
+        n_players_per_simulation=n_players_per_simulation,
     )
     data_frame = _indicate_which_cards_appear_in_hand(data_dict)
     _validate_n_cards_in_hand(

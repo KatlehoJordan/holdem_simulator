@@ -35,7 +35,7 @@ def validate_flush(
         name = f"No {hand_name_root}."
     else:
         flush_found = True
-        name = f"{hand_name_root}: {', '.join(find_key_by_raw_rank_value(rank) for rank in sorted_raw_rank_values[-n_cards_in_a_flush:])}, in {most_common_suit}."
+        name = f"{hand_name_root}: {', '.join(find_key_by_raw_rank_value(rank) for rank in sorted_raw_rank_values[:n_cards_in_a_flush])}, in {most_common_suit}."
 
     return (flush_found, hand_type_score, top_ranks_in_flush, name)
 
