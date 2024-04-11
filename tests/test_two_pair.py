@@ -56,12 +56,12 @@ TWO_PAIR_4S_AND_5S_WEAKER_KICKER = make_community_cards_for_testing(
     ]
 )
 
-TWO_PAIR_4S_AND_5S = make_community_cards_for_testing(
+TWO_PAIR_5S_AND_6S = make_community_cards_for_testing(
     [
-        "4_OF_SPADES",
-        "4_OF_HEARTS",
         "5_OF_CLUBS",
         "5_OF_DIAMONDS",
+        "6_OF_SPADES",
+        "6_OF_HEARTS",
         "ACE_OF_SPADES",
     ]
 )
@@ -81,7 +81,7 @@ VALID_TWO_PAIR_CASES_IN_ASCENDING_STRENGTH = [
     TWO_PAIR_3S_AND_2S,
     TWO_PAIR_3S_AND_2S_ALTERNATE,
     TWO_PAIR_4S_AND_5S_WEAKER_KICKER,
-    TWO_PAIR_4S_AND_5S,
+    TWO_PAIR_5S_AND_6S,
     COMMUNITY_TWO_PAIR_ACES_AND_KINGS,
 ]
 

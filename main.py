@@ -35,9 +35,7 @@ Do you want to train again?
 
 # TODO: Solve why debugger is not working as well (fails to restart often and opens a new terminal instead)
 
-# TODO: Resolve why total wins is not equal to sum of expected wins in the aggregated data for 2 players file...  There are still cases where perhaps single winner and/or tie are not adding up correctly! See current output file rows 220, 378, 830, for example. Fix may be needed in player_hand.py or hand_type.py. I observed that when community cards give the best flush, but a player has a low rank with the same suit, then that player may get assigned the wrong hand_type (a flush, but not the community/best flush).
-# TODO: Fix logic for finding ties in this case! For case in row 220, winning_hole_cards_flavor is only capturing one winner, though there are multiple, and it's indicating a Single winner, although there are ties.
-# TODO: Fix logic for finding flushes! For case in row 378, there should only be one winner, the one with a Jack-high flush, but it is not indicating the winning-hand as a jack-high flush, and the loser is therefore getting credit for a win.
+# TODO: Resolve why total wins is not equal to sum of expected wins in the aggregated data for 2 players file...  There are still cases where perhaps single winner and/or tie are not adding up correctly! See current output file rows 830, for example. Fix may be needed in player_hand.py or hand_type.py. I observed that when community cards give the best flush, but a player has a low rank with the same suit, then that player may get assigned the wrong hand_type (a flush, but not the community/best flush).
 # TODO: Fix logic for finding straights when an Ace is in the hand! For case in row 830, it is incorrectly indicating an Ace-high straight, although the straight is actually 10-high, and the loser also has a straight, but a lower straight, and therefore should not be getting credit for a win but it currently is.
 # TODO: increase n_simulations sufficiently to get below thresholds specified in aggregate_simulations. May want to disable logging to make simulations faster.
 # TODO: Run simulations for all player counts between 2 and 10.

@@ -11,7 +11,7 @@ from src.config import (
     PATH_TO_SIMULATIONS_DATA_RESULTS,
     logger,
 )
-from src.hand import Hand
+from src.hand import HAND_WINNER_FLAVOR, Hand
 from src.hole_cards import N_HOLE_CARDS_PER_PLAYER, VALID_HOLE_CARDS_FLAVORS_LIST
 from src.make_dir_if_does_not_exist import make_dir_if_not_exist
 from src.players_ahead_of_you import PlayersAheadOfYou
@@ -76,6 +76,7 @@ def _add_player_specific_data(
     hand: Hand,
     data_dict: dict,
     n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+    single_winner_hand_winner_flavor: str = HAND_WINNER_FLAVOR,
 ) -> dict:
     logger.info("Adding player-specific data to dictionary")
     sum_of_wins_as_float = 0.0
@@ -122,9 +123,9 @@ def _add_player_specific_data(
         raise ValueError(
             f"Sum of wins as float is not close to 1.0, indicating some wins are being tallied incorrectly: {sum_of_wins_as_float}"
         )
-    if hand.winning_type == "Single winner" and count_winners != 1:
+    if hand.winning_type == single_winner_hand_winner_flavor and count_winners != 1:
         raise ValueError(
-            f"Winning type is Single winner, but count_winners is not 1: {count_winners}, indicating some wins are being tallied incorrectly!"
+            f"Winning type is {single_winner_hand_winner_flavor}, but count_winners is not 1: {count_winners}, indicating some wins are being tallied incorrectly!"
         )
 
     return data_dict
