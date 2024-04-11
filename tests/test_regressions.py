@@ -5,6 +5,16 @@ from tests.tests_config import (
     make_hole_cards_for_testing,
 )
 
+# TODO: Rename these unit tests and update the doc string to use case 01, 02, etc.
+
+"""Regression tests for previously identified issues.
+
+These tests are for cases where the logic was previously incorrect and has since been fixed.
+
+The naming convention for these tests is as follows:
+- case_<issue_number>: The issue number is based on the row of an excel file where the issue was identified. This is not future proof and should be replaced with a more robust system.
+"""
+
 CASE_378_COMMUNITY_SPADES_FLUSH_10_HI = make_community_cards_for_testing(
     [
         "6_OF_SPADES",
