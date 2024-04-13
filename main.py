@@ -1,4 +1,5 @@
 from src.aggregate_simulations import aggregate_simulations
+from src.config import logger
 from src.deck import Deck
 from src.guess_functions import (
     clear_console,
@@ -33,12 +34,10 @@ Do you want to train again?
 """
 
 
-# TODO: Solve why debugger is not working as well (fails to restart often and opens a new terminal instead)
-
 # TODO: increase n_simulations sufficiently to get below thresholds specified in aggregate_simulations. May want to disable logging to make simulations faster.
 # TODO: Run simulations for all player counts between 2 and 10.
 # TODO: After getting all simulations and aggregations working, build a way to graph the results
-N_SIMS = 1000  # >210 000 is likely needed to get over 1000 appearances for each hole_cards_flavor
+N_SIMS = 300000  # >210 000 is likely needed to get over 1000 appearances for each hole_cards_flavor
 N_PLAYERS_TO_SIM_OR_AGGREGATE = 2
 ERRORS_FOR_LOW_SAMPLE_SIZE = False
 
@@ -51,11 +50,13 @@ def main(
 ) -> None:
     clear_console()
     if purpose == "Simulating":
+        logger.setLevel("WARNING")
         simulate_hands(
             n_simulations=N_SIMS, n_players_per_simulation=N_PLAYERS_TO_SIM_OR_AGGREGATE
         )
         exit()
     if purpose == "Aggregating":
+        logger.setLevel("WARNING")
         aggregate_simulations(
             n_players_simulated_to_aggregate=N_PLAYERS_TO_SIM_OR_AGGREGATE,
             errors_for_low_sample_size=ERRORS_FOR_LOW_SAMPLE_SIZE,

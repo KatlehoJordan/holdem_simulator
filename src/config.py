@@ -73,6 +73,8 @@ VALID_RANKS_DICT = {
     },
 }
 
+TRAINING_LOGGING_LEVEL = 15  # Between DEBUG (10) and INFO (20)
+
 
 def find_key_by_raw_rank_value(
     input_integer: int,
@@ -88,6 +90,6 @@ def find_key_by_raw_rank_value(
     return "Rank not found"
 
 
-# TODO: Change logging level to INFO for when training
-logging.basicConfig(level=logging.WARN, format="%(levelname)s: %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logging.addLevelName(TRAINING_LOGGING_LEVEL, "TRAINING")
 logger = logging.getLogger()

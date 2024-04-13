@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "console": "integratedTerminal",
+            "console": "externalTerminal", // This was working previously with integratedTerminal, but became unstable. Now an externalTerminal is launched, but I'm not yet sure if it is stable. Somehow not behaving with integratedTerminal as Git Bash after first launch...
             "justMyCode": true,
             "name": "Python: main.py",
             "program": "${workspaceFolder}/main.py",
@@ -9,7 +9,7 @@
             "type": "debugpy",
         },
         {
-            "console": "externalTerminal", // This was working previously with internal terminal, but became unstable. Now an external terminal is launched, but I'm not yet sure if it is stable.
+            "console": "externalTerminal", // This was working previously with integratedTerminal, but became unstable. Now an externalTerminal is launched, but I'm not yet sure if it is stable. Somehow not behaving with integratedTerminal as Git Bash after first launch...
             "justMyCode": true,
             "name": "Pytest: Current File",
             "program": "${file}",
