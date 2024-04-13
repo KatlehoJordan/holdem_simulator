@@ -76,7 +76,6 @@ def _add_player_specific_data(
     hand: Hand,
     data_dict: dict,
     n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
-    single_winner_hand_winner_flavor: str = HAND_WINNER_FLAVOR,
 ) -> dict:
     logger.info("Adding player-specific data to dictionary")
     sum_of_wins_as_float = 0.0
@@ -119,16 +118,26 @@ def _add_player_specific_data(
         sum_of_wins_as_float += data_dict[win_as_float_key]
         if data_dict[win_key]:
             count_winners += 1
+    _validate_player_specific_data(hand, sum_of_wins_as_float, count_winners)
+
+    return data_dict
+
+
+def _validate_player_specific_data(
+    hand: Hand,
+    sum_of_wins_as_float: float,
+    count_winners: int,
+    single_winner_hand_winner_flavor: str = HAND_WINNER_FLAVOR,
+) -> None:
+    logger.info("Validating player-specific data")
     if not math.isclose(sum_of_wins_as_float, 1.0, rel_tol=1e-9):
         raise ValueError(
-            f"Sum of wins as float is not close to 1.0, indicating some wins are being tallied incorrectly: {sum_of_wins_as_float}"
+            f"Sum of wins as float is {sum_of_wins_as_float}, which is not close to 1.0, indicating some wins are being tallied incorrectly!"
         )
     if hand.winning_type == single_winner_hand_winner_flavor and count_winners != 1:
         raise ValueError(
             f"Winning type is {single_winner_hand_winner_flavor}, but count_winners is not 1: {count_winners}, indicating some wins are being tallied incorrectly!"
         )
-
-    return data_dict
 
 
 def _indicate_which_cards_appear_in_hand(
