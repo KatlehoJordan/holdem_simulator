@@ -91,5 +91,4 @@ def find_key_by_raw_rank_value(
 
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-logging.addLevelName(TRAINING_LOGGING_LEVEL, "TRAINING")
 logger = logging.getLogger()
