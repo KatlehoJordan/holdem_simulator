@@ -1,4 +1,5 @@
 import math
+import os
 import shutil
 from pathlib import Path
 
@@ -14,48 +15,54 @@ from src.hole_cards import VALID_HOLE_CARDS_FLAVORS_LIST
 from src.make_dir_if_does_not_exist import make_dir_if_not_exist
 from src.simulate_hands import (
     N_CARDS_IN_HAND_STRING,
-    make_file_path_for_unaggregated_simulations,
+    make_folder_for_unaggregated_simulations,
 )
 
 PATH_TO_AGGREGATED_DATA_RESULTS = PATH_TO_SIMULATIONS_DATA_RESULTS / "aggregated"
 TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING = 0.01
 N_PLAYERS_SIMULATED_TO_AGGREGATE = 2
 MIN_N_APPEARANCES_EXPECTED_OF_EACH_FLAVOR = 1000
+TMP_FILE_NAME = "all_simulations_results.csv"
 
 
 def aggregate_simulations(
-    n_players_simulated_to_aggregate: int = N_PLAYERS_SIMULATED_TO_AGGREGATE,
-    errors_for_low_sample_size: bool = True,
+    tmp_file_name: str = TMP_FILE_NAME,
 ):
-    file_path_for_simulations_results = make_file_path_for_unaggregated_simulations(
-        n_players_per_simulation=n_players_simulated_to_aggregate
-    )
+    unaggregated_results_folder = make_folder_for_unaggregated_simulations()
+    tmp_file_path = unaggregated_results_folder / tmp_file_name
+
+    counter = 0
+    for file in unaggregated_results_folder.iterdir():
+        if file.suffix == ".csv":
+            df = pd.read_csv(file)
+            read_header = counter == 0
+            df.to_csv(tmp_file_path, mode="a", index=False, header=read_header)
+            counter += 1
+
     aggregated_wins_by_player_df = _aggregate_wins_by_player(
-        file_path_for_simulations_results,
-        error_if_deviation_above_tolerable_threshold=errors_for_low_sample_size,
+        tmp_file_path,
     )
     _make_aggregated_wins_by_player_file(aggregated_wins_by_player_df)
 
     aggregated_card_appearances_df = _aggregate_appearances_by_card(
-        file_path_for_simulations_results,
-        error_if_deviation_above_tolerable_threshold=errors_for_low_sample_size,
+        tmp_file_path,
     )
     _make_aggregated_card_appearances_file(aggregated_card_appearances_df)
 
     aggregated_wins_by_hole_cards_flavor_df = _aggregate_wins_by_hole_cards_flavor(
-        file_path_for_simulations_results,
-        error_if_too_few_of_any_given_flavor=errors_for_low_sample_size,
+        tmp_file_path,
     )
     _make_aggregated_wins_by_hole_cards_flavor_file(
         aggregated_wins_by_hole_cards_flavor_df
     )
+    logger.info("Removing the temp file %s", tmp_file_path)
+    os.unlink(tmp_file_path)
 
 
 def _aggregate_wins_by_player(
     file_for_simulations_results: Path,
     n_players_simulated_to_aggregate: int = N_PLAYERS_SIMULATED_TO_AGGREGATE,
     tolerance_threshold_for_random_drawing: float = TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING,
-    error_if_deviation_above_tolerable_threshold: bool = True,
 ) -> pd.DataFrame:
     logger.info("Aggregating total wins by player.")
     data_frame = pd.read_csv(file_for_simulations_results)
@@ -92,11 +99,10 @@ def _aggregate_wins_by_player(
         raise ValueError(
             "The total deviation is not equal to 0. This indicates that perhaps ties are not being handled correctly."
         )
-    if error_if_deviation_above_tolerable_threshold:
-        if out_df["deviation_above_tolerable_threshold"].any():
-            raise ValueError(
-                f"At least one player's wins deviate from the expected number of wins by more than {tolerance_threshold_for_random_drawing:.0%}. A larger sample should be drawn or else the random assignment of cards to players is not working."
-            )
+    if out_df["deviation_above_tolerable_threshold"].any():
+        logger.warning(
+            f"At least one player's wins deviate from the expected number of wins by more than {tolerance_threshold_for_random_drawing:.0%}. A larger sample should be drawn or else the random assignment of cards to players is not working."
+        )
 
     return out_df
 
@@ -106,7 +112,6 @@ def _aggregate_appearances_by_card(
     n_cards_in_hand_string: str = N_CARDS_IN_HAND_STRING,
     valid_cards_dict: dict = VALID_CARDS_DICT,
     tolerance_threshold_for_random_drawing: float = TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING,
-    error_if_deviation_above_tolerable_threshold: bool = True,
 ) -> pd.DataFrame:
     logger.info("Aggregating appearances of each card")
     data_frame = pd.read_csv(file_for_simulations_results)
@@ -149,11 +154,8 @@ def _aggregate_appearances_by_card(
         raise ValueError(
             "The total deviation is not equal to 0. This indicates that perhaps expected appearances are not being calculated correctly."
         )
-    if (
-        error_if_deviation_above_tolerable_threshold
-        and out_df["deviation_above_tolerable_threshold"].any()
-    ):
-        raise ValueError(
+    if out_df["deviation_above_tolerable_threshold"].any():
+        logger.warning(
             f"At least one card's appearances deviate from the expected number of appearances by more than {tolerance_threshold_for_random_drawing:.0%}. A larger sample should be drawn or else the random assignment of cards to players is not working."
         )
 
@@ -164,7 +166,6 @@ def _aggregate_wins_by_hole_cards_flavor(
     file_for_simulations_results: Path,
     valid_hole_cards_flavors_list: list = VALID_HOLE_CARDS_FLAVORS_LIST,
     min_n_appearances_expected_of_each_flavor: int = MIN_N_APPEARANCES_EXPECTED_OF_EACH_FLAVOR,
-    error_if_too_few_of_any_given_flavor: bool = True,
 ) -> pd.DataFrame:
     logger.info("Aggregating total wins by hole cards flavor")
     data_frame = pd.read_csv(file_for_simulations_results)
@@ -191,11 +192,8 @@ def _aggregate_wins_by_hole_cards_flavor(
         )
     out_df = pd.DataFrame(results)
     df_sorted_by_win_ratio = out_df.sort_values("win ratio", ascending=False)
-    if (
-        error_if_too_few_of_any_given_flavor
-        and df_sorted_by_win_ratio["fewer than expected appearances"].any()
-    ):
-        raise ValueError(
+    if df_sorted_by_win_ratio["fewer than expected appearances"].any():
+        logger.warning(
             f"At least one hole_card_flavor's appearances are fewer than the expected appearances of  {min_n_appearances_expected_of_each_flavor}. A larger sample should be drawn to get more representation of all hole_card_flavors."
         )
     return df_sorted_by_win_ratio

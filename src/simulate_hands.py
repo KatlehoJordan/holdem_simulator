@@ -1,4 +1,5 @@
 import math
+import re
 import shutil
 from pathlib import Path
 
@@ -21,12 +22,18 @@ N_PLAYERS_PER_SIMULATION = 2
 PATH_TO_UNAGGREGATED_DATA_RESULTS = PATH_TO_SIMULATIONS_DATA_RESULTS / "unaggregated"
 N_CARDS_IN_HAND_STRING = "n_cards_in_hand"
 N_HOLE_CARDS_FLAVORS_IN_HAND_STRING = "n_hole_cards_flavors_in_hand"
+FILE_SAVE_TYPE = ".csv"
+FILE_SUFFIX_NUMBER = 1
 
 
 def simulate_hands(
     n_simulations: int = N_SIMULATIONS,
     n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
 ) -> Path:
+    if n_simulations > 50_000:
+        raise ValueError(
+            "n_simulations cannot be over 50,000 or else the file sizes will get too large and GitHub may stop accepting pushes."
+        )
     logger.info("Initializing empty dataframe")
     simulated_data_df = pd.DataFrame()
     logger.info("Simulating %s hands", n_simulations)
@@ -185,8 +192,6 @@ def _indicate_which_hole_cards_flavors_appear_in_hand(
         hole_cards_flavor_key = hole_cards_flavor
         if hole_cards_flavor_key not in new_data:
             new_data[hole_cards_flavor_key] = 0
-        # new_data[hole_cards_flavor_key] += (
-        #     hole_cards_flavor in data_frame["all_hole_cards_flavors_in_the_hand"][0]
         new_data[hole_cards_flavor_key] += data_frame[
             "all_hole_cards_flavors_in_the_hand"
         ][0].count(hole_cards_flavor)
@@ -242,8 +247,12 @@ def _extract_results_data(
 def _make_simulations_results_file(
     df: pd.DataFrame,
     path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
+    file_save_type: str = FILE_SAVE_TYPE,
+    file_suffix_number: int = FILE_SUFFIX_NUMBER,
 ) -> Path:
-    file_path_for_simulations_results = make_file_path_for_unaggregated_simulations()
+    file_path_for_simulations_results = _make_file_path_for_unaggregated_simulations(
+        file_suffix_number=file_suffix_number
+    )
 
     if file_path_for_simulations_results.exists():
         logger.info(
@@ -251,16 +260,24 @@ def _make_simulations_results_file(
             file_path_for_simulations_results,
         )
         timestamp = pd.Timestamp.now().strftime("%Y-%m-%d")
+        backup_file_path = (
+            path_to_archive
+            / f"{file_path_for_simulations_results.stem} dated {timestamp}{file_save_type}"
+        )
         shutil.copy2(
             file_path_for_simulations_results,
-            path_to_archive
-            / f"{file_path_for_simulations_results.stem} dated {timestamp}.csv",
+            backup_file_path,
         )
-
-        logger.info("Appending new data to %s", file_path_for_simulations_results)
-        df.to_csv(
-            file_path_for_simulations_results, mode="a", header=False, index=False
-        )
+        match = re.search(r"\d{3}", file_path_for_simulations_results.name)
+        if match:
+            ddd = int(match.group())
+            logger.info("Extracted <ddd> from file name: %d", ddd)
+            logger.info("Incrementing <ddd> by 1.")
+            file_path_for_simulations_results = _make_simulations_results_file(
+                df=df, file_suffix_number=ddd + 1
+            )
+        else:
+            raise ValueError("Could not extract <ddd> from file name.")
     else:
         logger.info(
             "%s does not exist. Creating it now.", file_path_for_simulations_results
@@ -269,19 +286,30 @@ def _make_simulations_results_file(
     return file_path_for_simulations_results
 
 
-def make_file_path_for_unaggregated_simulations(
+def _make_file_path_for_unaggregated_simulations(
     path_to_unaggregated_directory: Path = PATH_TO_UNAGGREGATED_DATA_RESULTS,
     path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
     n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+    file_suffix_number: int = FILE_SUFFIX_NUMBER,
+    file_save_type: str = FILE_SAVE_TYPE,
 ) -> Path:
     make_dir_if_not_exist(path_to_archive)
-    make_dir_if_not_exist(path_to_unaggregated_directory)
+    _ = make_folder_for_unaggregated_simulations()
 
     subfolder = path_to_unaggregated_directory
     file_name_prefix = "unaggregated"
+    file_suffix_string = str(file_suffix_number).zfill(3) + file_save_type
     file_for_simulations_results = (
         subfolder
-        / f"{file_name_prefix} data for {n_players_per_simulation} players.csv"
+        / f"{file_name_prefix} data for {n_players_per_simulation} players {file_suffix_string}"
     )
 
     return file_for_simulations_results
+
+
+def make_folder_for_unaggregated_simulations(
+    path_to_unaggregated_directory: Path = PATH_TO_UNAGGREGATED_DATA_RESULTS,
+) -> Path:
+    make_dir_if_not_exist(path_to_unaggregated_directory)
+
+    return path_to_unaggregated_directory
