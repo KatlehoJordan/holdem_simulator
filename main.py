@@ -39,7 +39,6 @@ Do you want to train again?
 # TODO: After getting all simulations and aggregations working, build a way to graph the results
 N_SIMS = 50_000  # >210 000 total is likely needed to get over 1000 appearances for each hole_cards_flavor
 N_PLAYERS_TO_SIM_OR_AGGREGATE = 2
-ERRORS_FOR_LOW_SAMPLE_SIZE = False
 
 
 # TODO: Resolve TODOs in other files
