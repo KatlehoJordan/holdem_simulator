@@ -8,6 +8,8 @@ import pandas as pd
 from src.card import VALID_CARDS_DICT
 from src.community_cards import N_CARDS_IN_COMMUNITY_CARDS
 from src.config import (
+    N_PLAYERS_PATH_PREFIX,
+    N_PLAYERS_TO_SIM_OR_AGGREGATE,
     PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
     PATH_TO_SIMULATIONS_DATA_RESULTS,
     logger,
@@ -18,7 +20,6 @@ from src.make_dir_if_does_not_exist import make_dir_if_not_exist
 from src.players_ahead_of_you import PlayersAheadOfYou
 
 N_SIMULATIONS = 1
-N_PLAYERS_PER_SIMULATION = 2
 PATH_TO_UNAGGREGATED_DATA_RESULTS = PATH_TO_SIMULATIONS_DATA_RESULTS / "unaggregated"
 N_CARDS_IN_HAND_STRING = "n_cards_in_hand"
 N_HOLE_CARDS_FLAVORS_IN_HAND_STRING = "n_hole_cards_flavors_in_hand"
@@ -28,7 +29,7 @@ FILE_SUFFIX_NUMBER = 1
 
 def simulate_hands(
     n_simulations: int = N_SIMULATIONS,
-    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+    n_players_per_simulation: int = N_PLAYERS_TO_SIM_OR_AGGREGATE,
 ) -> Path:
     if n_simulations > 50_000:
         raise ValueError(
@@ -50,13 +51,14 @@ def simulate_hands(
         )
 
     file_path_for_simulations_results = _make_simulations_results_file(
-        simulated_data_df
+        simulated_data_df, n_players_per_simulation=n_players_per_simulation
     )
     return file_path_for_simulations_results
 
 
 def _initialize_data_dictionary(
-    hand: Hand, n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION
+    hand: Hand,
+    n_players_per_simulation: int,
 ) -> dict:
     logger.info("Initializing data dictionary")
     data = {
@@ -82,7 +84,7 @@ def _initialize_data_dictionary(
 def _add_player_specific_data(
     hand: Hand,
     data_dict: dict,
-    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+    n_players_per_simulation: int,
 ) -> dict:
     logger.info("Adding player-specific data to dictionary")
     sum_of_wins_as_float = 0.0
@@ -164,7 +166,7 @@ def _indicate_which_cards_appear_in_hand(
 
 def _validate_n_cards_in_hand(
     df: pd.DataFrame,
-    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+    n_players_per_simulation: int,
     n_cards_in_community_cards: int = N_CARDS_IN_COMMUNITY_CARDS,
     n_hole_cards_per_player: int = N_HOLE_CARDS_PER_PLAYER,
     n_cards_in_hand_string: str = N_CARDS_IN_HAND_STRING,
@@ -206,7 +208,7 @@ def _indicate_which_hole_cards_flavors_appear_in_hand(
 
 def _validate_hole_cards_flavors_tagged(
     df: pd.DataFrame,
-    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+    n_players_per_simulation: int,
     n_hole_cards_flavors_in_hand_string: str = N_HOLE_CARDS_FLAVORS_IN_HAND_STRING,
 ) -> None:
     if not (
@@ -219,7 +221,7 @@ def _validate_hole_cards_flavors_tagged(
 
 def _extract_results_data(
     hand: Hand,
-    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
+    n_players_per_simulation: int,
 ) -> pd.DataFrame:
     logger.info("Extracting info from hand")
     data_dict = _initialize_data_dictionary(
@@ -246,12 +248,14 @@ def _extract_results_data(
 
 def _make_simulations_results_file(
     df: pd.DataFrame,
+    n_players_per_simulation: int,
     path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
     file_save_type: str = FILE_SAVE_TYPE,
     file_suffix_number: int = FILE_SUFFIX_NUMBER,
 ) -> Path:
     file_path_for_simulations_results = _make_file_path_for_unaggregated_simulations(
-        file_suffix_number=file_suffix_number
+        file_suffix_number=file_suffix_number,
+        n_players_per_simulation=n_players_per_simulation,
     )
 
     if file_path_for_simulations_results.exists():
@@ -274,7 +278,9 @@ def _make_simulations_results_file(
             logger.info("Extracted <ddd> from file name: %d", ddd)
             logger.info("Incrementing <ddd> by 1.")
             file_path_for_simulations_results = _make_simulations_results_file(
-                df=df, file_suffix_number=ddd + 1
+                df=df,
+                n_players_per_simulation=n_players_per_simulation,
+                file_suffix_number=ddd + 1,
             )
         else:
             raise ValueError("Could not extract <ddd> from file name.")
@@ -287,29 +293,35 @@ def _make_simulations_results_file(
 
 
 def _make_file_path_for_unaggregated_simulations(
+    n_players_per_simulation: int,
+    file_suffix_number: int = FILE_SUFFIX_NUMBER,
     path_to_unaggregated_directory: Path = PATH_TO_UNAGGREGATED_DATA_RESULTS,
     path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
-    n_players_per_simulation: int = N_PLAYERS_PER_SIMULATION,
-    file_suffix_number: int = FILE_SUFFIX_NUMBER,
     file_save_type: str = FILE_SAVE_TYPE,
+    n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
 ) -> Path:
-    make_dir_if_not_exist(path_to_archive)
-    _ = make_folder_for_unaggregated_simulations()
+    base_path_for_n_players = Path(f"{n_players_path_prefix}{n_players_per_simulation}")
+    make_dir_if_not_exist(base_path_for_n_players / path_to_archive)
+    _ = make_folder_for_unaggregated_simulations(
+        n_players_per_simulation=n_players_per_simulation
+    )
 
     subfolder = path_to_unaggregated_directory
     file_name_prefix = "unaggregated"
     file_suffix_string = str(file_suffix_number).zfill(3) + file_save_type
     file_for_simulations_results = (
-        subfolder
-        / f"{file_name_prefix} data for {n_players_per_simulation} players {file_suffix_string}"
+        subfolder / f"{file_name_prefix} data {file_suffix_string}"
     )
 
     return file_for_simulations_results
 
 
 def make_folder_for_unaggregated_simulations(
+    n_players_per_simulation: int,
     path_to_unaggregated_directory: Path = PATH_TO_UNAGGREGATED_DATA_RESULTS,
+    n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
 ) -> Path:
-    make_dir_if_not_exist(path_to_unaggregated_directory)
+    base_path_for_n_players = Path(f"{n_players_path_prefix}{n_players_per_simulation}")
+    make_dir_if_not_exist(base_path_for_n_players / path_to_unaggregated_directory)
 
     return path_to_unaggregated_directory
