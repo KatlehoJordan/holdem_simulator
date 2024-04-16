@@ -9,8 +9,8 @@ from src.card import VALID_CARDS_DICT
 from src.config import (
     N_PLAYERS_PATH_PREFIX,
     N_PLAYERS_TO_SIM_OR_AGGREGATE,
-    PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
-    PATH_TO_SIMULATIONS_DATA_RESULTS,
+    PATH_TO_ARCHIVED_SIMULATIONS,
+    PATH_TO_SIMULATIONS,
     logger,
 )
 from src.hole_cards import VALID_HOLE_CARDS_FLAVORS_LIST
@@ -20,7 +20,7 @@ from src.simulate_hands import (
     make_folder_for_unaggregated_simulations,
 )
 
-PATH_TO_AGGREGATED_DATA_RESULTS = PATH_TO_SIMULATIONS_DATA_RESULTS / "aggregated"
+PATH_TO_AGGREGATED_DATA_RESULTS = PATH_TO_SIMULATIONS / "aggregated"
 TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING = 0.01
 MIN_N_APPEARANCES_EXPECTED_OF_EACH_FLAVOR = 1000
 TMP_FILE_NAME = "all_simulations_results.csv"
@@ -221,7 +221,7 @@ def _make_aggregated_file(
     file_name: str,
     n_players_simulated_to_aggregate: int,
     path_to_aggregated_directory: Path = PATH_TO_AGGREGATED_DATA_RESULTS,
-    path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
+    path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS,
     n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
 ) -> None:
     base_path_for_n_players = Path(

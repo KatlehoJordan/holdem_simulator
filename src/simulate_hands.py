@@ -10,8 +10,8 @@ from src.community_cards import N_CARDS_IN_COMMUNITY_CARDS
 from src.config import (
     N_PLAYERS_PATH_PREFIX,
     N_PLAYERS_TO_SIM_OR_AGGREGATE,
-    PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
-    PATH_TO_SIMULATIONS_DATA_RESULTS,
+    PATH_TO_ARCHIVED_SIMULATIONS,
+    PATH_TO_SIMULATIONS,
     logger,
 )
 from src.hand import HAND_WINNER_FLAVOR, Hand
@@ -20,7 +20,7 @@ from src.make_dir_if_does_not_exist import make_dir_if_not_exist
 from src.players_ahead_of_you import PlayersAheadOfYou
 
 N_SIMULATIONS = 1
-PATH_TO_UNAGGREGATED_DATA_RESULTS = PATH_TO_SIMULATIONS_DATA_RESULTS / "unaggregated"
+PATH_TO_UNAGGREGATED_DATA = Path("unaggregated")
 N_CARDS_IN_HAND_STRING = "n_cards_in_hand"
 N_HOLE_CARDS_FLAVORS_IN_HAND_STRING = "n_hole_cards_flavors_in_hand"
 FILE_SAVE_TYPE = ".csv"
@@ -249,9 +249,12 @@ def _extract_results_data(
 def _make_simulations_results_file(
     df: pd.DataFrame,
     n_players_per_simulation: int,
-    path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
+    path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS,
+    path_to_simulations: Path = PATH_TO_SIMULATIONS,
     file_save_type: str = FILE_SAVE_TYPE,
     file_suffix_number: int = FILE_SUFFIX_NUMBER,
+    n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
+    path_to_unaggregated: Path = PATH_TO_UNAGGREGATED_DATA,
 ) -> Path:
     file_path_for_simulations_results = _make_file_path_for_unaggregated_simulations(
         file_suffix_number=file_suffix_number,
@@ -264,13 +267,23 @@ def _make_simulations_results_file(
             file_path_for_simulations_results,
         )
         timestamp = pd.Timestamp.now().strftime("%Y-%m-%d")
+        base_path_for_n_players = Path(
+            f"{n_players_path_prefix}{n_players_per_simulation}"
+        )
         backup_file_path = (
-            path_to_archive
-            / f"{file_path_for_simulations_results.stem} dated {timestamp}{file_save_type}"
+            path_to_simulations
+            / base_path_for_n_players
+            / path_to_archive
+            / path_to_unaggregated
+        )
+        make_dir_if_not_exist(backup_file_path)
+        backup_file = (
+            backup_file_path
+            / f"{file_path_for_simulations_results.stem}{file_save_type}"
         )
         shutil.copy2(
             file_path_for_simulations_results,
-            backup_file_path,
+            backup_file,
         )
         match = re.search(r"\d{3}", file_path_for_simulations_results.name)
         if match:
@@ -295,22 +308,27 @@ def _make_simulations_results_file(
 def _make_file_path_for_unaggregated_simulations(
     n_players_per_simulation: int,
     file_suffix_number: int = FILE_SUFFIX_NUMBER,
-    path_to_unaggregated_directory: Path = PATH_TO_UNAGGREGATED_DATA_RESULTS,
-    path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS_DATA_RESULTS,
+    path_to_simulations: Path = PATH_TO_SIMULATIONS,
+    path_to_unaggregated_directory: Path = PATH_TO_UNAGGREGATED_DATA,
+    path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS,
     file_save_type: str = FILE_SAVE_TYPE,
     n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
 ) -> Path:
     base_path_for_n_players = Path(f"{n_players_path_prefix}{n_players_per_simulation}")
-    make_dir_if_not_exist(base_path_for_n_players / path_to_archive)
+    make_dir_if_not_exist(
+        path_to_simulations / base_path_for_n_players / path_to_archive
+    )
     _ = make_folder_for_unaggregated_simulations(
         n_players_per_simulation=n_players_per_simulation
     )
 
-    subfolder = path_to_unaggregated_directory
-    file_name_prefix = "unaggregated"
+    file_name_prefix = str(path_to_unaggregated_directory)
     file_suffix_string = str(file_suffix_number).zfill(3) + file_save_type
     file_for_simulations_results = (
-        subfolder / f"{file_name_prefix} data {file_suffix_string}"
+        path_to_simulations
+        / base_path_for_n_players
+        / path_to_unaggregated_directory
+        / f"{file_name_prefix} data {file_suffix_string}"
     )
 
     return file_for_simulations_results
@@ -318,10 +336,14 @@ def _make_file_path_for_unaggregated_simulations(
 
 def make_folder_for_unaggregated_simulations(
     n_players_per_simulation: int,
-    path_to_unaggregated_directory: Path = PATH_TO_UNAGGREGATED_DATA_RESULTS,
+    path_to_simulations: Path = PATH_TO_SIMULATIONS,
+    path_to_unaggregated_directory: Path = PATH_TO_UNAGGREGATED_DATA,
     n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
 ) -> Path:
     base_path_for_n_players = Path(f"{n_players_path_prefix}{n_players_per_simulation}")
-    make_dir_if_not_exist(base_path_for_n_players / path_to_unaggregated_directory)
+    path_to_unaggregated_directory = (
+        path_to_simulations / base_path_for_n_players / path_to_unaggregated_directory
+    )
+    make_dir_if_not_exist(path_to_unaggregated_directory)
 
     return path_to_unaggregated_directory
