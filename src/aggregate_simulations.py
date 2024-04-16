@@ -20,10 +20,10 @@ from src.simulate_hands import (
     make_folder_for_unaggregated_simulations,
 )
 
-PATH_TO_AGGREGATED_DATA_RESULTS = PATH_TO_SIMULATIONS / "aggregated"
+PATH_TO_AGGREGATED_DATA_RESULTS = Path("aggregated")
 TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING = 0.01
 MIN_N_APPEARANCES_EXPECTED_OF_EACH_FLAVOR = 1000
-TMP_FILE_NAME = "all_simulations_results.csv"
+TMP_FILE_NAME = "temp_all_simulations_results.csv"
 WINS_BY_PLAYER_STRING = "wins by player"
 APPEARANCES_OF_CARDS_STRING = "appearances of cards"
 WINS_BY_HOLE_CARDS_FLAVOR_STRING = "wins by hole cards flavor"
@@ -216,10 +216,13 @@ def _aggregate_wins_by_hole_cards_flavor(
     return df_sorted_by_win_ratio
 
 
+# TODO: Make sure not creating new folders at top-level (above simulations).
+# TODO: Update this to make an archived version of the new file rather than the old file.
 def _make_aggregated_file(
     df: pd.DataFrame,
     file_name: str,
     n_players_simulated_to_aggregate: int,
+    path_to_simulations: Path = PATH_TO_SIMULATIONS,
     path_to_aggregated_directory: Path = PATH_TO_AGGREGATED_DATA_RESULTS,
     path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS,
     n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
@@ -227,10 +230,17 @@ def _make_aggregated_file(
     base_path_for_n_players = Path(
         f"{n_players_path_prefix}{n_players_simulated_to_aggregate}"
     )
-    make_dir_if_not_exist(base_path_for_n_players / path_to_archive)
-    make_dir_if_not_exist(path_to_aggregated_directory)
+    make_dir_if_not_exist(
+        path_to_simulations / base_path_for_n_players / path_to_archive
+    )
+    make_dir_if_not_exist(base_path_for_n_players / path_to_aggregated_directory)
 
-    file_path_for_results = path_to_aggregated_directory / file_name
+    file_path_for_results = (
+        path_to_simulations
+        / base_path_for_n_players
+        / path_to_aggregated_directory
+        / file_name
+    )
 
     if file_path_for_results.exists():
         logger.info(
@@ -240,7 +250,11 @@ def _make_aggregated_file(
         timestamp = pd.Timestamp.now().strftime("%Y-%m-%d")
         shutil.copy2(
             file_path_for_results,
-            path_to_archive / timestamp / f"{file_path_for_results.stem}.csv",
+            path_to_simulations
+            / base_path_for_n_players
+            / path_to_archive
+            / Path(file_name).stem
+            / f"{timestamp}.csv",
         )
 
     else:
