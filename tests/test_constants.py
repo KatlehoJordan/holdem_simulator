@@ -10,83 +10,83 @@ from tests.tests_config import VALID_CARDS_DICT
 
 PAIR_OF_FIVES = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["5_OF_SPADES"],
-    card2=VALID_CARDS_DICT["5_OF_DIAMONDS"],
+    hole_card_1=VALID_CARDS_DICT["5_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["5_OF_DIAMONDS"],
 )
 KING_QUEEN_SUITED = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["KING_OF_SPADES"],
-    card2=VALID_CARDS_DICT["QUEEN_OF_SPADES"],
+    hole_card_1=VALID_CARDS_DICT["KING_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["QUEEN_OF_SPADES"],
 )
 PAIR_OF_FOURS = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["4_OF_SPADES"],
-    card2=VALID_CARDS_DICT["4_OF_DIAMONDS"],
+    hole_card_1=VALID_CARDS_DICT["4_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["4_OF_DIAMONDS"],
 )
 FIVE_FOUR_SUITED = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["5_OF_SPADES"],
-    card2=VALID_CARDS_DICT["4_OF_SPADES"],
+    hole_card_1=VALID_CARDS_DICT["5_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["4_OF_SPADES"],
 )
 PAIR_OF_TWOS = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["2_OF_SPADES"],
-    card2=VALID_CARDS_DICT["2_OF_DIAMONDS"],
+    hole_card_1=VALID_CARDS_DICT["2_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["2_OF_DIAMONDS"],
 )
 KING_QUEEN_OFF_SUIT = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["KING_OF_SPADES"],
-    card2=VALID_CARDS_DICT["QUEEN_OF_DIAMONDS"],
+    hole_card_1=VALID_CARDS_DICT["KING_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["QUEEN_OF_DIAMONDS"],
 )
 FOUR_THREE_SUITED = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["4_OF_SPADES"],
-    card2=VALID_CARDS_DICT["3_OF_SPADES"],
+    hole_card_1=VALID_CARDS_DICT["4_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["3_OF_SPADES"],
 )
 PAIR_OF_ACES = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["ACE_OF_SPADES"],
-    card2=VALID_CARDS_DICT["ACE_OF_DIAMONDS"],
+    hole_card_1=VALID_CARDS_DICT["ACE_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["ACE_OF_DIAMONDS"],
 )
 ACE_QUEEN_OFF_SUIT = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["ACE_OF_SPADES"],
-    card2=VALID_CARDS_DICT["QUEEN_OF_DIAMONDS"],
+    hole_card_1=VALID_CARDS_DICT["ACE_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["QUEEN_OF_DIAMONDS"],
 )
 ACE_JACK_SUITED = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["ACE_OF_SPADES"],
-    card2=VALID_CARDS_DICT["JACK_OF_SPADES"],
+    hole_card_1=VALID_CARDS_DICT["ACE_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["JACK_OF_SPADES"],
 )
 ACE_NINE_SUITED = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["ACE_OF_SPADES"],
-    card2=VALID_CARDS_DICT["9_OF_SPADES"],
+    hole_card_1=VALID_CARDS_DICT["ACE_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["9_OF_SPADES"],
 )
 EIGHT_SEVEN_SUITED = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["8_OF_SPADES"],
-    card2=VALID_CARDS_DICT["7_OF_SPADES"],
+    hole_card_1=VALID_CARDS_DICT["8_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["7_OF_SPADES"],
 )
 SEVEN_TWO_OFF_SUIT = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["7_OF_SPADES"],
-    card2=VALID_CARDS_DICT["2_OF_DIAMONDS"],
+    hole_card_1=VALID_CARDS_DICT["7_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["2_OF_DIAMONDS"],
 )
 SIX_FIVE_OFF_SUIT = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["6_OF_SPADES"],
-    card2=VALID_CARDS_DICT["5_OF_DIAMONDS"],
+    hole_card_1=VALID_CARDS_DICT["6_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["5_OF_DIAMONDS"],
 )
 FOUR_TWO_OFF_SUIT = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["4_OF_SPADES"],
-    card2=VALID_CARDS_DICT["2_OF_DIAMONDS"],
+    hole_card_1=VALID_CARDS_DICT["4_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["2_OF_DIAMONDS"],
 )
 THREE_TWO_OFF_SUIT = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["3_OF_SPADES"],
-    card2=VALID_CARDS_DICT["2_OF_DIAMONDS"],
+    hole_card_1=VALID_CARDS_DICT["3_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["2_OF_DIAMONDS"],
 )
 
 

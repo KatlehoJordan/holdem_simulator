@@ -8,8 +8,10 @@ VALID_SUITS = ["Clubs", "Diamonds", "Hearts", "Spades"]
 
 RAW_RANK_VALUE_STRING = "raw_rank_value"
 N_POSSIBLE_STRAIGHTS_STRING = "n_possible_straights"
-N_SIMS = 50_000  # >210 000 total is likely needed to get over 1000 appearances for each hole_cards_flavor
-N_PLAYERS_TO_SIM_OR_AGGREGATE = 2
+N_PLAYERS_TO_SIM_OR_AGGREGATE = 3
+N_SIMS = int(
+    100_000 / N_PLAYERS_TO_SIM_OR_AGGREGATE
+)  # >210 000 total is likely needed to get over 1000 appearances for each hole_cards_flavor
 
 NUMBER_OF_CARDS_IN_QUALIFYING_HAND = 5
 ACE_AS_LOW_RAW_RANK_VALUE = 1

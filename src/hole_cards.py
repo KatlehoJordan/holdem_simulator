@@ -35,12 +35,12 @@ class HoleCards:
     def __init__(
         self,
         deck: Deck,
-        card1: Union[Card, None] = None,
-        card2: Union[Card, None] = None,
+        hole_card_1: Union[Card, None] = None,
+        hole_card_2: Union[Card, None] = None,
         whose_cards: str = DEFAULT_WHOSE_CARDS,
     ):
         self.hi_card, self.lo_card = _extract_hi_and_lo_cards(
-            deck=deck, card1=card1, card2=card2
+            deck=deck, card1=hole_card_1, card2=hole_card_2
         )
 
         (

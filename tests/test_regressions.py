@@ -87,6 +87,37 @@ CASE_003_PLAYER_2_HOLE_CARDS = make_hole_cards_for_testing(
     ]
 )
 
+CASE_004_TIE_WINNING_TYPE_WITH_3_PLAYERS = make_community_cards_for_testing(
+    [
+        "7_OF_DIAMONDS",
+        "KING_OF_CLUBS",
+        "6_OF_SPADES",
+        "3_OF_HEARTS",
+        "KING_OF_HEARTS",
+    ]
+)
+
+CASE_004_PLAYER_1_HOLE_CARDS = make_hole_cards_for_testing(
+    [
+        "6_OF_CLUBS",
+        "2_OF_CLUBS",
+    ]
+)
+
+CASE_004_PLAYER_2_HOLE_CARDS = make_hole_cards_for_testing(
+    [
+        "6_OF_HEARTS",
+        "5_OF_SPADES",
+    ]
+)
+
+CASE_004_PLAYER_3_HOLE_CARDS = make_hole_cards_for_testing(
+    [
+        "ACE_OF_SPADES",
+        "5_OF_HEARTS",
+    ]
+)
+
 
 def test_case_001():
     logger.debug(
@@ -120,7 +151,7 @@ def test_case_002():
 
 def test_case_003():
     logger.debug(
-        "Previously, the winning hand was incorrectly identified as an Ace-high straight. The winner is actually a 10-high straight. There is also a 8-high straight that is a loser."
+        "Previously, the winning hand was incorrectly identified as an Ace-high straight. The winner is actually a 10-high straight. There is also a 8-high straight that is a loser. This was due to incorrect sorting of the top-ranked cards in the straight."
     )
     community_cards = CASE_003_COMMUNITY_STRAIGHT_QUEEN_HIGH
     player_hand_1 = PlayerHand(
@@ -137,3 +168,23 @@ def test_case_003():
     )
     assert player_hand_1.hand_type.name == "Straight: 10 high."
     assert player_hand_2.hand_type.name == "Straight: 8 high."
+
+
+# TODO: Continue working on this... need to keep working on hand.py to enable passing specific hole cards and community cards when creating a Hand object.
+def test_case_004():
+    logger.debug(
+        "Previously, the winning type was identified as 'Single winner' though there is a tie between player 1 and player 2."
+    )
+    community_cards = CASE_004_TIE_WINNING_TYPE_WITH_3_PLAYERS
+    player_hand_1 = PlayerHand(
+        hole_cards=CASE_004_PLAYER_1_HOLE_CARDS,
+        community_cards=community_cards,
+    )
+    player_hand_2 = PlayerHand(
+        hole_cards=CASE_004_PLAYER_2_HOLE_CARDS,
+        community_cards=community_cards,
+    )
+    player_hand_3 = PlayerHand(
+        hole_cards=CASE_004_PLAYER_3_HOLE_CARDS,
+        community_cards=community_cards,
+    )

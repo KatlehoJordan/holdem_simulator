@@ -154,14 +154,20 @@ def _simulate_bets_for_players_ahead_of_you(
 def _simulate_hole_cards_for_players_ahead_of_you(
     n_players_ahead_of_you: PlayersAheadOfYou,
     deck: Deck,
+    hole_card_1: Union[Card, None] = None,
+    hole_card_2: Union[Card, None] = None,
 ) -> Dict[str, HoleCards]:
+    if hole_card_1 is None:
+        hole_card_1 = deck.draw_card()
+    if hole_card_2 is None:
+        hole_card_2 = deck.draw_card()
     hole_cards = {}
     for player in range(n_players_ahead_of_you.n):
         player_n = f"Player {player + 1}"
         player_n_hole_cards = HoleCards(
             deck=deck,
-            card1=deck.draw_card(),
-            card2=deck.draw_card(),
+            hole_card_1=hole_card_1,
+            hole_card_2=hole_card_2,
             whose_cards=f"{player_n}'s",
         )
         logger.debug("%s has hole cards: %s", player_n, player_n_hole_cards.name)
@@ -265,24 +271,68 @@ def _determine_winners_and_losers(
     )
 
 
+# TODO: Try to simplify this since may be lots of repeated code...
 def _init_cards_and_bets(
     n_players_ahead_of_you: Union[PlayersAheadOfYou, None] = None,
     small_blind: Union[SmallBlind, None] = None,
+    your_hole_card_1: Union[Card, None] = None,
+    your_hole_card_2: Union[Card, None] = None,
+    community_card_1: Union[Card, None] = None,
+    community_card_2: Union[Card, None] = None,
+    community_card_3: Union[Card, None] = None,
+    community_card_4: Union[Card, None] = None,
+    community_card_5: Union[Card, None] = None,
+    player_ahead_of_you_hole_card_1: Union[Card, None] = None,
+    player_ahead_of_you_hole_card_2: Union[Card, None] = None,
 ) -> Tuple[int, int, HoleCards, int, str, CommunityCards, Dict[str, HoleCards]]:
     n_players_ahead_of_you, small_blind = _init_n_players_and_small_blind(
         n_players_ahead_of_you, small_blind
     )
     max_bet = BigBlind(small_blind).amount
     deck = Deck()
-    your_hole_cards = HoleCards(deck=deck)
+
+    if your_hole_card_1 is None:
+        your_hole_card_1 = deck.draw_card()
+    if your_hole_card_2 is None:
+        your_hole_card_2 = deck.draw_card()
+    your_hole_cards = HoleCards(
+        deck=deck, hole_card_1=your_hole_card_1, hole_card_2=your_hole_card_2
+    )
+
     pot_size = small_blind.amount + max_bet
     pot_odds = _calculate_pot_odds(max_bet, pot_size)
     pot_size, pot_odds = _simulate_bets_for_players_ahead_of_you(
         n_players_ahead_of_you, max_bet, pot_size, pot_odds
     )
-    community_cards = CommunityCards(deck=deck)
+
+    if community_card_1 is None:
+        community_card_1 = deck.draw_card()
+    if community_card_2 is None:
+        community_card_2 = deck.draw_card()
+    if community_card_3 is None:
+        community_card_3 = deck.draw_card()
+    if community_card_4 is None:
+        community_card_4 = deck.draw_card()
+    if community_card_5 is None:
+        community_card_5 = deck.draw_card()
+    community_cards = CommunityCards(
+        deck=deck,
+        community_card_1=community_card_1,
+        community_card_2=community_card_2,
+        community_card_3=community_card_3,
+        community_card_4=community_card_4,
+        community_card_5=community_card_5,
+    )
+
+    if player_ahead_of_you_hole_card_1 is None:
+        player_ahead_of_you_hole_card_1 = deck.draw_card()
+    if player_ahead_of_you_hole_card_2 is None:
+        player_ahead_of_you_hole_card_2 = deck.draw_card()
     hole_cards_for_players_ahead_of_you = _simulate_hole_cards_for_players_ahead_of_you(
-        n_players_ahead_of_you=n_players_ahead_of_you, deck=deck
+        n_players_ahead_of_you=n_players_ahead_of_you,
+        deck=deck,
+        hole_card_1=player_ahead_of_you_hole_card_1,
+        hole_card_2=player_ahead_of_you_hole_card_2,
     )
 
     n_players_in_the_hand = n_players_ahead_of_you.n + 1

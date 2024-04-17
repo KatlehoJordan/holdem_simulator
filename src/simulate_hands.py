@@ -8,12 +8,12 @@ import pandas as pd
 from src.card import VALID_CARDS_DICT
 from src.community_cards import N_CARDS_IN_COMMUNITY_CARDS
 from src.config import (
+    FILE_SAVE_TYPE,
     N_PLAYERS_PATH_PREFIX,
     N_PLAYERS_TO_SIM_OR_AGGREGATE,
     PATH_TO_ARCHIVED_SIMULATIONS,
     PATH_TO_SIMULATIONS,
     logger,
-    FILE_SAVE_TYPE,
 )
 from src.hand import HAND_WINNER_FLAVOR, Hand
 from src.hole_cards import N_HOLE_CARDS_PER_PLAYER, VALID_HOLE_CARDS_FLAVORS_LIST
@@ -127,6 +127,12 @@ def _add_player_specific_data(
         sum_of_wins_as_float += data_dict[win_as_float_key]
         if data_dict[win_key]:
             count_winners += 1
+    # TODO: Remove this next bit of code after done troubleshooting since it is redundant with the next function and is only here for troubleshooting.
+    # Sometimes indicated as 'Single winner', but boh 'you_win' and 'player_1_wins' are True (while 'player_2_wins' is False). In this example, you and player 1 have hand_type 'Two Pair: Kings over 6s with 7 kicker' while player 2 has hand_type 'Pair: Kings with ['Ace', '7', '6'] kickers'. Community cards are ['7 of Diamonds', 'King of Clubs', '6 of Spades', '3 of Hearts', 'King of Hearts']. Your hole cards are '6 of Clubs, 2 of Clubs'. Player 1's hole cards are '6 of Hearts, 5 of Spades'. Player 2's hole cards are 'Ace of Spades, 5 of Hearts'. So the issue seems to be that the winning_type is wrongly saying 'Single winner' when there are multiple winners.
+    if not math.isclose(sum_of_wins_as_float, 1.0, rel_tol=1e-9):
+        raise ValueError(
+            f"Sum of wins as float is {sum_of_wins_as_float}, which is not close to 1.0, indicating some wins are being tallied incorrectly!"
+        )
     _validate_player_specific_data(hand, sum_of_wins_as_float, count_winners)
 
     return data_dict

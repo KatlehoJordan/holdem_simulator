@@ -11,15 +11,21 @@ class CommunityCards:
     def __init__(
         self,
         deck: Deck,
-        card1: Union[Card, None] = None,
-        card2: Union[Card, None] = None,
-        card3: Union[Card, None] = None,
-        card4: Union[Card, None] = None,
-        card5: Union[Card, None] = None,
+        community_card_1: Union[Card, None] = None,
+        community_card_2: Union[Card, None] = None,
+        community_card_3: Union[Card, None] = None,
+        community_card_4: Union[Card, None] = None,
+        community_card_5: Union[Card, None] = None,
     ):
         self.cards = [
             card if isinstance(card, Card) else deck.draw_card()
-            for card in [card1, card2, card3, card4, card5]
+            for card in [
+                community_card_1,
+                community_card_2,
+                community_card_3,
+                community_card_4,
+                community_card_5,
+            ]
         ]
 
         card_names = [card.name for card in self.cards]

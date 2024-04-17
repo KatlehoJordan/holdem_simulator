@@ -9,8 +9,8 @@ from src.player_hand import PlayerHand
 
 HOLE_CARDS_2_3_SPADES = HoleCards(
     deck=Deck(),
-    card1=VALID_CARDS_DICT["2_OF_SPADES"],
-    card2=VALID_CARDS_DICT["3_OF_SPADES"],
+    hole_card_1=VALID_CARDS_DICT["2_OF_SPADES"],
+    hole_card_2=VALID_CARDS_DICT["3_OF_SPADES"],
 )
 
 
@@ -59,14 +59,14 @@ def make_community_cards_for_testing(list_of_5_cards: List[str]) -> CommunityCar
     cards = [VALID_CARDS_DICT[card] for card in list_of_5_cards]
     return CommunityCards(
         deck=Deck(),
-        card1=cards[0],
-        card2=cards[1],
-        card3=cards[2],
-        card4=cards[3],
-        card5=cards[4],
+        community_card_1=cards[0],
+        community_card_2=cards[1],
+        community_card_3=cards[2],
+        community_card_4=cards[3],
+        community_card_5=cards[4],
     )
 
 
 def make_hole_cards_for_testing(list_of_2_cards: List[str]) -> HoleCards:
     cards = [VALID_CARDS_DICT[card] for card in list_of_2_cards]
-    return HoleCards(deck=Deck(), card1=cards[0], card2=cards[1])
+    return HoleCards(deck=Deck(), hole_card_1=cards[0], hole_card_2=cards[1])
