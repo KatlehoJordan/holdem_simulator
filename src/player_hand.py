@@ -79,7 +79,7 @@ class PlayerHand:
         return f"{self.hand_type}"
 
 
-def compare_player_hands_from_hole_cards(
+def _compare_player_hands_from_hole_cards(
     community_cards: CommunityCards,
     hole_cards_1: HoleCards,
     hole_cards_2: HoleCards,
@@ -121,14 +121,45 @@ def compare_player_hands_from_hole_cards(
 
 
 def compare_player_hands(
-    player_hand_1: PlayerHand,
-    player_hand_2: PlayerHand,
+    *player_hands: PlayerHand, players_tie_string: str = PLAYERS_TIE_STRING
 ) -> str:
-    return compare_player_hands_from_hole_cards(
-        community_cards=player_hand_1.community_cards,
-        hole_cards_1=player_hand_1.hole_cards,
-        hole_cards_2=player_hand_2.hole_cards,
+    if not (2 <= len(player_hands) <= 10):
+        raise ValueError("Number of players must be between 2 and 10")
+
+    if len(player_hands) == 2:
+        return _compare_player_hands_from_hole_cards(
+            community_cards=player_hands[0].community_cards,
+            hole_cards_1=player_hands[0].hole_cards,
+            hole_cards_2=player_hands[1].hole_cards,
+        )
+
+    # Sort player hands by hand type score and top ranks
+    sorted_player_hands = sorted(
+        player_hands,
+        key=lambda hand: (hand.hand_type.hand_type_score, hand.hand_type.top_ranks),
+        reverse=True,
     )
+
+    # Compare the best hand with the second best hand
+    best_hand = sorted_player_hands[0]
+    second_best_hand = sorted_player_hands[1]
+
+    if best_hand.hand_type.hand_type_score > second_best_hand.hand_type.hand_type_score:
+        return f"Player {player_hands.index(best_hand) + 1} wins"
+    elif (
+        best_hand.hand_type.hand_type_score < second_best_hand.hand_type.hand_type_score
+    ):
+        return f"Player {player_hands.index(second_best_hand) + 1} wins"
+    else:
+        for rank_1, rank_2 in zip(
+            best_hand.hand_type.top_ranks, second_best_hand.hand_type.top_ranks
+        ):
+            if rank_1 > rank_2:
+                return f"Player {player_hands.index(best_hand) + 1} wins"
+            elif rank_1 < rank_2:
+                return f"Player {player_hands.index(second_best_hand) + 1} wins"
+
+    return players_tie_string
 
 
 def assert_winner_regardless_of_order(
@@ -140,7 +171,7 @@ def assert_winner_regardless_of_order(
         "Test that the correct hand is determined as winner regardless of order"
     )
     assert (
-        compare_player_hands_from_hole_cards(
+        _compare_player_hands_from_hole_cards(
             community_cards=community_cards,
             hole_cards_1=winning_hole_cards,
             hole_cards_2=losing_hole_cards,
@@ -148,7 +179,7 @@ def assert_winner_regardless_of_order(
         == FIRST_PLAYER_WINS_STRING
     )
     assert (
-        compare_player_hands_from_hole_cards(
+        _compare_player_hands_from_hole_cards(
             community_cards=community_cards,
             hole_cards_1=losing_hole_cards,
             hole_cards_2=winning_hole_cards,
@@ -164,7 +195,7 @@ def assert_tie_regardless_of_order(
 ):
     logger.debug("Test that ties are determined as a tie regardless of order")
     assert (
-        compare_player_hands_from_hole_cards(
+        _compare_player_hands_from_hole_cards(
             community_cards=community_cards,
             hole_cards_1=hole_cards_1,
             hole_cards_2=hole_cards_2,
@@ -172,7 +203,7 @@ def assert_tie_regardless_of_order(
         == PLAYERS_TIE_STRING
     )
     assert (
-        compare_player_hands_from_hole_cards(
+        _compare_player_hands_from_hole_cards(
             community_cards=community_cards,
             hole_cards_1=hole_cards_2,
             hole_cards_2=hole_cards_1,

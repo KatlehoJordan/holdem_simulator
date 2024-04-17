@@ -143,10 +143,7 @@ def test_case_002():
         hole_cards=CASE_002_PLAYER_2_HOLE_CARDS,
         community_cards=community_cards,
     )
-    assert (
-        compare_player_hands(player_hand_1=player_hand_1, player_hand_2=player_hand_2)
-        == PLAYERS_TIE_STRING
-    )
+    assert compare_player_hands(player_hand_1, player_hand_2) == PLAYERS_TIE_STRING
 
 
 def test_case_003():
@@ -163,17 +160,15 @@ def test_case_003():
         community_cards=community_cards,
     )
     assert (
-        compare_player_hands(player_hand_1=player_hand_1, player_hand_2=player_hand_2)
-        == FIRST_PLAYER_WINS_STRING
+        compare_player_hands(player_hand_1, player_hand_2) == FIRST_PLAYER_WINS_STRING
     )
     assert player_hand_1.hand_type.name == "Straight: 10 high."
     assert player_hand_2.hand_type.name == "Straight: 8 high."
 
 
-# TODO: Continue working on this... need to keep working on hand.py to enable passing specific hole cards and community cards when creating a Hand object.
 def test_case_004():
     logger.debug(
-        "Previously, the winning type was identified as 'Single winner' though there is a tie between player 1 and player 2."
+        "Previously, the winning type was identified as 'Single winner' though there is a tie between player 1 and player 2. This was due to compare_player_hands not being able to compare more than two players at a time before and it's implementation in hand.py was not always returning a 'tie' if the final two hands compared were not a tie although other hands were tied."
     )
     community_cards = CASE_004_TIE_WINNING_TYPE_WITH_3_PLAYERS
     player_hand_1 = PlayerHand(
@@ -187,4 +182,8 @@ def test_case_004():
     player_hand_3 = PlayerHand(
         hole_cards=CASE_004_PLAYER_3_HOLE_CARDS,
         community_cards=community_cards,
+    )
+    assert (
+        compare_player_hands(player_hand_1, player_hand_2, player_hand_3)
+        == PLAYERS_TIE_STRING
     )

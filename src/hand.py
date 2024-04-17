@@ -154,20 +154,14 @@ def _simulate_bets_for_players_ahead_of_you(
 def _simulate_hole_cards_for_players_ahead_of_you(
     n_players_ahead_of_you: PlayersAheadOfYou,
     deck: Deck,
-    hole_card_1: Union[Card, None] = None,
-    hole_card_2: Union[Card, None] = None,
 ) -> Dict[str, HoleCards]:
-    if hole_card_1 is None:
-        hole_card_1 = deck.draw_card()
-    if hole_card_2 is None:
-        hole_card_2 = deck.draw_card()
     hole_cards = {}
     for player in range(n_players_ahead_of_you.n):
         player_n = f"Player {player + 1}"
         player_n_hole_cards = HoleCards(
             deck=deck,
-            hole_card_1=hole_card_1,
-            hole_card_2=hole_card_2,
+            hole_card_1=deck.draw_card(),
+            hole_card_2=deck.draw_card(),
             whose_cards=f"{player_n}'s",
         )
         logger.debug("%s has hole cards: %s", player_n, player_n_hole_cards.name)
@@ -232,27 +226,36 @@ def _determine_winners_and_losers(
     hand_tie_flavor: str = HAND_TIE_FLAVOR,
 ) -> Tuple[str, List[PlayerHand], List[PlayerHand], List[str], List[str]]:
     winning_type = ""
-
     current_best_hand = player_hands_in_the_hand[0]
     winning_hands = [current_best_hand]
-
     winning_hole_cards_flavors = [current_best_hand.hole_cards.hole_cards_flavor]
 
     for player_hand in player_hands_in_the_hand[1:]:
-        comparison_result = compare_player_hands(current_best_hand, player_hand)
-        if comparison_result == first_player_wins_string:
-            winning_type = hand_winner_flavor
-            winning_hands = [current_best_hand]
-            winning_hole_cards_flavors = [winning_hands[0].hole_cards.hole_cards_flavor]
-        elif comparison_result == second_player_wins_string:
-            winning_type = hand_winner_flavor
+        head_to_head_result = compare_player_hands(current_best_hand, player_hand)
+
+        if head_to_head_result == second_player_wins_string:
             current_best_hand = player_hand
+
+        if head_to_head_result != first_player_wins_string:
             winning_hands = [current_best_hand]
-            winning_hole_cards_flavors = [winning_hands[0].hole_cards.hole_cards_flavor]
-        elif comparison_result == players_tie_string:
-            winning_type = hand_tie_flavor
+            winning_hole_cards_flavors = [
+                current_best_hand.hole_cards.hole_cards_flavor
+            ]
+
+        if head_to_head_result == players_tie_string:
             winning_hands.append(player_hand)
             winning_hole_cards_flavors.append(player_hand.hole_cards.hole_cards_flavor)
+
+    overall_comparison_result = compare_player_hands(*player_hands_in_the_hand)
+    if overall_comparison_result == players_tie_string:
+        winning_type = hand_tie_flavor
+        if len(winning_hands) <= 1:
+            raise ValueError(
+                "There must be more than one winning hand in the case of a tie."
+            )
+    else:
+        winning_type = hand_winner_flavor
+
     losing_hands = [
         player_hand
         for player_hand in player_hands_in_the_hand
@@ -271,68 +274,24 @@ def _determine_winners_and_losers(
     )
 
 
-# TODO: Try to simplify this since may be lots of repeated code...
 def _init_cards_and_bets(
     n_players_ahead_of_you: Union[PlayersAheadOfYou, None] = None,
     small_blind: Union[SmallBlind, None] = None,
-    your_hole_card_1: Union[Card, None] = None,
-    your_hole_card_2: Union[Card, None] = None,
-    community_card_1: Union[Card, None] = None,
-    community_card_2: Union[Card, None] = None,
-    community_card_3: Union[Card, None] = None,
-    community_card_4: Union[Card, None] = None,
-    community_card_5: Union[Card, None] = None,
-    player_ahead_of_you_hole_card_1: Union[Card, None] = None,
-    player_ahead_of_you_hole_card_2: Union[Card, None] = None,
 ) -> Tuple[int, int, HoleCards, int, str, CommunityCards, Dict[str, HoleCards]]:
     n_players_ahead_of_you, small_blind = _init_n_players_and_small_blind(
         n_players_ahead_of_you, small_blind
     )
     max_bet = BigBlind(small_blind).amount
     deck = Deck()
-
-    if your_hole_card_1 is None:
-        your_hole_card_1 = deck.draw_card()
-    if your_hole_card_2 is None:
-        your_hole_card_2 = deck.draw_card()
-    your_hole_cards = HoleCards(
-        deck=deck, hole_card_1=your_hole_card_1, hole_card_2=your_hole_card_2
-    )
-
+    your_hole_cards = HoleCards(deck=deck)
     pot_size = small_blind.amount + max_bet
     pot_odds = _calculate_pot_odds(max_bet, pot_size)
     pot_size, pot_odds = _simulate_bets_for_players_ahead_of_you(
         n_players_ahead_of_you, max_bet, pot_size, pot_odds
     )
-
-    if community_card_1 is None:
-        community_card_1 = deck.draw_card()
-    if community_card_2 is None:
-        community_card_2 = deck.draw_card()
-    if community_card_3 is None:
-        community_card_3 = deck.draw_card()
-    if community_card_4 is None:
-        community_card_4 = deck.draw_card()
-    if community_card_5 is None:
-        community_card_5 = deck.draw_card()
-    community_cards = CommunityCards(
-        deck=deck,
-        community_card_1=community_card_1,
-        community_card_2=community_card_2,
-        community_card_3=community_card_3,
-        community_card_4=community_card_4,
-        community_card_5=community_card_5,
-    )
-
-    if player_ahead_of_you_hole_card_1 is None:
-        player_ahead_of_you_hole_card_1 = deck.draw_card()
-    if player_ahead_of_you_hole_card_2 is None:
-        player_ahead_of_you_hole_card_2 = deck.draw_card()
+    community_cards = CommunityCards(deck=deck)
     hole_cards_for_players_ahead_of_you = _simulate_hole_cards_for_players_ahead_of_you(
-        n_players_ahead_of_you=n_players_ahead_of_you,
-        deck=deck,
-        hole_card_1=player_ahead_of_you_hole_card_1,
-        hole_card_2=player_ahead_of_you_hole_card_2,
+        n_players_ahead_of_you=n_players_ahead_of_you, deck=deck
     )
 
     n_players_in_the_hand = n_players_ahead_of_you.n + 1

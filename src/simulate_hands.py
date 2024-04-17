@@ -129,6 +129,16 @@ def _add_player_specific_data(
             count_winners += 1
     # TODO: Remove this next bit of code after done troubleshooting since it is redundant with the next function and is only here for troubleshooting.
     # Sometimes indicated as 'Single winner', but boh 'you_win' and 'player_1_wins' are True (while 'player_2_wins' is False). In this example, you and player 1 have hand_type 'Two Pair: Kings over 6s with 7 kicker' while player 2 has hand_type 'Pair: Kings with ['Ace', '7', '6'] kickers'. Community cards are ['7 of Diamonds', 'King of Clubs', '6 of Spades', '3 of Hearts', 'King of Hearts']. Your hole cards are '6 of Clubs, 2 of Clubs'. Player 1's hole cards are '6 of Hearts, 5 of Spades'. Player 2's hole cards are 'Ace of Spades, 5 of Hearts'. So the issue seems to be that the winning_type is wrongly saying 'Single winner' when there are multiple winners.
+    # New case came up:
+    # community cards: ['6 of Diamonds', 'Queen of Diamonds', '8 of Clubs', '5 of Hearts', '4 of Clubs']
+    # your hole cards: '7 of Clubs, 6 of Spades'
+    # player 1's hole cards: 'Ace of Diamonds, 7 of Hearts'
+    # player 2's hole cards: '8 of Diamonds, 7 of Diamonds'
+    # Should be 3-way tie with 'Straight: 8 high'. All three players DO have that hand_type.name.
+    # The winning_type IS 'Tie'.
+    # The problem is tnat data_dict['n_winners'] is only showing 2 instead of 3.
+    # This is because hand.winning_hands only has 2 items instead of 3. Should probably be fixed in hand.py
+
     if not math.isclose(sum_of_wins_as_float, 1.0, rel_tol=1e-9):
         raise ValueError(
             f"Sum of wins as float is {sum_of_wins_as_float}, which is not close to 1.0, indicating some wins are being tallied incorrectly!"

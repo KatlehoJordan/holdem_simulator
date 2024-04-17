@@ -1,4 +1,5 @@
 import random
+from typing import Union
 
 from src.card import Card
 from src.config import VALID_RANKS_DICT, VALID_SUITS, logger
@@ -30,3 +31,9 @@ class Deck:
 
     def draw_card(self) -> Card:
         return self.cards.pop()
+
+
+def draw_card_if_card_is_none(card: Union[Card, None], deck: Deck) -> Card:
+    if card is None:
+        card = deck.draw_card()
+    return card
