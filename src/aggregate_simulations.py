@@ -4,9 +4,11 @@ import shutil
 from pathlib import Path
 
 import pandas as pd
+from isort import file
 
 from src.card import VALID_CARDS_DICT
 from src.config import (
+    FILE_SAVE_TYPE,
     N_PLAYERS_PATH_PREFIX,
     N_PLAYERS_TO_SIM_OR_AGGREGATE,
     PATH_TO_ARCHIVED_SIMULATIONS,
@@ -23,7 +25,7 @@ from src.simulate_hands import (
 PATH_TO_AGGREGATED_DATA_RESULTS = Path("aggregated")
 TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING = 0.01
 MIN_N_APPEARANCES_EXPECTED_OF_EACH_FLAVOR = 1000
-TMP_FILE_NAME = "temp_all_simulations_results.csv"
+TMP_FILE_NAME = f"temp_all_simulations_results{FILE_SAVE_TYPE}"
 WINS_BY_PLAYER_STRING = "wins by player"
 APPEARANCES_OF_CARDS_STRING = "appearances of cards"
 WINS_BY_HOLE_CARDS_FLAVOR_STRING = "wins by hole cards flavor"
@@ -32,6 +34,10 @@ WINS_BY_HOLE_CARDS_FLAVOR_STRING = "wins by hole cards flavor"
 def aggregate_simulations(
     tmp_file_name: str = TMP_FILE_NAME,
     n_players_to_sim_or_aggregate: int = N_PLAYERS_TO_SIM_OR_AGGREGATE,
+    file_save_type: str = FILE_SAVE_TYPE,
+    wins_by_player_string: str = WINS_BY_PLAYER_STRING,
+    appearances_of_cards_string: str = APPEARANCES_OF_CARDS_STRING,
+    wins_by_hole_cards_flavor_string: str = WINS_BY_HOLE_CARDS_FLAVOR_STRING,
 ):
     unaggregated_results_folder = make_folder_for_unaggregated_simulations(
         n_players_per_simulation=n_players_to_sim_or_aggregate
@@ -40,7 +46,7 @@ def aggregate_simulations(
 
     counter = 0
     for file in unaggregated_results_folder.iterdir():
-        if file.suffix == ".csv":
+        if file.suffix == file_save_type:
             df = pd.read_csv(file)
             read_header = counter == 0
             df.to_csv(tmp_file_path, mode="a", index=False, header=read_header)
@@ -49,30 +55,35 @@ def aggregate_simulations(
     aggregated_wins_by_player_df = _aggregate_wins_by_player(
         tmp_file_path,
     )
-    _make_aggregated_wins_by_player_file(
-        aggregated_wins_by_player_df,
+    _make_aggregated_file(
+        df=aggregated_wins_by_player_df,
+        file_name_string_root=wins_by_player_string,
         n_players_simulated_to_aggregate=n_players_to_sim_or_aggregate,
     )
 
     aggregated_card_appearances_df = _aggregate_appearances_by_card(
         tmp_file_path,
     )
-    _make_aggregated_card_appearances_file(
-        aggregated_card_appearances_df,
+    _make_aggregated_file(
+        df=aggregated_card_appearances_df,
+        file_name_string_root=appearances_of_cards_string,
         n_players_simulated_to_aggregate=n_players_to_sim_or_aggregate,
     )
 
     aggregated_wins_by_hole_cards_flavor_df = _aggregate_wins_by_hole_cards_flavor(
         tmp_file_path,
     )
-    _make_aggregated_wins_by_hole_cards_flavor_file(
-        aggregated_wins_by_hole_cards_flavor_df,
+    _make_aggregated_file(
+        df=aggregated_wins_by_hole_cards_flavor_df,
+        file_name_string_root=wins_by_hole_cards_flavor_string,
         n_players_simulated_to_aggregate=n_players_to_sim_or_aggregate,
     )
+
     logger.info("Removing the temp file %s", tmp_file_path)
     os.unlink(tmp_file_path)
 
 
+# TODO: See if can refactor/simplify this function
 def _aggregate_wins_by_player(
     file_for_simulations_results: Path,
     n_players_simulated_to_aggregate: int = N_PLAYERS_TO_SIM_OR_AGGREGATE,
@@ -122,6 +133,7 @@ def _aggregate_wins_by_player(
     return out_df
 
 
+# TODO: See if can refactor/simplify this function
 def _aggregate_appearances_by_card(
     file_for_simulations_results: Path,
     n_cards_in_hand_string: str = N_CARDS_IN_HAND_STRING,
@@ -178,6 +190,7 @@ def _aggregate_appearances_by_card(
     return out_df
 
 
+# TODO: See if can refactor/simplify this function
 def _aggregate_wins_by_hole_cards_flavor(
     file_for_simulations_results: Path,
     valid_hole_cards_flavors_list: list = VALID_HOLE_CARDS_FLAVORS_LIST,
@@ -216,80 +229,40 @@ def _aggregate_wins_by_hole_cards_flavor(
     return df_sorted_by_win_ratio
 
 
-# TODO: Make sure not creating new folders at top-level (above simulations).
-# TODO: Update this to make an archived version of the new file rather than the old file.
 def _make_aggregated_file(
     df: pd.DataFrame,
-    file_name: str,
+    file_name_string_root: str,
     n_players_simulated_to_aggregate: int,
     path_to_simulations: Path = PATH_TO_SIMULATIONS,
     path_to_aggregated_directory: Path = PATH_TO_AGGREGATED_DATA_RESULTS,
     path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS,
     n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
+    file_save_type: str = FILE_SAVE_TYPE,
 ) -> None:
+    file_name_string_root = file_name_string_root
+    file_name = f"{file_name_string_root}{file_save_type}"
     base_path_for_n_players = Path(
         f"{n_players_path_prefix}{n_players_simulated_to_aggregate}"
     )
-    make_dir_if_not_exist(
-        path_to_simulations / base_path_for_n_players / path_to_archive
-    )
-    make_dir_if_not_exist(base_path_for_n_players / path_to_aggregated_directory)
+    path_for_n_players = path_to_simulations / base_path_for_n_players
+    path_for_n_players_archive = path_for_n_players / path_to_archive
+    make_dir_if_not_exist(path_for_n_players_archive)
+    path_for_n_players_aggregated = path_for_n_players / path_to_aggregated_directory
+    make_dir_if_not_exist(path_for_n_players_aggregated)
 
-    file_path_for_results = (
-        path_to_simulations
-        / base_path_for_n_players
-        / path_to_aggregated_directory
-        / file_name
-    )
-
-    if file_path_for_results.exists():
-        logger.info(
-            "%s already exists. Copying it to the archive folder with a timestamp.",
-            file_path_for_results,
-        )
-        timestamp = pd.Timestamp.now().strftime("%Y-%m-%d")
-        shutil.copy2(
-            file_path_for_results,
-            path_to_simulations
-            / base_path_for_n_players
-            / path_to_archive
-            / Path(file_name).stem
-            / f"{timestamp}.csv",
-        )
-
-    else:
-        logger.info("%s does not exist. Creating it now.", file_path_for_results)
+    file_path_for_results = path_for_n_players_aggregated / file_name
+    logger.info("Saving aggregated results to %s", file_path_for_results)
     df.to_csv(file_path_for_results, index=False)
 
-
-def _make_aggregated_wins_by_player_file(
-    df: pd.DataFrame,
-    n_players_simulated_to_aggregate: int,
-    wins_by_player_string: str = WINS_BY_PLAYER_STRING,
-) -> None:
-    file_name = f"{wins_by_player_string}.csv"
-    _make_aggregated_file(
-        df, file_name, n_players_simulated_to_aggregate=n_players_simulated_to_aggregate
+    timestamp = pd.Timestamp.now().strftime("%Y-%m-%d")
+    logger.info(
+        "Saving timestamped copy of aggregated results to %s with timestamp %s",
+        path_for_n_players_archive,
+        timestamp,
     )
-
-
-def _make_aggregated_card_appearances_file(
-    df: pd.DataFrame,
-    n_players_simulated_to_aggregate: int,
-    appearances_of_cards_string: str = APPEARANCES_OF_CARDS_STRING,
-) -> None:
-    file_name = f"{appearances_of_cards_string}.csv"
-    _make_aggregated_file(
-        df, file_name, n_players_simulated_to_aggregate=n_players_simulated_to_aggregate
-    )
-
-
-def _make_aggregated_wins_by_hole_cards_flavor_file(
-    df: pd.DataFrame,
-    n_players_simulated_to_aggregate: int,
-    wins_by_hole_cards_flavor_string: str = WINS_BY_HOLE_CARDS_FLAVOR_STRING,
-) -> None:
-    file_name = f"{wins_by_hole_cards_flavor_string}.csv"
-    _make_aggregated_file(
-        df, file_name, n_players_simulated_to_aggregate=n_players_simulated_to_aggregate
+    shutil.copy2(
+        file_path_for_results,
+        path_for_n_players_archive
+        / Path(file_name).stem
+        / f"{timestamp}{file_save_type}",
     )

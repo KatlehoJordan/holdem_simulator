@@ -17,6 +17,7 @@ ACE_AS_HIGH_RAW_RANK_VALUE = 14
 N_PLAYERS_PATH_PREFIX = "n_players_"
 PATH_TO_SIMULATIONS = Path("simulations")
 PATH_TO_ARCHIVED_SIMULATIONS = Path("archived_simulations")
+FILE_SAVE_TYPE = ".csv"
 
 VALID_RANKS_DICT = {
     "2": {

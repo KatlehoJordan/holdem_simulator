@@ -13,6 +13,7 @@ from src.config import (
     PATH_TO_ARCHIVED_SIMULATIONS,
     PATH_TO_SIMULATIONS,
     logger,
+    FILE_SAVE_TYPE,
 )
 from src.hand import HAND_WINNER_FLAVOR, Hand
 from src.hole_cards import N_HOLE_CARDS_PER_PLAYER, VALID_HOLE_CARDS_FLAVORS_LIST
@@ -23,7 +24,6 @@ N_SIMULATIONS = 1
 PATH_TO_UNAGGREGATED_DATA = Path("unaggregated")
 N_CARDS_IN_HAND_STRING = "n_cards_in_hand"
 N_HOLE_CARDS_FLAVORS_IN_HAND_STRING = "n_hole_cards_flavors_in_hand"
-FILE_SAVE_TYPE = ".csv"
 FILE_SUFFIX_NUMBER = 1
 
 
