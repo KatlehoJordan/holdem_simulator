@@ -1,6 +1,7 @@
 from tkinter import FIRST
 
 from src.config import logger
+from src.hand import HAND_TIE_FLAVOR, determine_winners_and_losers
 from src.player_hand import (
     FIRST_PLAYER_WINS_STRING,
     PLAYERS_TIE_STRING,
@@ -118,6 +119,37 @@ CASE_004_PLAYER_3_HOLE_CARDS = make_hole_cards_for_testing(
     ]
 )
 
+CASE_005_TIE_WINNING_TYPE_WITH_3_PLAYERS = make_community_cards_for_testing(
+    [
+        "6_OF_DIAMONDS",
+        "QUEEN_OF_DIAMONDS",
+        "8_OF_CLUBS",
+        "5_OF_HEARTS",
+        "4_OF_CLUBS",
+    ]
+)
+
+CASE_005_PLAYER_1_HOLE_CARDS = make_hole_cards_for_testing(
+    [
+        "7_OF_CLUBS",
+        "6_OF_SPADES",
+    ]
+)
+
+CASE_005_PLAYER_2_HOLE_CARDS = make_hole_cards_for_testing(
+    [
+        "ACE_OF_DIAMONDS",
+        "7_OF_HEARTS",
+    ]
+)
+
+CASE_005_PLAYER_3_HOLE_CARDS = make_hole_cards_for_testing(
+    [
+        "8_OF_DIAMONDS",
+        "7_OF_DIAMONDS",
+    ]
+)
+
 
 def test_case_001():
     logger.debug(
@@ -187,3 +219,37 @@ def test_case_004():
         compare_player_hands(player_hand_1, player_hand_2, player_hand_3)
         == PLAYERS_TIE_STRING
     )
+
+
+def test_case_005():
+    logger.debug(
+        "Previously, only 2 winners were counted, but all 3 players have the same 8-high straight and should therefore be counted. This was due to poor control flow in the determine_winners_and_losers function."
+    )
+    community_cards = CASE_005_TIE_WINNING_TYPE_WITH_3_PLAYERS
+    player_hand_1 = PlayerHand(
+        hole_cards=CASE_005_PLAYER_1_HOLE_CARDS,
+        community_cards=community_cards,
+    )
+    player_hand_2 = PlayerHand(
+        hole_cards=CASE_005_PLAYER_2_HOLE_CARDS,
+        community_cards=community_cards,
+    )
+    player_hand_3 = PlayerHand(
+        hole_cards=CASE_005_PLAYER_3_HOLE_CARDS,
+        community_cards=community_cards,
+    )
+    player_hands_in_the_hand = [player_hand_1, player_hand_2, player_hand_3]
+    (
+        winning_type,
+        winning_hands,
+        losing_hands,
+        winning_hole_cards_flavors,
+        losing_hole_cards_flavors,
+    ) = determine_winners_and_losers(
+        player_hands_in_the_hand,
+    )
+    assert winning_type == HAND_TIE_FLAVOR
+    assert len(winning_hands) == 3
+    assert len(losing_hands) == 0
+    assert len(winning_hole_cards_flavors) == 3
+    assert len(losing_hole_cards_flavors) == 0

@@ -11,7 +11,6 @@ from src.config import logger
 from src.deck import Deck
 from src.hole_cards import HoleCards
 from src.player_hand import (
-    FIRST_PLAYER_WINS_STRING,
     PLAYERS_TIE_STRING,
     SECOND_PLAYER_WINS_STRING,
     PlayerHand,
@@ -217,9 +216,8 @@ def _ensure_player_hands_are_valid(player_hands_in_the_hand: list[PlayerHand]) -
         raise ValueError("There must be at least 2 player's hands in the hand.")
 
 
-def _determine_winners_and_losers(
+def determine_winners_and_losers(
     player_hands_in_the_hand: List[PlayerHand],
-    first_player_wins_string: str = FIRST_PLAYER_WINS_STRING,
     second_player_wins_string: str = SECOND_PLAYER_WINS_STRING,
     players_tie_string: str = PLAYERS_TIE_STRING,
     hand_winner_flavor: str = HAND_WINNER_FLAVOR,
@@ -233,18 +231,16 @@ def _determine_winners_and_losers(
     for player_hand in player_hands_in_the_hand[1:]:
         head_to_head_result = compare_player_hands(current_best_hand, player_hand)
 
-        if head_to_head_result == second_player_wins_string:
-            current_best_hand = player_hand
+        if head_to_head_result == players_tie_string:
+            winning_hands.append(player_hand)
+            winning_hole_cards_flavors.append(player_hand.hole_cards.hole_cards_flavor)
 
-        if head_to_head_result != first_player_wins_string:
+        elif head_to_head_result == second_player_wins_string:
+            current_best_hand = player_hand
             winning_hands = [current_best_hand]
             winning_hole_cards_flavors = [
                 current_best_hand.hole_cards.hole_cards_flavor
             ]
-
-        if head_to_head_result == players_tie_string:
-            winning_hands.append(player_hand)
-            winning_hole_cards_flavors.append(player_hand.hole_cards.hole_cards_flavor)
 
     overall_comparison_result = compare_player_hands(*player_hands_in_the_hand)
     if overall_comparison_result == players_tie_string:
@@ -393,7 +389,7 @@ def _assign_hand_attributes(
         losing_hands,
         winning_hole_cards_flavors,
         losing_hole_cards_flavors,
-    ) = _determine_winners_and_losers(
+    ) = determine_winners_and_losers(
         player_hands_in_the_hand,
     )
 

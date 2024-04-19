@@ -133,14 +133,12 @@ def compare_player_hands(
             hole_cards_2=player_hands[1].hole_cards,
         )
 
-    # Sort player hands by hand type score and top ranks
     sorted_player_hands = sorted(
         player_hands,
         key=lambda hand: (hand.hand_type.hand_type_score, hand.hand_type.top_ranks),
         reverse=True,
     )
 
-    # Compare the best hand with the second best hand
     best_hand = sorted_player_hands[0]
     second_best_hand = sorted_player_hands[1]
 
