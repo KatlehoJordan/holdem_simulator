@@ -151,7 +151,6 @@ def _validate_player_results(
         )
 
 
-# TODO: See if can refactor/simplify this function
 def _aggregate_appearances_by_card(
     file_for_simulations_results: Path,
     n_cards_in_hand_string: str = N_CARDS_IN_HAND_STRING,
@@ -162,34 +161,64 @@ def _aggregate_appearances_by_card(
     logger.info("Aggregating %s.", appearances_of_cards_string)
     data_frame = pd.read_csv(file_for_simulations_results)
 
-    if data_frame[n_cards_in_hand_string].nunique() != 1:
-        raise ValueError("Not all hands have the same number of cards!")
+    _validate_hand_size(data_frame, n_cards_in_hand_string)
 
     prob_of_drawing_a_card_in_a_hand = data_frame[n_cards_in_hand_string].iloc[0] / len(
         valid_cards_dict
     )
-    results = []
-    for card in valid_cards_dict:
-        card_name = valid_cards_dict[card].name
-        this_card_appearances = sum(data_frame[card_name])
-        expected_appearances = len(data_frame) * prob_of_drawing_a_card_in_a_hand
-        deviation = this_card_appearances - expected_appearances
-        percent_deviation = abs(deviation) / expected_appearances
-        deviation_above_tolerable_threshold = (
-            percent_deviation > tolerance_threshold_for_random_drawing
+    results = [
+        _calculate_card_results(
+            card,
+            data_frame,
+            prob_of_drawing_a_card_in_a_hand,
+            valid_cards_dict,
+            tolerance_threshold_for_random_drawing,
         )
-        results.append(
-            {
-                "card name": card_name,
-                "appearances": this_card_appearances,
-                "probability of appearing in a hand": prob_of_drawing_a_card_in_a_hand,
-                "expected_appearances": expected_appearances,
-                "deviation": deviation,
-                "percent_deviation": percent_deviation,
-                "deviation_above_tolerable_threshold": deviation_above_tolerable_threshold,
-            }
-        )
-    out_df = pd.DataFrame(results)
+        for card in valid_cards_dict
+    ]
+    aggregated_appearances_by_card_df = pd.DataFrame(results)
+
+    _validate_aggregated_appearances_by_card_results(
+        aggregated_appearances_by_card_df, tolerance_threshold_for_random_drawing
+    )
+
+    return aggregated_appearances_by_card_df
+
+
+def _validate_hand_size(data_frame: pd.DataFrame, n_cards_in_hand_string: str):
+    if data_frame[n_cards_in_hand_string].nunique() != 1:
+        raise ValueError("Not all hands have the same number of cards!")
+
+
+def _calculate_card_results(
+    card: str,
+    data_frame: pd.DataFrame,
+    prob_of_drawing_a_card_in_a_hand: float,
+    valid_cards_dict: dict,
+    tolerance_threshold_for_random_drawing: float,
+) -> dict:
+    card_name = valid_cards_dict[card].name
+    this_card_appearances = sum(data_frame[card_name])
+    expected_appearances = len(data_frame) * prob_of_drawing_a_card_in_a_hand
+    deviation = this_card_appearances - expected_appearances
+    percent_deviation = abs(deviation) / expected_appearances
+    deviation_above_tolerable_threshold = (
+        percent_deviation > tolerance_threshold_for_random_drawing
+    )
+    return {
+        "card name": card_name,
+        "appearances": this_card_appearances,
+        "probability of appearing in a hand": prob_of_drawing_a_card_in_a_hand,
+        "expected_appearances": expected_appearances,
+        "deviation": deviation,
+        "percent_deviation": percent_deviation,
+        "deviation_above_tolerable_threshold": deviation_above_tolerable_threshold,
+    }
+
+
+def _validate_aggregated_appearances_by_card_results(
+    out_df: pd.DataFrame, tolerance_threshold_for_random_drawing: float
+):
     if not math.isclose(
         out_df["appearances"].sum(), out_df["expected_appearances"].sum(), rel_tol=1e-9
     ):
@@ -204,8 +233,6 @@ def _aggregate_appearances_by_card(
         logger.warning(
             f"At least one card's appearances deviate from the expected number of appearances by more than {tolerance_threshold_for_random_drawing:.0%}. A larger sample should be drawn or else the random assignment of cards to players is not working."
         )
-
-    return out_df
 
 
 # TODO: See if can refactor/simplify this function
