@@ -324,9 +324,9 @@ def _make_aggregated_file(
         path_for_n_players_archive,
         timestamp,
     )
+    subfolder_path = path_for_n_players_archive / Path(file_name).stem
+    make_dir_if_not_exist(subfolder_path)
     shutil.copy2(
         file_path_for_results,
-        path_for_n_players_archive
-        / Path(file_name).stem
-        / f"{timestamp}{file_save_type}",
+        subfolder_path / f"{timestamp}{file_save_type}",
     )
