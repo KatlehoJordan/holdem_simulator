@@ -246,7 +246,6 @@ def _extract_results_data(
     return data_frame
 
 
-# TODO: Refactor or simplify this function
 def _make_simulations_results_file(
     df: pd.DataFrame,
     n_players_per_simulation: int,
