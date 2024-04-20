@@ -14,9 +14,8 @@ def main(
 ) -> None:
     clear_console()
     if purpose == "Sim and Agg":
-        simulate_and_aggregate(n_players_per_simulation=10)
-        # for n_players in range(3, 11):
-        #     simulate_and_aggregate(n_players_per_simulation=n_players)
+        for n_players in range(3, 10):
+            simulate_and_aggregate(n_players_per_simulation=n_players)
     if purpose == "Training":
         train()
     if purpose == "Graph":
