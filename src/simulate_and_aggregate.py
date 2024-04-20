@@ -22,4 +22,3 @@ def simulate_and_aggregate(
         n_players_per_simulation=n_players_per_simulation,
     )
     aggregate_simulations(n_players_to_sim_or_aggregate=n_players_per_simulation)
-    exit()
