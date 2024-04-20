@@ -83,7 +83,6 @@ def aggregate_simulations(
     os.unlink(tmp_file_path)
 
 
-# TODO: See if can refactor/simplify this function
 def _aggregate_wins_by_player(
     file_for_simulations_results: Path,
     n_players_simulated_to_aggregate: int = N_PLAYERS_TO_SIM_OR_AGGREGATE,
@@ -92,29 +91,50 @@ def _aggregate_wins_by_player(
 ) -> pd.DataFrame:
     logger.info("Aggregating total %s.", wins_by_player_string)
     data_frame = pd.read_csv(file_for_simulations_results)
-    results = []
-    for player in range(n_players_simulated_to_aggregate):
-        wins_as_float_key = (
-            f"player_{player}_wins_as_float" if player != 0 else "you_win_as_float"
+    results = [
+        _calculate_player_results(
+            player,
+            data_frame,
+            n_players_simulated_to_aggregate,
+            tolerance_threshold_for_random_drawing,
         )
-        this_players_wins = sum(data_frame[wins_as_float_key])
-        expected_wins = len(data_frame) / n_players_simulated_to_aggregate
-        deviation = this_players_wins - expected_wins
-        percent_deviation = abs(deviation) / expected_wins
-        deviation_above_tolerable_threshold = (
-            percent_deviation > tolerance_threshold_for_random_drawing
-        )
-        results.append(
-            {
-                "player": player,
-                "wins": this_players_wins,
-                "expected_wins": expected_wins,
-                "deviation": deviation,
-                "percent_deviation": percent_deviation,
-                "deviation_above_tolerable_threshold": deviation_above_tolerable_threshold,
-            }
-        )
-    out_df = pd.DataFrame(results)
+        for player in range(n_players_simulated_to_aggregate)
+    ]
+    player_results_df = pd.DataFrame(results)
+    _validate_player_results(player_results_df)
+    return player_results_df
+
+
+def _calculate_player_results(
+    player: int,
+    data_frame: pd.DataFrame,
+    n_players_simulated_to_aggregate: int,
+    tolerance_threshold_for_random_drawing: float,
+) -> dict:
+    wins_as_float_key = (
+        f"player_{player}_wins_as_float" if player != 0 else "you_win_as_float"
+    )
+    this_players_wins = sum(data_frame[wins_as_float_key])
+    expected_wins = len(data_frame) / n_players_simulated_to_aggregate
+    deviation = this_players_wins - expected_wins
+    percent_deviation = abs(deviation) / expected_wins
+    deviation_above_tolerable_threshold = (
+        percent_deviation > tolerance_threshold_for_random_drawing
+    )
+    return {
+        "player": player,
+        "wins": this_players_wins,
+        "expected_wins": expected_wins,
+        "deviation": deviation,
+        "percent_deviation": percent_deviation,
+        "deviation_above_tolerable_threshold": deviation_above_tolerable_threshold,
+    }
+
+
+def _validate_player_results(
+    out_df: pd.DataFrame,
+    tolerance_threshold_for_random_drawing: float = TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING,
+) -> None:
     if not math.isclose(
         out_df["wins"].sum(), out_df["expected_wins"].sum(), rel_tol=1e-9
     ):
@@ -129,8 +149,6 @@ def _aggregate_wins_by_player(
         logger.warning(
             f"At least one player's wins deviate from the expected number of wins by more than {tolerance_threshold_for_random_drawing:.0%}. A larger sample should be drawn or else the random assignment of cards to players is not working."
         )
-
-    return out_df
 
 
 # TODO: See if can refactor/simplify this function
