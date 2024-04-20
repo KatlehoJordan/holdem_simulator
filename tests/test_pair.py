@@ -116,7 +116,7 @@ PAIR_DOMINATING_WEAKER_HANDS = make_community_cards_for_testing(
     ]
 )
 
-# TODO: Delete this after veryfing pre-commit hooks are working
+# TODO: Delete this after verifying pre-commit hooks are working
 
 
 def test_pair():
