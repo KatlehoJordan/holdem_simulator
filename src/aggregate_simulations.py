@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pandas as pd
 
-from get_path_for_n_players_aggregated import get_path_for_n_players_aggregated
 from src.card import VALID_CARDS_DICT
 from src.config import (
     FILE_SAVE_TYPE,
@@ -15,6 +14,7 @@ from src.config import (
     PATH_TO_SIMULATIONS,
     logger,
 )
+from src.get_path_for_n_players_aggregated import get_path_for_n_players_aggregated
 from src.hole_cards import VALID_HOLE_CARDS_FLAVORS_LIST
 from src.make_dir_if_does_not_exist import make_dir_if_not_exist
 from src.simulate_hands import (
