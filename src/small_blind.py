@@ -1,5 +1,4 @@
 import random
-from tkinter.tix import MAX
 
 from src.bet import Bet
 from src.config import MIN_SMALL_BLIND, logger
