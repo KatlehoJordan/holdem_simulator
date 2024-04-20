@@ -1,6 +1,10 @@
 from src.aggregate_simulations import aggregate_simulations
-from src.config import N_PLAYERS_TO_SIM_AGG_OR_PLOT, N_SIMS, logger
+from src.config import N_PLAYERS_TO_SIM_AGG_OR_PLOT, logger
 from src.simulate_hands import simulate_hands
+
+N_SIMS = int(
+    100_000 / N_PLAYERS_TO_SIM_AGG_OR_PLOT
+)  # >420 000 total is likely needed to get over 1000 appearances for each hole_cards_flavor
 
 
 # TODO: increase n_simulations sufficiently to get below thresholds specified in aggregate_simulations. May want to disable logging to make simulations faster.
