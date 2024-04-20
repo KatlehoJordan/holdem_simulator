@@ -57,6 +57,13 @@ def main(
         logger.setLevel("WARNING")
         aggregate_simulations()
         exit()
+    if purpose == "Sim and Agg":
+        logger.setLevel("WARNING")
+        simulate_hands(
+            n_simulations=N_SIMS, n_players_per_simulation=N_PLAYERS_TO_SIM_OR_AGGREGATE
+        )
+        aggregate_simulations()
+        exit()
     if purpose == "Training":
         user_input = input_with_escape_hatch(starting_prompt)
         if user_input.lower() not in ["y", "", "n", "0"]:
@@ -95,4 +102,4 @@ def main(
 
 
 if __name__ == "__main__":
-    main(purpose="Aggregating")
+    main(purpose="Sim and Agg")
