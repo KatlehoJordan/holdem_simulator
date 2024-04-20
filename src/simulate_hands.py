@@ -127,11 +127,6 @@ def _add_player_specific_data(
         sum_of_wins_as_float += data_dict[win_as_float_key]
         if data_dict[win_key]:
             count_winners += 1
-    # TODO: Remove this next bit of code after done troubleshooting since it is redundant with the next function and is only here for troubleshooting.
-    if not math.isclose(sum_of_wins_as_float, 1.0, rel_tol=1e-9):
-        raise ValueError(
-            f"Sum of wins as float is {sum_of_wins_as_float}, which is not close to 1.0, indicating some wins are being tallied incorrectly!"
-        )
     _validate_player_specific_data(hand, sum_of_wins_as_float, count_winners)
 
     return data_dict
@@ -255,12 +250,7 @@ def _extract_results_data(
 def _make_simulations_results_file(
     df: pd.DataFrame,
     n_players_per_simulation: int,
-    path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS,
-    path_to_simulations: Path = PATH_TO_SIMULATIONS,
-    file_save_type: str = FILE_SAVE_TYPE,
     file_suffix_number: int = FILE_SUFFIX_NUMBER,
-    n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
-    path_to_unaggregated: Path = PATH_TO_UNAGGREGATED_DATA,
 ) -> Path:
     file_path_for_simulations_results = _make_file_path_for_unaggregated_simulations(
         file_suffix_number=file_suffix_number,
@@ -268,47 +258,46 @@ def _make_simulations_results_file(
     )
 
     if file_path_for_simulations_results.exists():
-        logger.info(
-            "%s already exists. Copying it to the archive folder with a timestamp.",
-            file_path_for_simulations_results,
+        file_path_for_simulations_results = _backup_and_increment_file(
+            file_path_for_simulations_results, n_players_per_simulation
         )
-        timestamp = pd.Timestamp.now().strftime("%Y-%m-%d")
-        base_path_for_n_players = Path(
-            f"{n_players_path_prefix}{n_players_per_simulation}"
-        )
-        backup_file_path = (
-            path_to_simulations
-            / base_path_for_n_players
-            / path_to_archive
-            / path_to_unaggregated
-        )
-        make_dir_if_not_exist(backup_file_path)
-        backup_file = (
-            backup_file_path
-            / f"{file_path_for_simulations_results.stem}{file_save_type}"
-        )
-        shutil.copy2(
-            file_path_for_simulations_results,
-            backup_file,
-        )
-        match = re.search(r"\d{3}", file_path_for_simulations_results.name)
-        if match:
-            ddd = int(match.group())
-            logger.info("Extracted <ddd> from file name: %d", ddd)
-            logger.info("Incrementing <ddd> by 1.")
-            file_path_for_simulations_results = _make_simulations_results_file(
-                df=df,
-                n_players_per_simulation=n_players_per_simulation,
-                file_suffix_number=ddd + 1,
-            )
-        else:
-            raise ValueError("Could not extract <ddd> from file name.")
     else:
         logger.info(
             "%s does not exist. Creating it now.", file_path_for_simulations_results
         )
         df.to_csv(file_path_for_simulations_results, index=False)
     return file_path_for_simulations_results
+
+
+def _backup_and_increment_file(file_path: Path, n_players_per_simulation: int) -> Path:
+    logger.info(
+        "%s already exists. Copying it to the archive folder with a timestamp.",
+        file_path,
+    )
+    base_path_for_n_players = Path(f"{N_PLAYERS_PATH_PREFIX}{n_players_per_simulation}")
+    backup_file_path = (
+        PATH_TO_SIMULATIONS
+        / base_path_for_n_players
+        / PATH_TO_ARCHIVED_SIMULATIONS
+        / PATH_TO_UNAGGREGATED_DATA
+    )
+    make_dir_if_not_exist(backup_file_path)
+    backup_file = backup_file_path / f"{file_path.stem}{FILE_SAVE_TYPE}"
+    shutil.copy2(
+        file_path,
+        backup_file,
+    )
+    match = re.search(r"\d{3}", file_path.name)
+    if match:
+        ddd = int(match.group())
+        logger.info("Extracted <ddd> from file name: %d", ddd)
+        logger.info("Incrementing <ddd> by 1.")
+        return _make_file_path_for_unaggregated_simulations(
+            file_suffix_number=ddd + 1,
+            n_players_per_simulation=n_players_per_simulation,
+        )
+    else:
+        raise ValueError("Could not extract <ddd> from file name.")
 
 
 def _make_file_path_for_unaggregated_simulations(

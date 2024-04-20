@@ -33,8 +33,6 @@ Do you want to train again?
 {COMMON_PROMPT}
 """
 
-# TODO: Fix that n_3_players is not archiving_unaggregated data
-# TODO: In simulate_hands and aggregate_simulations, specify a different folder depending on the number of players.
 # TODO: increase n_simulations sufficiently to get below thresholds specified in aggregate_simulations. May want to disable logging to make simulations faster.
 # TODO: Run simulations for all player counts between 2 and 10.
 # TODO: After getting all simulations and aggregations working, build a way to graph the results
