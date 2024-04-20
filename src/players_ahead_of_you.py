@@ -1,5 +1,3 @@
-from tkinter.tix import MAX
-
 import numpy as np
 
 from src.config import logger
