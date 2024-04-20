@@ -76,8 +76,6 @@ VALID_RANKS_DICT = {
     },
 }
 
-TRAINING_LOGGING_LEVEL = 15  # Between DEBUG (10) and INFO (20)
-
 
 def find_key_by_raw_rank_value(
     input_integer: int,
@@ -93,5 +91,30 @@ def find_key_by_raw_rank_value(
     return "Rank not found"
 
 
+# logging.addLevelName(5, "CUSTOM")
+# logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+# logger = logging.getLogger()
+
+# def custom(self, message, *args, **kws):
+#     if self.isEnabledFor(5):
+#         self._log(5, message, args, **kws)
+
+# logging.Logger.custom = custom
+
+########
+
+import logging
+
+
+class CustomLogger(logging.Logger):
+    def simulating(self, message, *args, **kws):
+        if self.isEnabledFor(25):
+            self._log(25, message, args, **kws)
+
+
+logging.setLoggerClass(CustomLogger)
+logging.addLevelName(25, "SIMULATING")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-logger = logging.getLogger()
+logger: CustomLogger = logging.getLogger(__name__)  # type: ignore because Pylance does not recognize that the custom logger class can inherit from the base logger class
+
+logger.simulating("This is a custom log message")

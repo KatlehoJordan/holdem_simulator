@@ -45,6 +45,15 @@ def main(
     purpose: str = "Training",
 ) -> None:
     clear_console()
+    if purpose == "logging":
+        logger.setLevel("DEBUG")
+        logger.debug("Debug message")
+        logger.info("Info message")
+        logger.simulating("Simulating message")
+        logger.warning("Warning message")
+        logger.error("Error message")
+        logger.critical("Critical message")
+        exit()
     if purpose == "Simulating":
         logger.setLevel("WARNING")
         simulate_hands(
@@ -100,4 +109,5 @@ def main(
 
 
 if __name__ == "__main__":
-    main(purpose="Sim and Agg")
+    # main(purpose="Sim and Agg")
+    main(purpose="logging")
