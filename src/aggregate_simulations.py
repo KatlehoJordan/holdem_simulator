@@ -10,7 +10,7 @@ from src.card import VALID_CARDS_DICT
 from src.config import (
     FILE_SAVE_TYPE,
     N_PLAYERS_PATH_PREFIX,
-    N_PLAYERS_TO_SIM_OR_AGGREGATE,
+    N_PLAYERS_TO_SIM_AGG_OR_PLOT,
     PATH_TO_ARCHIVED_SIMULATIONS,
     PATH_TO_SIMULATIONS,
     logger,
@@ -33,7 +33,7 @@ WINS_BY_HOLE_CARDS_FLAVOR_STRING = "wins by hole cards flavor"
 
 def aggregate_simulations(
     tmp_file_name: str = TMP_FILE_NAME,
-    n_players_to_sim_or_aggregate: int = N_PLAYERS_TO_SIM_OR_AGGREGATE,
+    n_players_to_sim_or_aggregate: int = N_PLAYERS_TO_SIM_AGG_OR_PLOT,
     file_save_type: str = FILE_SAVE_TYPE,
     wins_by_player_string: str = WINS_BY_PLAYER_STRING,
     appearances_of_cards_string: str = APPEARANCES_OF_CARDS_STRING,
@@ -85,7 +85,7 @@ def aggregate_simulations(
 
 def _aggregate_wins_by_player(
     file_for_simulations_results: Path,
-    n_players_simulated_to_aggregate: int = N_PLAYERS_TO_SIM_OR_AGGREGATE,
+    n_players_simulated_to_aggregate: int = N_PLAYERS_TO_SIM_AGG_OR_PLOT,
     tolerance_threshold_for_random_drawing: float = TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING,
     wins_by_player_string: str = WINS_BY_PLAYER_STRING,
 ) -> pd.DataFrame:
@@ -297,17 +297,16 @@ def _make_aggregated_file(
     file_name_string_root: str,
     n_players_simulated_to_aggregate: int,
     path_to_simulations: Path = PATH_TO_SIMULATIONS,
+    n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
     path_to_aggregated_directory: Path = PATH_TO_AGGREGATED_DATA_RESULTS,
     path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS,
-    n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
     file_save_type: str = FILE_SAVE_TYPE,
 ) -> None:
     file_name_string_root = file_name_string_root
     file_name = f"{file_name_string_root}{file_save_type}"
-    base_path_for_n_players = Path(
-        f"{n_players_path_prefix}{n_players_simulated_to_aggregate}"
+    path_for_n_players = get_path_for_n_players_aggregated(
+        n_players_simulated_to_aggregate, path_to_simulations, n_players_path_prefix
     )
-    path_for_n_players = path_to_simulations / base_path_for_n_players
     path_for_n_players_archive = path_for_n_players / path_to_archive
     make_dir_if_not_exist(path_for_n_players_archive)
     path_for_n_players_aggregated = path_for_n_players / path_to_aggregated_directory
@@ -329,3 +328,15 @@ def _make_aggregated_file(
         / Path(file_name).stem
         / f"{timestamp}{file_save_type}",
     )
+
+
+def get_path_for_n_players_aggregated(
+    n_players_simulated_to_aggregate: int = N_PLAYERS_TO_SIM_AGG_OR_PLOT,
+    path_to_simulations: Path = PATH_TO_SIMULATIONS,
+    n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
+) -> Path:
+    base_path_for_n_players = Path(
+        f"{n_players_path_prefix}{n_players_simulated_to_aggregate}"
+    )
+    path_for_n_players = path_to_simulations / base_path_for_n_players
+    return path_for_n_players

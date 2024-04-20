@@ -1,5 +1,5 @@
-from src.graph import graph
 from src.guess_functions import clear_console
+from src.plot_data import plot_data
 from src.simulate_and_aggregate import simulate_and_aggregate
 from src.train import train
 
@@ -18,7 +18,7 @@ def main(
     if purpose == "Training":
         train()
     if purpose == "Graph":
-        graph()
+        plot_data()
 
 
 if __name__ == "__main__":

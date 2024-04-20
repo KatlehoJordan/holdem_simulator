@@ -10,7 +10,7 @@ from src.community_cards import N_CARDS_IN_COMMUNITY_CARDS
 from src.config import (
     FILE_SAVE_TYPE,
     N_PLAYERS_PATH_PREFIX,
-    N_PLAYERS_TO_SIM_OR_AGGREGATE,
+    N_PLAYERS_TO_SIM_AGG_OR_PLOT,
     PATH_TO_ARCHIVED_SIMULATIONS,
     PATH_TO_SIMULATIONS,
     logger,
@@ -29,7 +29,7 @@ FILE_SUFFIX_NUMBER = 1
 
 def simulate_hands(
     n_simulations: int = N_SIMULATIONS,
-    n_players_per_simulation: int = N_PLAYERS_TO_SIM_OR_AGGREGATE,
+    n_players_per_simulation: int = N_PLAYERS_TO_SIM_AGG_OR_PLOT,
 ) -> Path:
     if n_simulations > 50_000:
         raise ValueError(
