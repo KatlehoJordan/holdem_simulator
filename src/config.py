@@ -101,5 +101,3 @@ logging.setLoggerClass(CustomLogger)
 logging.addLevelName(25, "SIMULATING")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger: CustomLogger = logging.getLogger(__name__)  # type: ignore because Pylance does not recognize that the custom logger class can inherit from the base logger class
-
-logger.sim("This is a custom log message")

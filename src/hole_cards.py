@@ -269,7 +269,7 @@ def _make_valid_hole_cards_flavors_list(
     pickle_file_path = Path(data_path) / valid_hole_cards_flavors_list_file_name
 
     if pickle_file_path.exists():
-        logger.info(f"Loading valid hole cards flavors list from {pickle_file_path}")
+        logger.debug(f"Loading valid hole cards flavors list from {pickle_file_path}")
         with open(pickle_file_path, "rb") as f:
             valid_hole_cards_flavors_list = pickle.load(f)
         return valid_hole_cards_flavors_list

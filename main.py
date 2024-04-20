@@ -1,7 +1,7 @@
+from src.graph import graph
 from src.guess_functions import clear_console
 from src.simulate_and_aggregate import simulate_and_aggregate
 from src.train import train
-from src.graph import graph
 
 # TODO: After getting all simulations and aggregations working, build a way to graph the results
 

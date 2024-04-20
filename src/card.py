@@ -46,7 +46,7 @@ def _make_valid_cards_dict(
     pickle_file_path = Path(data_path) / valid_cards_dict_file_name
 
     if pickle_file_path.exists():
-        logger.info(f"Loading valid cards dict from {pickle_file_path}")
+        logger.debug(f"Loading valid cards dict from {pickle_file_path}")
         with open(pickle_file_path, "rb") as f:
             valid_cards_dict = pickle.load(f)
         return valid_cards_dict
