@@ -49,13 +49,13 @@ def main(
         logger.setLevel("DEBUG")
         logger.debug("Debug message")
         logger.info("Info message")
-        logger.simulating("Simulating message")
+        logger.sim("Simulating message")
         logger.warning("Warning message")
         logger.error("Error message")
         logger.critical("Critical message")
         exit()
     if purpose == "Simulating":
-        logger.setLevel("WARNING")
+        logger.setLevel("SIMULATING")
         simulate_hands(
             n_simulations=N_SIMS, n_players_per_simulation=N_PLAYERS_TO_SIM_OR_AGGREGATE
         )
@@ -110,4 +110,4 @@ def main(
 
 if __name__ == "__main__":
     # main(purpose="Sim and Agg")
-    main(purpose="logging")
+    main(purpose="Simulating")

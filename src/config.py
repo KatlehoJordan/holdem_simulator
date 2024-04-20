@@ -8,7 +8,7 @@ VALID_SUITS = ["Clubs", "Diamonds", "Hearts", "Spades"]
 
 RAW_RANK_VALUE_STRING = "raw_rank_value"
 N_POSSIBLE_STRAIGHTS_STRING = "n_possible_straights"
-N_PLAYERS_TO_SIM_OR_AGGREGATE = 9
+N_PLAYERS_TO_SIM_OR_AGGREGATE = 10
 N_SIMS = int(
     100_000 / N_PLAYERS_TO_SIM_OR_AGGREGATE
 )  # >420 000 total is likely needed to get over 1000 appearances for each hole_cards_flavor
@@ -91,23 +91,8 @@ def find_key_by_raw_rank_value(
     return "Rank not found"
 
 
-# logging.addLevelName(5, "CUSTOM")
-# logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-# logger = logging.getLogger()
-
-# def custom(self, message, *args, **kws):
-#     if self.isEnabledFor(5):
-#         self._log(5, message, args, **kws)
-
-# logging.Logger.custom = custom
-
-########
-
-import logging
-
-
 class CustomLogger(logging.Logger):
-    def simulating(self, message, *args, **kws):
+    def sim(self, message, *args, **kws):
         if self.isEnabledFor(25):
             self._log(25, message, args, **kws)
 
@@ -117,4 +102,4 @@ logging.addLevelName(25, "SIMULATING")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger: CustomLogger = logging.getLogger(__name__)  # type: ignore because Pylance does not recognize that the custom logger class can inherit from the base logger class
 
-logger.simulating("This is a custom log message")
+logger.sim("This is a custom log message")
