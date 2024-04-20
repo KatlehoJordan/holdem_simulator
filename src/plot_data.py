@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
+from get_path_for_n_players_aggregated import get_path_for_n_players_aggregated
 from src.config import N_PLAYERS_TO_SIM_AGG_OR_PLOT, logger
 from src.make_dir_if_does_not_exist import make_dir_if_not_exist
 

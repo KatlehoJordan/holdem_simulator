@@ -4,8 +4,8 @@ import shutil
 from pathlib import Path
 
 import pandas as pd
-from isort import file
 
+from get_path_for_n_players_aggregated import get_path_for_n_players_aggregated
 from src.card import VALID_CARDS_DICT
 from src.config import (
     FILE_SAVE_TYPE,
@@ -53,7 +53,7 @@ def aggregate_simulations(
             counter += 1
 
     aggregated_wins_by_player_df = _aggregate_wins_by_player(
-        tmp_file_path,
+        tmp_file_path, n_players_simulated_to_aggregate=n_players_to_sim_or_aggregate
     )
     _make_aggregated_file(
         df=aggregated_wins_by_player_df,
@@ -85,7 +85,7 @@ def aggregate_simulations(
 
 def _aggregate_wins_by_player(
     file_for_simulations_results: Path,
-    n_players_simulated_to_aggregate: int = N_PLAYERS_TO_SIM_AGG_OR_PLOT,
+    n_players_simulated_to_aggregate: int,
     tolerance_threshold_for_random_drawing: float = TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING,
     wins_by_player_string: str = WINS_BY_PLAYER_STRING,
 ) -> pd.DataFrame:
@@ -305,7 +305,9 @@ def _make_aggregated_file(
     file_name_string_root = file_name_string_root
     file_name = f"{file_name_string_root}{file_save_type}"
     path_for_n_players = get_path_for_n_players_aggregated(
-        n_players_simulated_to_aggregate, path_to_simulations, n_players_path_prefix
+        n_players_simulated_to_aggregate=n_players_simulated_to_aggregate,
+        path_to_simulations=path_to_simulations,
+        n_players_path_prefix=n_players_path_prefix,
     )
     path_for_n_players_archive = path_for_n_players / path_to_archive
     make_dir_if_not_exist(path_for_n_players_archive)
@@ -328,15 +330,3 @@ def _make_aggregated_file(
         / Path(file_name).stem
         / f"{timestamp}{file_save_type}",
     )
-
-
-def get_path_for_n_players_aggregated(
-    n_players_simulated_to_aggregate: int = N_PLAYERS_TO_SIM_AGG_OR_PLOT,
-    path_to_simulations: Path = PATH_TO_SIMULATIONS,
-    n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
-) -> Path:
-    base_path_for_n_players = Path(
-        f"{n_players_path_prefix}{n_players_simulated_to_aggregate}"
-    )
-    path_for_n_players = path_to_simulations / base_path_for_n_players
-    return path_for_n_players
