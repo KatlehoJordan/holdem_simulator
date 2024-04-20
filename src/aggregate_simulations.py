@@ -235,7 +235,6 @@ def _validate_aggregated_appearances_by_card_results(
         )
 
 
-# TODO: See if can refactor/simplify this function
 def _aggregate_wins_by_hole_cards_flavor(
     file_for_simulations_results: Path,
     valid_hole_cards_flavors_list: list = VALID_HOLE_CARDS_FLAVORS_LIST,
@@ -244,34 +243,53 @@ def _aggregate_wins_by_hole_cards_flavor(
 ) -> pd.DataFrame:
     logger.info("Aggregating %s.", wins_by_hole_cards_flavor_string)
     data_frame = pd.read_csv(file_for_simulations_results)
-    results = []
-    for hole_cards_flavor in valid_hole_cards_flavors_list:
-        this_hole_cards_flavor_appears = sum(data_frame[hole_cards_flavor])
-        this_hole_cards_flavor_wins = data_frame.winning_hole_cards_flavors.apply(
-            lambda x: x.count(hole_cards_flavor)
-        ).sum()
-        win_ratio = this_hole_cards_flavor_wins / this_hole_cards_flavor_appears
-        win_ratio_rounded_down_to_nearest_5_percent = win_ratio // 0.05 * 0.05
-        fewer_than_expected_appearances = (
-            this_hole_cards_flavor_appears < min_n_appearances_expected_of_each_flavor
+    results = [
+        _calculate_hole_card_results(
+            hole_cards_flavor, data_frame, min_n_appearances_expected_of_each_flavor
         )
-        results.append(
-            {
-                "hole cards flavor": hole_cards_flavor,
-                "appearances": this_hole_cards_flavor_appears,
-                "wins": this_hole_cards_flavor_wins,
-                "win ratio": win_ratio,
-                "win ratio rounded down to nearest 5%": win_ratio_rounded_down_to_nearest_5_percent,
-                "fewer than expected appearances": fewer_than_expected_appearances,
-            }
-        )
-    out_df = pd.DataFrame(results)
-    df_sorted_by_win_ratio = out_df.sort_values("win ratio", ascending=False)
+        for hole_cards_flavor in valid_hole_cards_flavors_list
+    ]
+    aggregated_wins_by_hole_cards_df = pd.DataFrame(results)
+    df_sorted_by_win_ratio = aggregated_wins_by_hole_cards_df.sort_values(
+        "win ratio", ascending=False
+    )
+    _validate_appearances_of_hole_cards(
+        df_sorted_by_win_ratio, min_n_appearances_expected_of_each_flavor
+    )
+    return df_sorted_by_win_ratio
+
+
+def _calculate_hole_card_results(
+    hole_cards_flavor: str,
+    data_frame: pd.DataFrame,
+    min_n_appearances_expected_of_each_flavor: int,
+) -> dict:
+    this_hole_cards_flavor_appears = sum(data_frame[hole_cards_flavor])
+    this_hole_cards_flavor_wins = data_frame.winning_hole_cards_flavors.apply(
+        lambda x: x.count(hole_cards_flavor)
+    ).sum()
+    win_ratio = this_hole_cards_flavor_wins / this_hole_cards_flavor_appears
+    win_ratio_rounded_down_to_nearest_5_percent = win_ratio // 0.05 * 0.05
+    fewer_than_expected_appearances = (
+        this_hole_cards_flavor_appears < min_n_appearances_expected_of_each_flavor
+    )
+    return {
+        "hole cards flavor": hole_cards_flavor,
+        "appearances": this_hole_cards_flavor_appears,
+        "wins": this_hole_cards_flavor_wins,
+        "win ratio": win_ratio,
+        "win ratio rounded down to nearest 5%": win_ratio_rounded_down_to_nearest_5_percent,
+        "fewer than expected appearances": fewer_than_expected_appearances,
+    }
+
+
+def _validate_appearances_of_hole_cards(
+    df_sorted_by_win_ratio: pd.DataFrame, min_n_appearances_expected_of_each_flavor: int
+):
     if df_sorted_by_win_ratio["fewer than expected appearances"].any():
         logger.warning(
             f"At least one hole_card_flavor's appearances are fewer than the expected appearances of  {min_n_appearances_expected_of_each_flavor}. A larger sample should be drawn to get more representation of all hole_card_flavors."
         )
-    return df_sorted_by_win_ratio
 
 
 def _make_aggregated_file(
