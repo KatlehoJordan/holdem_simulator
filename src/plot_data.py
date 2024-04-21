@@ -1,9 +1,11 @@
+import importlib
 from pathlib import Path
 from typing import Union
 
 import pandas as pd
 from pandas import DataFrame
 
+import src.plot_builders_plotly
 from src.aggregate_simulations import (
     PATH_TO_AGGREGATED_DATA_RESULTS,
     WINS_BY_HOLE_CARDS_FLAVOR_STRING,
@@ -12,6 +14,8 @@ from src.config import FILE_SAVE_TYPE, N_PLAYERS_TO_SIM_AGG_OR_PLOT
 from src.get_path_for_n_players_aggregated import get_path_for_n_players_aggregated
 from src.plot_builders_mpl import use_mpl
 from src.plot_builders_plotly import use_plotly
+
+importlib.reload(src.plot_builders_plotly)
 
 
 def plot_data(
@@ -25,7 +29,13 @@ def plot_data(
         n_players_to_plot=n_players_to_plot
     )
     if plot_engine == "plotly":
-        use_plotly(n_cols_to_show, show_plot, save_plot, wins_by_hole_cards_flavor_df)
+        use_plotly(
+            n_players_to_plot,
+            n_cols_to_show,
+            show_plot,
+            save_plot,
+            wins_by_hole_cards_flavor_df,
+        )
     elif plot_engine == "mpl":
         use_mpl(n_cols_to_show, show_plot, save_plot, wins_by_hole_cards_flavor_df)
 
