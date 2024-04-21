@@ -31,13 +31,17 @@ def plot_data(
     if plot_engine == "plotly":
         use_plotly(
             n_players_to_plot,
-            n_cols_to_show,
             show_plot,
             save_plot,
             wins_by_hole_cards_flavor_df,
         )
     elif plot_engine == "mpl":
-        use_mpl(n_cols_to_show, show_plot, save_plot, wins_by_hole_cards_flavor_df)
+        use_mpl(
+            n_cols_to_show,
+            show_plot,
+            save_plot,
+            wins_by_hole_cards_flavor_df,
+        )
 
 
 def _load_wins_by_hole_cards_flavor_df(

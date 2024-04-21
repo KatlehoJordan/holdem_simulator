@@ -31,7 +31,8 @@ APPEARANCES_STRING = "appearances"
 APPEARANCES_OF_CARDS_STRING = f"{APPEARANCES_STRING} of cards"
 HOLE_CARDS_FLAVOR_STRING = "hole cards flavor"
 WINS_BY_HOLE_CARDS_FLAVOR_STRING = f"wins by {HOLE_CARDS_FLAVOR_STRING}"
-WIN_RATIO_ROUNDED_DOWN_STRING = "win ratio rounded down to nearest 5%"
+WIN_RATIO_STRING = "win ratio"
+WIN_RATIO_ROUNDED_DOWN_STRING = f"{WIN_RATIO_STRING} rounded down to nearest 5%"
 
 
 def aggregate_simulations(
@@ -243,6 +244,7 @@ def _aggregate_wins_by_hole_cards_flavor(
     file_for_simulations_results: Path,
     valid_hole_cards_flavors_list: list = VALID_HOLE_CARDS_FLAVORS_LIST,
     min_n_appearances_expected_of_each_flavor: int = MIN_N_APPEARANCES_EXPECTED_OF_EACH_FLAVOR,
+    win_ratio_string: str = WIN_RATIO_STRING,
     wins_by_hole_cards_flavor_string: str = WINS_BY_HOLE_CARDS_FLAVOR_STRING,
 ) -> pd.DataFrame:
     logger.info("Aggregating %s.", wins_by_hole_cards_flavor_string)
@@ -255,7 +257,7 @@ def _aggregate_wins_by_hole_cards_flavor(
     ]
     aggregated_wins_by_hole_cards_df = pd.DataFrame(results)
     df_sorted_by_win_ratio = aggregated_wins_by_hole_cards_df.sort_values(
-        "win ratio", ascending=False
+        win_ratio_string, ascending=False
     )
     _validate_appearances_of_hole_cards(
         df_sorted_by_win_ratio, min_n_appearances_expected_of_each_flavor
@@ -269,6 +271,7 @@ def _calculate_hole_card_results(
     min_n_appearances_expected_of_each_flavor: int,
     hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
     appearances_string: str = APPEARANCES_STRING,
+    win_ratio_string: str = WIN_RATIO_STRING,
     win_ratio_rounded_down_string: str = WIN_RATIO_ROUNDED_DOWN_STRING,
 ) -> dict:
     this_hole_cards_flavor_appears = sum(data_frame[hole_cards_flavor])
@@ -284,7 +287,7 @@ def _calculate_hole_card_results(
         hole_cards_flavor_string: hole_cards_flavor,
         appearances_string: this_hole_cards_flavor_appears,
         "wins": this_hole_cards_flavor_wins,
-        "win ratio": win_ratio,
+        win_ratio_string: win_ratio,
         win_ratio_rounded_down_string: win_ratio_rounded_down_to_nearest_5_percent,
         "fewer than expected appearances": fewer_than_expected_appearances,
     }

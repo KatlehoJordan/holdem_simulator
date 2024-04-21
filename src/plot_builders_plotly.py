@@ -3,25 +3,26 @@ from typing import Union
 
 import plotly.express as px
 import plotly.graph_objects as go
+from matplotlib import colorbar
 from pandas import DataFrame
 
 from src.aggregate_simulations import (
     APPEARANCES_STRING,
     HOLE_CARDS_FLAVOR_STRING,
     WIN_RATIO_ROUNDED_DOWN_STRING,
+    WIN_RATIO_STRING,
 )
 from src.config import PLOT_FILE_NAME, PLOTS_PATH, logger
 from src.make_dir_if_does_not_exist import make_dir_if_not_exist
 
+MINOR_FONT_SIZE = 12
+MAJOR_FONT_SIZE = MINOR_FONT_SIZE + 2
+TITLE_FONT_SIZE = MAJOR_FONT_SIZE + 6
 
-# TODO: Make the plots prettier by:
-# Removing the grid lines
-# Using monospace for labels and ticks
-# Using gray for the chart borders, ticks, and labels
-# using viridis magma for coloring of traces
+
+# TODO: Ensure can export/save plotly plots
 def use_plotly(
     n_players_to_plot: int,
-    n_cols_to_show: int,
     show_plot: bool,
     save_plot: bool,
     wins_by_hole_cards_flavor_df: DataFrame,
@@ -29,7 +30,6 @@ def use_plotly(
     fig = _make_plotly_fig_and_ax_objects(
         dataframe=wins_by_hole_cards_flavor_df,
         n_players_to_plot=n_players_to_plot,
-        n_cols_to_show=n_cols_to_show,
     )
     _show_plotly_plot(fig, show_plot=show_plot)
     _save_plotly_plot(fig, save_plot=save_plot)
@@ -38,62 +38,92 @@ def use_plotly(
 def _make_plotly_fig_and_ax_objects(
     dataframe: DataFrame,
     n_players_to_plot: int,
-    n_cols_to_show: Union[int, None] = None,
-    hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
-    win_ratio_rounded_down_string: str = WIN_RATIO_ROUNDED_DOWN_STRING,
-    appearances_string: str = APPEARANCES_STRING,
 ) -> go.Figure:
     logger.info("Making plotly figure and axis objects")
-    title = f"Win Ratio Rounded Down by {hole_cards_flavor_string} and {appearances_string} for {n_players_to_plot} Players"
-    x_var = hole_cards_flavor_string
-    y1_var = win_ratio_rounded_down_string
-    y2_var = appearances_string
-    logger.info("Sorting data frame descending by %s", y1_var)
-    dataframe = dataframe.sort_values(by=y1_var, ascending=False)
-    if n_cols_to_show is not None:
-        dataframe = dataframe.head(n_cols_to_show)
-    x = dataframe[x_var]
-    y1 = dataframe[y1_var]
-    y2 = dataframe[y2_var]
+    dataframe, x, y1, y2, y3 = _prepare_df_and_vars(dataframe)
 
-    fig = px.bar(dataframe, x=x, y=y1, color=y2, color_continuous_scale="Magma_r")
-
-    fig.update_yaxes(showgrid=False, range=[0, 1], showticklabels=False)
-    fig.update_layout(
-        plot_bgcolor="white",
-        title=title,
-        legend=dict(
-            yanchor="top",
-            y=0.99,
-            xanchor="center",
-            x=0.5,
-        ),
+    fig = px.bar(
+        dataframe,
+        x=x,
+        y=y1,
+        color=y2,
+        color_continuous_scale="Magma_r",
+        hover_data={y1.name: ":.0%", y3.name: ":.2%"},
     )
+
+    fig.update_yaxes(showgrid=False, range=[0, 1], showticklabels=False, title_text="")
+    fig.update_xaxes(showgrid=False, title_text="")
+    fig.update_layout(plot_bgcolor="white")
+    _adjust_colorbar(fig)
+    _add_title(n_players_to_plot, fig)
     _mark_winners_losers_threshold(n_players_to_plot, fig)
 
     return fig
+
+
+def _adjust_colorbar(
+    fig,
+    minor_font_size: int = MINOR_FONT_SIZE,
+    major_font_size: int = MAJOR_FONT_SIZE,
+    appearances_string: str = APPEARANCES_STRING,
+):
+    colorbar_title = f"{appearances_string}".title()
+    fig.update_layout(
+        coloraxis_colorbar=dict(
+            thickness=10,
+            title=colorbar_title,
+            title_font=dict(size=major_font_size, family="serif"),
+            tickfont=dict(size=minor_font_size, family="monospace"),
+        ),
+    )
+
+
+def _prepare_df_and_vars(
+    dataframe,
+    hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
+    win_ratio_string: str = WIN_RATIO_STRING,
+    win_ratio_rounded_down_string: str = WIN_RATIO_ROUNDED_DOWN_STRING,
+    appearances_string: str = APPEARANCES_STRING,
+):
+    x_var = hole_cards_flavor_string
+    y1_var = win_ratio_rounded_down_string
+    y2_var = appearances_string
+    y3_var = win_ratio_string
+    dataframe = dataframe[[x_var, y1_var, y2_var, y3_var]]
+    dataframe[y3_var] = dataframe[y3_var].round(4)
+    logger.info("Sorting data frame descending by %s", y1_var)
+    dataframe = dataframe.sort_values(by=[y3_var, y1_var], ascending=False)
+    x = dataframe[x_var]
+    y1 = dataframe[y1_var]
+    y2 = dataframe[y2_var]
+    y3 = dataframe[y3_var]
+    return dataframe, x, y1, y2, y3
+
+
+def _add_title(
+    n_players_to_plot,
+    fig,
+    hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
+    title_font_size: int = TITLE_FONT_SIZE,
+):
+    title = f"Best {hole_cards_flavor_string}s for {n_players_to_plot} Players"
+    fig.update_layout(
+        title=title, title_font_size=title_font_size, title_font_family="serif"
+    )
 
 
 def _mark_winners_losers_threshold(n_players_to_plot, fig) -> None:
     winners_color = "limegreen"
     winners_line_height = 1 - (1 / n_players_to_plot) - 0.005
     losers_color = "red"
-    _add_threshold_line(fig, winners_color, winners_line_height)
+    _add_threshold_line(fig, losers_color, winners_line_height)
     _add_winner_loser_rectangle(fig, winners_line_height, 1, winners_color)
     _add_winner_loser_rectangle(fig, 0, winners_line_height, losers_color)
-    fig.add_trace(
-        go.Scatter(
-            x=[None],
-            y=[None],
-            mode="lines",
-            line=dict(color=winners_color, width=1),
-            name="Likely winners/losers threshold",  # The label
-            showlegend=True,
-        )
-    )
 
 
-def _add_threshold_line(fig, winners_color, winners_line_height):
+def _add_threshold_line(
+    fig, losers_color, winners_line_height, minor_font_size: int = MINOR_FONT_SIZE
+):
     fig.add_shape(
         type="line",
         x0=0,
@@ -103,9 +133,28 @@ def _add_threshold_line(fig, winners_color, winners_line_height):
         xref="paper",
         yref="y",
         line=dict(
-            color=winners_color,
+            color=losers_color,
             width=1,
         ),
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=[None],
+            y=[None],
+            mode="lines",
+            line=dict(color=losers_color, width=1),
+            name="Likely Win/Lose Threshold",
+            showlegend=True,
+        )
+    )
+    fig.update_layout(
+        legend=dict(
+            font=dict(size=minor_font_size, family="serif"),
+            yanchor="top",
+            y=0.99,
+            xanchor="center",
+            x=0.5,
+        )
     )
 
 
