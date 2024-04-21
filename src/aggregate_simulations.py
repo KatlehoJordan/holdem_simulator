@@ -27,8 +27,11 @@ TOLERANCE_THRESHOLD_FOR_RANDOM_DRAWING = 0.01
 MIN_N_APPEARANCES_EXPECTED_OF_EACH_FLAVOR = 1000
 TMP_FILE_NAME = f"temp_all_simulations_results{FILE_SAVE_TYPE}"
 WINS_BY_PLAYER_STRING = "wins by player"
-APPEARANCES_OF_CARDS_STRING = "appearances of cards"
-WINS_BY_HOLE_CARDS_FLAVOR_STRING = "wins by hole cards flavor"
+APPEARANCES_STRING = "appearances"
+APPEARANCES_OF_CARDS_STRING = f"{APPEARANCES_STRING} of cards"
+HOLE_CARDS_FLAVOR_STRING = "hole cards flavor"
+WINS_BY_HOLE_CARDS_FLAVOR_STRING = f"wins by {HOLE_CARDS_FLAVOR_STRING}"
+WIN_RATIO_ROUNDED_DOWN_STRING = "win ratio rounded down to nearest 5%"
 
 
 def aggregate_simulations(
@@ -196,6 +199,7 @@ def _calculate_card_results(
     prob_of_drawing_a_card_in_a_hand: float,
     valid_cards_dict: dict,
     tolerance_threshold_for_random_drawing: float,
+    appearances_string: str = APPEARANCES_STRING,
 ) -> dict:
     card_name = valid_cards_dict[card].name
     this_card_appearances = sum(data_frame[card_name])
@@ -207,7 +211,7 @@ def _calculate_card_results(
     )
     return {
         "card name": card_name,
-        "appearances": this_card_appearances,
+        appearances_string: this_card_appearances,
         "probability of appearing in a hand": prob_of_drawing_a_card_in_a_hand,
         "expected_appearances": expected_appearances,
         "deviation": deviation,
@@ -263,6 +267,9 @@ def _calculate_hole_card_results(
     hole_cards_flavor: str,
     data_frame: pd.DataFrame,
     min_n_appearances_expected_of_each_flavor: int,
+    hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
+    appearances_string: str = APPEARANCES_STRING,
+    win_ratio_rounded_down_string: str = WIN_RATIO_ROUNDED_DOWN_STRING,
 ) -> dict:
     this_hole_cards_flavor_appears = sum(data_frame[hole_cards_flavor])
     this_hole_cards_flavor_wins = data_frame.winning_hole_cards_flavors.apply(
@@ -274,11 +281,11 @@ def _calculate_hole_card_results(
         this_hole_cards_flavor_appears < min_n_appearances_expected_of_each_flavor
     )
     return {
-        "hole cards flavor": hole_cards_flavor,
-        "appearances": this_hole_cards_flavor_appears,
+        hole_cards_flavor_string: hole_cards_flavor,
+        appearances_string: this_hole_cards_flavor_appears,
         "wins": this_hole_cards_flavor_wins,
         "win ratio": win_ratio,
-        "win ratio rounded down to nearest 5%": win_ratio_rounded_down_to_nearest_5_percent,
+        win_ratio_rounded_down_string: win_ratio_rounded_down_to_nearest_5_percent,
         "fewer than expected appearances": fewer_than_expected_appearances,
     }
 

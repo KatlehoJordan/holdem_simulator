@@ -18,9 +18,9 @@ def main(
             simulate_and_aggregate(n_players_per_simulation=n_players)
     if purpose == "Training":
         train()
-    if purpose == "Graph":
-        plot_data()
+    if purpose == "Plot":
+        plot_data(show_plot=True)
 
 
 if __name__ == "__main__":
-    main(purpose="Sim and Agg")
+    main(purpose="Plot")
