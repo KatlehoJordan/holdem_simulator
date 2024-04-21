@@ -37,10 +37,12 @@ def simulate_hands(
         )
     logger.info("Initializing empty dataframe")
     simulated_data_df = pd.DataFrame()
-    logger.info("Simulating %s hands", n_simulations)
     for simulation in range(n_simulations):
-        logger.sim("Simulation number %s", simulation + 1)
-        logger.info("Simulating %s players", n_players_per_simulation)
+        logger.sim(
+            "Simulating %s players; Simulation number %s",
+            n_players_per_simulation,
+            simulation + 1,
+        )
         hand = Hand(
             n_players_ahead_of_you=PlayersAheadOfYou(n_players_per_simulation - 1)
         )
