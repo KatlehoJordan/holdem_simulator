@@ -21,6 +21,7 @@ TITLE_FONT_SIZE = MAJOR_FONT_SIZE + 6
 
 
 # TODO: Ensure can export/save plotly plots
+# TODO: Find a way to do grouped bar charts so can get multiple players on the same chart
 def use_plotly(
     n_players_to_plot: int,
     show_plot: bool,
