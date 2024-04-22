@@ -12,18 +12,26 @@ from src.aggregate_simulations import (
     WIN_RATIO_ROUNDED_DOWN_STRING,
     WIN_RATIO_STRING,
 )
-from src.config import PLOT_FILE_NAME, PLOTS_PATH, logger
+from src.config import (
+    N_PLAYERS_STRING,
+    N_POSSIBLE_PLAYERS,
+    PLOT_FILE_NAME,
+    PLOTS_PATH,
+    logger,
+)
 from src.make_dir_if_does_not_exist import make_dir_if_not_exist
 
 MINOR_FONT_SIZE = 12
 MAJOR_FONT_SIZE = MINOR_FONT_SIZE + 2
 TITLE_FONT_SIZE = MAJOR_FONT_SIZE + 6
+PLOT_ALL_PLAYERS_STRING = "All"
+ACCEPTABLE_N_PLAYERS_TO_PLOT = N_POSSIBLE_PLAYERS + [PLOT_ALL_PLAYERS_STRING]
 
 
 # TODO: Ensure can export/save plotly plots
 # TODO: Find a way to do grouped bar charts so can get multiple players on the same chart
 def use_plotly(
-    n_players_to_plot: int,
+    n_players_to_plot: Union[int, str],
     show_plot: bool,
     save_plot: bool,
     wins_by_hole_cards_flavor_df: DataFrame,
@@ -38,14 +46,15 @@ def use_plotly(
 
 def _make_plotly_fig_and_ax_objects(
     dataframe: DataFrame,
-    n_players_to_plot: int,
+    n_players_to_plot: Union[int, str],
 ) -> go.Figure:
     logger.info("Making plotly figure and axis objects")
-    dataframe, x, y1, y2, y3 = _prepare_df_and_vars(dataframe)
+    dataframe, x1, x2, y1, y2, y3 = _prepare_df_and_vars(dataframe, n_players_to_plot)
 
+    # TODO: Implement x2 here (n_players) since currently not used
     fig = px.bar(
         dataframe,
-        x=x,
+        x=x1,
         y=y1,
         color=y2,
         color_continuous_scale="Magma_r",
@@ -81,33 +90,41 @@ def _adjust_colorbar(
 
 def _prepare_df_and_vars(
     dataframe,
+    n_players_to_plot: Union[int, str],
+    n_players_string: str = N_PLAYERS_STRING,
     hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
     win_ratio_string: str = WIN_RATIO_STRING,
     win_ratio_rounded_down_string: str = WIN_RATIO_ROUNDED_DOWN_STRING,
     appearances_string: str = APPEARANCES_STRING,
+    plot_all_players_string: str = PLOT_ALL_PLAYERS_STRING,
 ):
-    x_var = hole_cards_flavor_string
+    x1_var = hole_cards_flavor_string
+    x2_var = n_players_string
     y1_var = win_ratio_rounded_down_string
     y2_var = appearances_string
     y3_var = win_ratio_string
-    dataframe = dataframe[[x_var, y1_var, y2_var, y3_var]]
+    if n_players_to_plot != plot_all_players_string:
+        dataframe[x2_var] = n_players_to_plot
+    dataframe = dataframe[[x1_var, x2_var, y1_var, y2_var, y3_var]]
     dataframe[y3_var] = dataframe[y3_var].round(4)
     logger.info("Sorting data frame descending by %s", y1_var)
     dataframe = dataframe.sort_values(by=[y3_var, y1_var], ascending=False)
-    x = dataframe[x_var]
+    x1 = dataframe[x1_var]
+    x2 = dataframe[x2_var]
     y1 = dataframe[y1_var]
     y2 = dataframe[y2_var]
     y3 = dataframe[y3_var]
-    return dataframe, x, y1, y2, y3
+    return dataframe, x1, x2, y1, y2, y3
 
 
 def _add_title(
-    n_players_to_plot,
+    n_players_to_plot: Union[int, str],
     fig,
     hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
     title_font_size: int = TITLE_FONT_SIZE,
 ):
-    title = f"Best {hole_cards_flavor_string}s for {n_players_to_plot} Players"
+    title = f"Best {hole_cards_flavor_string}s for {str(n_players_to_plot)} Players"
+
     fig.update_layout(
         title=title, title_font_size=title_font_size, title_font_family="serif"
     )
@@ -115,11 +132,12 @@ def _add_title(
 
 def _mark_winners_losers_threshold(n_players_to_plot, fig) -> None:
     winners_color = "limegreen"
-    winners_line_height = 1 - (1 / n_players_to_plot) - 0.005
-    losers_color = "red"
-    _add_threshold_line(fig, losers_color, winners_line_height)
-    _add_winner_loser_rectangle(fig, winners_line_height, 1, winners_color)
-    _add_winner_loser_rectangle(fig, 0, winners_line_height, losers_color)
+    if type(n_players_to_plot) == int:
+        winners_line_height = 1 - (1 / n_players_to_plot) - 0.005
+        losers_color = "red"
+        _add_threshold_line(fig, losers_color, winners_line_height)
+        _add_winner_loser_rectangle(fig, winners_line_height, 1, winners_color)
+        _add_winner_loser_rectangle(fig, 0, winners_line_height, losers_color)
 
 
 def _add_threshold_line(

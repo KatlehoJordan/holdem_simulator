@@ -7,7 +7,7 @@ from src.bet import Bet
 from src.big_blind import BigBlind
 from src.card import Card
 from src.community_cards import CommunityCards
-from src.config import logger
+from src.config import N_PLAYERS_STRING, logger
 from src.deck import Deck
 from src.hole_cards import HoleCards
 from src.player_hand import (
@@ -73,6 +73,7 @@ class Hand:
 def _init_n_players_and_small_blind(
     n_players_ahead_of_you: Union[PlayersAheadOfYou, None],
     small_blind: Union[SmallBlind, None],
+    n_players_string: str = N_PLAYERS_STRING,
 ) -> Tuple[PlayersAheadOfYou, SmallBlind]:
     if n_players_ahead_of_you is None:
         n_players_ahead_of_you = PlayersAheadOfYou.select_n_players()
@@ -80,7 +81,7 @@ def _init_n_players_and_small_blind(
         small_blind = SmallBlind.select_random_small_blind()
     if not isinstance(n_players_ahead_of_you, PlayersAheadOfYou):
         raise ValueError(
-            f"n_players must be a PlayersAheadOfYou type, not {type(n_players_ahead_of_you)}"
+            f"{n_players_string} must be a PlayersAheadOfYou type, not {type(n_players_ahead_of_you)}"
         )
     if not isinstance(small_blind, SmallBlind):
         raise ValueError(

@@ -10,6 +10,7 @@ from src.community_cards import N_CARDS_IN_COMMUNITY_CARDS
 from src.config import (
     FILE_SAVE_TYPE,
     N_PLAYERS_PATH_PREFIX,
+    N_PLAYERS_STRING,
     N_PLAYERS_TO_SIM_AGG_OR_PLOT,
     PATH_TO_ARCHIVED_SIMULATIONS,
     PATH_TO_SIMULATIONS,
@@ -60,10 +61,11 @@ def simulate_hands(
 def _initialize_data_dictionary(
     hand: Hand,
     n_players_per_simulation: int,
+    n_players_string: str = N_PLAYERS_STRING,
 ) -> dict:
     logger.info("Initializing data dictionary")
     data = {
-        "n_players": n_players_per_simulation,
+        n_players_string: n_players_per_simulation,
         "all_cards_in_the_hand": [card.name for card in hand.all_cards_in_the_hand],
         "all_hole_cards_flavors_in_the_hand": [
             hole_cards_flavors

@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.config import logger
+from src.config import N_PLAYERS_STRING, logger
 
 MIN_PLAYERS_AHEAD_OF_YOU = 1
 MAX_PLAYERS_AHEAD_OF_YOU = 9
@@ -12,6 +12,7 @@ class PlayersAheadOfYou:
         n_players_ahead_of_you: int,
         min_players_ahead_of_you: int = MIN_PLAYERS_AHEAD_OF_YOU,
         max_players_ahead_of_you: int = MAX_PLAYERS_AHEAD_OF_YOU,
+        n_players_string: str = N_PLAYERS_STRING,
     ):
         if (
             n_players_ahead_of_you < min_players_ahead_of_you
@@ -19,7 +20,7 @@ class PlayersAheadOfYou:
             or n_players_ahead_of_you % 1 != 0
         ):
             raise ValueError(
-                f"n_players_ahead_of_you must be between {min_players_ahead_of_you} and {max_players_ahead_of_you} and an integer."
+                f"{n_players_string}_ahead_of_you must be between {min_players_ahead_of_you} and {max_players_ahead_of_you} and an integer."
             )
         self.n = n_players_ahead_of_you
         logger.info("%s\n", self)

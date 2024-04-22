@@ -8,13 +8,15 @@ VALID_SUITS = ["Clubs", "Diamonds", "Hearts", "Spades"]
 
 RAW_RANK_VALUE_STRING = "raw_rank_value"
 N_POSSIBLE_STRAIGHTS_STRING = "n_possible_straights"
+N_POSSIBLE_PLAYERS = [*range(2, 11)]
 N_PLAYERS_TO_SIM_AGG_OR_PLOT = 2
 N_SIMS_FOR_2_PLAYERS_TO_KEEP_UNDER_50_MB = 50_000  # >420 000 total is likely needed to get over 1000 appearances for each hole_cards_flavor
 
 NUMBER_OF_CARDS_IN_QUALIFYING_HAND = 5
 ACE_AS_LOW_RAW_RANK_VALUE = 1
 ACE_AS_HIGH_RAW_RANK_VALUE = 14
-N_PLAYERS_PATH_PREFIX = "n_players_"
+N_PLAYERS_STRING = "n_players"
+N_PLAYERS_PATH_PREFIX = f"{N_PLAYERS_STRING}_"
 PATH_TO_SIMULATIONS = Path("simulations")
 PATH_TO_ARCHIVED_SIMULATIONS = Path("archived_simulations")
 FILE_SAVE_TYPE = ".csv"

@@ -23,4 +23,4 @@ def main(
 
 
 if __name__ == "__main__":
-    main(purpose="Plot")
+    main(purpose="Sim and Agg")
