@@ -267,7 +267,7 @@ def _make_simulations_results_file(
         logger.info(
             "%s does not exist. Creating it now.", file_path_for_simulations_results
         )
-        df.to_csv(file_path_for_simulations_results, index=False)
+    df.to_csv(file_path_for_simulations_results, index=False)
     return file_path_for_simulations_results
 
 

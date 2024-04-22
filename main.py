@@ -13,7 +13,6 @@ def main(
     purpose: str = "Training",
 ) -> None:
     clear_console()
-    # TODO: This is not actually creating new unaggregated files...
     if purpose == "Sim and Agg":
         for n_players in range(3, 11):
             simulate_and_aggregate(n_players_per_simulation=n_players)
