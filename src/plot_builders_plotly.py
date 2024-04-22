@@ -47,19 +47,47 @@ def use_plotly(
 def _make_plotly_fig_and_ax_objects(
     dataframe: DataFrame,
     n_players_to_plot: Union[int, str],
+    plot_all_players_string: str = PLOT_ALL_PLAYERS_STRING,
+    n_players_string: str = N_PLAYERS_STRING,
+    major_font_size: int = MAJOR_FONT_SIZE,
+    minor_font_size: int = MINOR_FONT_SIZE,
 ) -> go.Figure:
     logger.info("Making plotly figure and axis objects")
     dataframe, x1, x2, y1, y2, y3 = _prepare_df_and_vars(dataframe, n_players_to_plot)
 
-    # TODO: Implement x2 here (n_players) since currently not used
-    fig = px.bar(
-        dataframe,
-        x=x1,
-        y=y1,
-        color=y2,
-        color_continuous_scale="Magma_r",
-        hover_data={y1.name: ":.0%", y3.name: ":.2%"},
-    )
+    # TODO: Refactor this
+    if n_players_to_plot == plot_all_players_string:
+        fig = px.bar(
+            dataframe,
+            x=x2,
+            y=y1,
+            color=y2,
+            facet_col=x1,
+            color_continuous_scale="Magma_r",
+            hover_data={y1.name: ":.0%", y3.name: ":.2%"},
+        )
+        fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
+        fig.add_annotation(
+            dict(
+                x=0.5,
+                y=-0.15,
+                showarrow=False,
+                text=n_players_string,
+                xref="paper",
+                yref="paper",
+                font=dict(size=major_font_size, family="sans-serif"),
+            )
+        )
+        fig.update_xaxes(tickfont=dict(size=minor_font_size, family="monospace"))
+    else:
+        fig = px.bar(
+            dataframe,
+            x=x1,
+            y=y1,
+            color=y2,
+            color_continuous_scale="Magma_r",
+            hover_data={y1.name: ":.0%", y3.name: ":.2%"},
+        )
 
     fig.update_yaxes(showgrid=False, range=[0, 1], showticklabels=False, title_text="")
     fig.update_xaxes(showgrid=False, title_text="")
@@ -82,7 +110,7 @@ def _adjust_colorbar(
         coloraxis_colorbar=dict(
             thickness=10,
             title=colorbar_title,
-            title_font=dict(size=major_font_size, family="serif"),
+            title_font=dict(size=major_font_size, family="sans-serif"),
             tickfont=dict(size=minor_font_size, family="monospace"),
         ),
     )
@@ -107,8 +135,13 @@ def _prepare_df_and_vars(
         dataframe[x2_var] = n_players_to_plot
     dataframe = dataframe[[x1_var, x2_var, y1_var, y2_var, y3_var]]
     dataframe[y3_var] = dataframe[y3_var].round(4)
-    logger.info("Sorting data frame descending by %s", y1_var)
+    logger.info("Sorting data frame ascending by %s", x2_var)
+    dataframe = dataframe.sort_values(by=[x2_var])
+    logger.info("Sorting data frame descending by %s, %s", y3_var, y1_var)
     dataframe = dataframe.sort_values(by=[y3_var, y1_var], ascending=False)
+    # TODO: Remove hard-coding of best and worst hole-cards flavors here
+    if n_players_to_plot == plot_all_players_string:
+        dataframe = dataframe[dataframe[x1_var].isin(["Aces paired", "3, 2 off suit"])]
     x1 = dataframe[x1_var]
     x2 = dataframe[x2_var]
     y1 = dataframe[y1_var]
@@ -122,8 +155,12 @@ def _add_title(
     fig,
     hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
     title_font_size: int = TITLE_FONT_SIZE,
+    plot_all_players_string: str = PLOT_ALL_PLAYERS_STRING,
 ):
-    title = f"Best {hole_cards_flavor_string}s for {str(n_players_to_plot)} Players"
+    if n_players_to_plot == plot_all_players_string:
+        title = f"Drop-off in Win Ratio for Best & Worst {hole_cards_flavor_string.title()}s by Table Size"
+    else:
+        title = f"Best {hole_cards_flavor_string}s for {str(n_players_to_plot)} Players"
 
     fig.update_layout(
         title=title, title_font_size=title_font_size, title_font_family="serif"
@@ -168,7 +205,7 @@ def _add_threshold_line(
     )
     fig.update_layout(
         legend=dict(
-            font=dict(size=minor_font_size, family="serif"),
+            font=dict(size=minor_font_size, family="sans-serif"),
             yanchor="top",
             y=0.99,
             xanchor="center",

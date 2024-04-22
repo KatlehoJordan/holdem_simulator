@@ -110,6 +110,7 @@
         "rcfonts",
         "savefig",
         "scatterpoints",
+        "showarrow",
         "showcaps",
         "showfliers",
         "showgrid",

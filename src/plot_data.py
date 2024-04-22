@@ -53,25 +53,25 @@ def plot_data(
         raise ValueError(f"plot_engine must be one of {acceptable_plot_engines}")
     if n_players_to_plot == plot_all_players_string:
         df_to_plot = _load_all_players_wins_by_hole_cards_flavor_df()
-    elif type(n_players_to_plot) == int:
+    else:
         wins_by_hole_cards_flavor_df = _load_wins_by_hole_cards_flavor_df(
-            n_players_to_plot=n_players_to_plot
+            n_players_to_plot=int(n_players_to_plot)
         )
         df_to_plot = wins_by_hole_cards_flavor_df
-        if plot_engine == plotly_string:
-            use_plotly(
-                n_players_to_plot,
-                show_plot,
-                save_plot,
-                df_to_plot,
-            )
-        elif plot_engine == mpl_string:
-            use_mpl(
-                n_cols_to_show,
-                show_plot,
-                save_plot,
-                df_to_plot,
-            )
+    if plot_engine == plotly_string:
+        use_plotly(
+            n_players_to_plot,
+            show_plot,
+            save_plot,
+            df_to_plot,
+        )
+    elif plot_engine == mpl_string:
+        use_mpl(
+            n_cols_to_show,
+            show_plot,
+            save_plot,
+            df_to_plot,
+        )
 
 
 def _load_wins_by_hole_cards_flavor_df(
@@ -96,6 +96,7 @@ def _load_all_players_wins_by_hole_cards_flavor_df(
 ) -> DataFrame:
     stacked_df = pd.DataFrame()
     for players in n_possible_players:
+        # for players in [2, 3, 4]:
         wins_by_hole_cards_flavor_df = _load_wins_by_hole_cards_flavor_df(
             n_players_to_plot=players
         )
