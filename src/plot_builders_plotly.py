@@ -3,8 +3,8 @@ from typing import Union
 
 import plotly.express as px
 import plotly.graph_objects as go
-from matplotlib import colorbar
 from pandas import DataFrame
+from plotly.graph_objects import Figure
 
 from src.aggregate_simulations import (
     APPEARANCES_STRING,
@@ -29,7 +29,6 @@ ACCEPTABLE_N_PLAYERS_TO_PLOT = N_POSSIBLE_PLAYERS + [PLOT_ALL_PLAYERS_STRING]
 
 
 # TODO: Ensure can export/save plotly plots
-# TODO: Find a way to do grouped bar charts so can get multiple players on the same chart
 def use_plotly(
     n_players_to_plot: Union[int, str],
     show_plot: bool,
@@ -55,39 +54,20 @@ def _make_plotly_fig_and_ax_objects(
     logger.info("Making plotly figure and axis objects")
     dataframe, x1, x2, y1, y2, y3 = _prepare_df_and_vars(dataframe, n_players_to_plot)
 
-    # TODO: Refactor this
     if n_players_to_plot == plot_all_players_string:
-        fig = px.bar(
+        fig = _make_fig_for_all_table_sizes(
             dataframe,
-            x=x2,
-            y=y1,
-            color=y2,
-            facet_col=x1,
-            color_continuous_scale="Magma_r",
-            hover_data={y1.name: ":.0%", y3.name: ":.2%"},
+            n_players_string,
+            major_font_size,
+            minor_font_size,
+            x1,
+            x2,
+            y1,
+            y2,
+            y3,
         )
-        fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
-        fig.add_annotation(
-            dict(
-                x=0.5,
-                y=-0.15,
-                showarrow=False,
-                text=n_players_string,
-                xref="paper",
-                yref="paper",
-                font=dict(size=major_font_size, family="sans-serif"),
-            )
-        )
-        fig.update_xaxes(tickfont=dict(size=minor_font_size, family="monospace"))
     else:
-        fig = px.bar(
-            dataframe,
-            x=x1,
-            y=y1,
-            color=y2,
-            color_continuous_scale="Magma_r",
-            hover_data={y1.name: ":.0%", y3.name: ":.2%"},
-        )
+        fig = _make_fig_for_one_table_size(dataframe, x1, y1, y2, y3)
 
     fig.update_yaxes(showgrid=False, range=[0, 1], showticklabels=False, title_text="")
     fig.update_xaxes(showgrid=False, title_text="")
@@ -96,6 +76,47 @@ def _make_plotly_fig_and_ax_objects(
     _add_title(n_players_to_plot, fig)
     _mark_winners_losers_threshold(n_players_to_plot, fig)
 
+    return fig
+
+
+def _make_fig_for_one_table_size(dataframe, x1, y1, y2, y3) -> Figure:
+    fig = px.bar(
+        dataframe,
+        x=x1,
+        y=y1,
+        color=y2,
+        color_continuous_scale="Magma_r",
+        hover_data={y1.name: ":.0%", y3.name: ":.2%"},
+    )
+
+    return fig
+
+
+def _make_fig_for_all_table_sizes(
+    dataframe, n_players_string, major_font_size, minor_font_size, x1, x2, y1, y2, y3
+) -> Figure:
+    fig = px.bar(
+        dataframe,
+        x=x2,
+        y=y1,
+        color=y2,
+        facet_col=x1,
+        color_continuous_scale="Magma_r",
+        hover_data={y1.name: ":.0%", y3.name: ":.2%"},
+    )
+    fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
+    fig.add_annotation(
+        dict(
+            x=0.5,
+            y=-0.15,
+            showarrow=False,
+            text=n_players_string,
+            xref="paper",
+            yref="paper",
+            font=dict(size=major_font_size, family="sans-serif"),
+        )
+    )
+    fig.update_xaxes(tickfont=dict(size=minor_font_size, family="monospace"))
     return fig
 
 

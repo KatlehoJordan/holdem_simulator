@@ -3,11 +3,8 @@ from src.plot_data import plot_data
 from src.simulate_and_aggregate import simulate_and_aggregate
 from src.train import train
 
-# TODO: After getting all simulations and aggregations working, build a way to graph the results
 
 # TODO: Get python debugger launch.json configuration working for a given file so that do not have to always bake logic into main.py
-
-
 # TODO: Resolve TODOs in other files
 def main(
     purpose: str = "Training",
