@@ -11,6 +11,7 @@ def main(
 ) -> None:
     clear_console()
     if purpose == "Sim and Agg":
+        # TODO: Resolve why this is not creating unaggregated 03
         for n_players in range(3, 11):
             simulate_and_aggregate(n_players_per_simulation=n_players)
     if purpose == "Training":

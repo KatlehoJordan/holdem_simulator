@@ -261,7 +261,7 @@ def _make_simulations_results_file(
 
     if file_path_for_simulations_results.exists():
         file_path_for_simulations_results = _backup_and_increment_file(
-            file_path_for_simulations_results, n_players_per_simulation
+            file_path_for_simulations_results, n_players_per_simulation, df=df
         )
     else:
         logger.info(
@@ -271,7 +271,9 @@ def _make_simulations_results_file(
     return file_path_for_simulations_results
 
 
-def _backup_and_increment_file(file_path: Path, n_players_per_simulation: int) -> Path:
+def _backup_and_increment_file(
+    file_path: Path, n_players_per_simulation: int, df: pd.DataFrame
+) -> Path:
     logger.info(
         "%s already exists. Copying it to the archive folder with a timestamp.",
         file_path,
@@ -294,9 +296,10 @@ def _backup_and_increment_file(file_path: Path, n_players_per_simulation: int) -
         ddd = int(match.group())
         logger.info("Extracted <ddd> from file name: %d", ddd)
         logger.info("Incrementing <ddd> by 1.")
-        return _make_file_path_for_unaggregated_simulations(
-            file_suffix_number=ddd + 1,
+        return _make_simulations_results_file(
+            df=df,
             n_players_per_simulation=n_players_per_simulation,
+            file_suffix_number=ddd + 1,
         )
     else:
         raise ValueError("Could not extract <ddd> from file name.")
