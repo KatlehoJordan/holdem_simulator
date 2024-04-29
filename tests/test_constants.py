@@ -8,6 +8,17 @@ from src.scaling_constants import (
 )
 from tests.tests_config import VALID_CARDS_DICT
 
+# TODO: Build tests that confirm the following are in the right order (%age at 2 players, %age at 10 players):
+# Aces paired (85, 30) > Kings paired (80, 20) > Jacks paired (75, 15) > 8s paired (70, 10) > King, 3 off suit (50, 5)
+# 10s paired (75, 15) > 7s paired (65, 10) > King, 3 off suit (50, 5)
+# 9s paired (70, 15) > Ace, 4 suited (60, 10) > King, 3 off suit (50, 5)
+# Ace, King suited (65, 20) > Queen, 10 suited (55, 15) > King, 3 off suit (50, 5)
+# King, Queen suited (65, 15) > Ace, 4 suited (60, 10) > Queen, 7 off suit (50, 5)
+# Ace, Jack suited (65, 15) > Queen, Jack off suit (55, 10) > King, 3 off suit (50, 5)
+# King, Jack suited (60, 15) > Queen, Jack off suit (55, 10) > 8, 3 suited (40, 5)
+# Queen, 10 suited (55, 15) > 3s paired (50, 10) >  Jack, 5 off suit (45, 5)
+
+
 # TODO: Implement these tests by removing the prefix underscores or consider deprecating this entire file
 PAIR_OF_FIVES = HoleCards(
     deck=Deck(),
