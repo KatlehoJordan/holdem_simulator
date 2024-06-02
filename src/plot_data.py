@@ -1,6 +1,5 @@
 import importlib
 from pathlib import Path
-from sys import int_info
 from typing import Union
 
 import pandas as pd
@@ -96,7 +95,6 @@ def _load_all_players_wins_by_hole_cards_flavor_df(
 ) -> DataFrame:
     stacked_df = pd.DataFrame()
     for players in n_possible_players:
-        # for players in [2, 3, 4]:
         wins_by_hole_cards_flavor_df = _load_wins_by_hole_cards_flavor_df(
             n_players_to_plot=players
         )
