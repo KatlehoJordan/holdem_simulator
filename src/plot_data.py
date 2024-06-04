@@ -88,7 +88,7 @@ def _load_wins_by_hole_cards_flavor_df(
     return pd.read_csv(file_path_for_results)
 
 
-# TODO: Continue working from here
+# TODO: Modify this function to create a pickle file if it does not exist. This function probably belongs in own .py file since will be called during training also, not just during plotting.
 def _load_all_players_wins_by_hole_cards_flavor_df(
     n_possible_players: list[int] = N_POSSIBLE_PLAYERS,
     n_players_string: str = N_PLAYERS_STRING,
