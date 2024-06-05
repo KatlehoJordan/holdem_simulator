@@ -20,6 +20,7 @@ N_PLAYERS_PATH_PREFIX = f"{N_PLAYERS_STRING}_"
 PATH_TO_SIMULATIONS = Path("simulations")
 PATH_TO_ARCHIVED_SIMULATIONS = Path("archived_simulations")
 FILE_SAVE_TYPE = ".csv"
+PICKLE_FILE_SAVE_TYPE = ".pkl"
 PLOTS_PATH = Path("plots")
 PLOT_FILE_TYPE = ".svg"
 PLOT_FILE_NAME = f"plot{PLOT_FILE_TYPE}"

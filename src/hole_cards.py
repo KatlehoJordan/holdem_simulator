@@ -7,6 +7,7 @@ from src.config import (
     ACE_AS_LOW_RAW_RANK_VALUE,
     DATA_PATH,
     NUMBER_OF_CARDS_IN_QUALIFYING_HAND,
+    PICKLE_FILE_SAVE_TYPE,
     RAW_RANK_VALUE_STRING,
     VALID_RANKS_DICT,
     logger,
@@ -27,7 +28,9 @@ HOLE_CARDS_PAIRED_FLAVOR = "s paired"
 N_HOLE_CARDS_PER_PLAYER = 2
 
 VALID_HOLE_CARDS_FLAVORS_LIST = []
-VALID_HOLE_CARDS_FLAVORS_LIST_FILE_NAME = "valid_hole_cards_list.pkl"
+VALID_HOLE_CARDS_FLAVORS_LIST_FILE_NAME = (
+    f"valid_hole_cards_list{PICKLE_FILE_SAVE_TYPE}"
+)
 
 
 class HoleCards:

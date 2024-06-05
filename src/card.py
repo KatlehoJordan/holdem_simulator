@@ -2,12 +2,18 @@ import pickle
 from pathlib import Path
 from typing import List, Union
 
-from src.config import DATA_PATH, VALID_RANKS_DICT, VALID_SUITS, logger
+from src.config import (
+    DATA_PATH,
+    VALID_RANKS_DICT,
+    VALID_SUITS,
+    logger,
+    PICKLE_FILE_SAVE_TYPE,
+)
 from src.rank import Rank
 from src.suit import Suit
 
 VALID_CARDS_DICT = {}
-VALID_CARDS_DICT_FILE_NAME = "valid_cards_dict.pkl"
+VALID_CARDS_DICT_FILE_NAME = f"valid_cards_dict{PICKLE_FILE_SAVE_TYPE}"
 
 
 class Card:
