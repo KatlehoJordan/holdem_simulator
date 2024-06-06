@@ -15,7 +15,7 @@ YELLOW_COLOR = "\033[93m"
 def clear_console() -> None:
     command = "cls" if os.name == "nt" else "clear"
     os.system(command)
-    os.system(command) # Sometimes necessary to run twice
+    os.system(command)  # Sometimes necessary to run twice
 
 
 def flexible_input(message: str) -> str:
@@ -39,11 +39,11 @@ def input_with_escape_hatch(message: str) -> str:
 
 
 def correct_guess():
-    logger.info("\n\n" + BLUE_COLOR + "Correct!" + STANDARD_COLOR + "\n\n")
+    logger.train("\n\n" + BLUE_COLOR + "Correct!" + STANDARD_COLOR + "\n\n")
 
 
 def wrong_guess():
-    logger.info(f"\n\n" + RED_COLOR + "WRONG!" + STANDARD_COLOR + "\n\n")
+    logger.train(f"\n\n" + RED_COLOR + "WRONG!" + STANDARD_COLOR + "\n\n")
 
 
 def guess_and_check(

@@ -145,7 +145,7 @@ def _simulate_bets_for_players_ahead_of_you(
         elif choice == "triple":
             max_bet *= 3
         ActivePlayer(bet=Bet(max_bet))
-        logger.info(f"Player {n_player} bets {max_bet}")
+        logger.train("Player %s bets %s\n", n_player, max_bet)
         pot_size += max_bet
         pot_odds = _calculate_pot_odds(max_bet, pot_size)
     return pot_size, pot_odds

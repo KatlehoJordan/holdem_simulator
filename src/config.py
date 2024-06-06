@@ -100,8 +100,36 @@ class CustomLogger(logging.Logger):
         if self.isEnabledFor(25):
             self._log(25, message, args, **kws)
 
+    def train(self, message, *args, **kws):
+        if self.isEnabledFor(26):
+            self._log(26, message, args, **kws)
+
+    def set_logging_level(self, level_name):
+        self.setLevel(level_name)
+
+
+class CustomFormatter(logging.Formatter):
+    def __init__(self, formats):
+        self.formats = formats
+
+    def format(self, record):
+        log_fmt = self.formats.get(record.levelname, self.formats["default"])
+        formatter = logging.Formatter(log_fmt)
+        return formatter.format(record)
+
+
+formats = {
+    "TRAINING INFO": "%(message)s",
+    "default": "%(levelname)s: %(message)s",
+}
+
+handler = logging.StreamHandler()
+handler.setFormatter(CustomFormatter(formats))
+
 
 logging.setLoggerClass(CustomLogger)
 logging.addLevelName(25, "SIMULATING")
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logging.addLevelName(26, "TRAINING INFO")
 logger: CustomLogger = logging.getLogger(__name__)  # type: ignore because Pylance does not recognize that the custom logger class can inherit from the base logger class
+logger.addHandler(handler)
+logger.set_logging_level("INFO")

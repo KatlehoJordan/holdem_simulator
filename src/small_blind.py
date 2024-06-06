@@ -19,7 +19,7 @@ class SmallBlind(Bet):
                 f"Amount must be less than or equal {max_small_blind} and divisible by {small_blind_increment}"
             )
         super().__init__(amount)
-        logger.info(f"{self}")
+        logger.train("%s\n", self)
 
     def __str__(self):
         return f"Small blind: {self.amount}"

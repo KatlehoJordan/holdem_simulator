@@ -1,3 +1,4 @@
+from src.config import logger
 from src.deck import Deck
 from src.guess_functions import (
     clear_console,
@@ -38,6 +39,7 @@ def train(
     starting_prompt: str = STARTING_PROMPT,
     continuation_prompt: str = CONTINUATION_PROMPT,
 ):
+    logger.set_logging_level("TRAINING INFO")
     user_input = input_with_escape_hatch(starting_prompt)
     if user_input.lower() not in ["y", "", "n", "0"]:
         print("You did not enter a valid response. Please try again.")

@@ -7,8 +7,6 @@ from src.config import (
 from src.simulate_hands import simulate_hands
 
 
-# TODO: increase n_simulations sufficiently to get below thresholds specified in aggregate_simulations warnings.
-# TODO: Run simulations for all player counts between 2 and 10.
 def simulate_and_aggregate(
     n_sims_for_2_players_to_keep_under_50_mb: int = N_SIMS_FOR_2_PLAYERS_TO_KEEP_UNDER_50_MB,
     n_players_per_simulation: int = N_PLAYERS_TO_SIM_AGG_OR_PLOT,
