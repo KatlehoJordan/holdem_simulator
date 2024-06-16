@@ -52,16 +52,16 @@ class Hand:
         return f"\n{self.name}"
 
     def show_pot_size(self):
-        logger.info("Pot size:")
-        logger.info("%s", self.pot_size)
+        logger.train("Pot size:")
+        logger.train("%s", self.pot_size)
 
     def show_pot_odds(self):
-        logger.info("Max bet:")
-        logger.info("%s", self.max_bet)
-        logger.info("Pot size:")
-        logger.info("%s", self.pot_size)
-        logger.info("Pot odds:")
-        logger.info(
+        logger.train("Max bet:")
+        logger.train("%s", self.max_bet)
+        logger.train("Pot size:")
+        logger.train("%s", self.pot_size)
+        logger.train("Pot odds:")
+        logger.train(
             "%s >= %s / (%s + %s)",
             self.pot_odds,
             self.max_bet,

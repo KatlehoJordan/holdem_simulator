@@ -22,7 +22,7 @@ class Deck:
         i = 0
         for card in self.cards:
             i += 1
-            print(f"Card {i} is {card}")
+            logger.info(f"Card {i} is {card}")
 
     def shuffle(self) -> None:
         for i in range(len(self.cards) - 1, 0, -1):

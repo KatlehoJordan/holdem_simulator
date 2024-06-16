@@ -11,7 +11,7 @@ from src.guess_functions import (
     guess_hole_cards_summed_value,
     guess_pot_odds,
     guess_pot_size,
-    input_with_escape_hatch,
+    input_with_escape_hatch_with_quit_prompt,
 )
 from src.hand import Hand
 from src.hole_cards import HoleCards
@@ -40,10 +40,10 @@ def train(
     continuation_prompt: str = CONTINUATION_PROMPT,
 ):
     logger.set_logging_level("TRAINING INFO")
-    user_input = input_with_escape_hatch(starting_prompt)
+    user_input = input_with_escape_hatch_with_quit_prompt(starting_prompt)
     if user_input.lower() not in ["y", "", "n", "0"]:
         print("You did not enter a valid response. Please try again.")
-        user_input = input_with_escape_hatch(starting_prompt)
+        user_input = input_with_escape_hatch_with_quit_prompt(starting_prompt)
     elif user_input.lower() in ["q", "quit", "n", "0", "exit"]:
         print("You chose not to train. Goodbye!")
         exit()
@@ -68,4 +68,4 @@ def train(
             # TODO: (Maybe deprecated) Determine how to re-implement the following print statement
             # print(cutoffs, row.names = FALSE)
 
-            user_input = input_with_escape_hatch(continuation_prompt)
+            user_input = input_with_escape_hatch_with_quit_prompt(continuation_prompt)
