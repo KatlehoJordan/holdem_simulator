@@ -12,6 +12,8 @@ STANDARD_COLOR = "\033[0m"
 BLUE_COLOR = "\033[94m"
 RED_COLOR = "\033[31m"
 YELLOW_COLOR = "\033[93m"
+TWO_NEW_LINES = "\n\n"
+VISUAL_BREAK = "*" * 80
 
 
 def clear_console() -> None:
@@ -27,25 +29,54 @@ def _flexible_input(message: str) -> str:
     return txt
 
 
-def _handle_quit(user_input: str) -> str:
+def _format_yellow_notification(
+    prompt: str, prompt_color: str = YELLOW_COLOR, standard_color: str = STANDARD_COLOR
+) -> str:
+    return prompt_color + prompt + standard_color
+
+
+def _start_pad(message: str, pad: str = TWO_NEW_LINES) -> str:
+    return pad + message
+
+
+def _end_pad(message: str, pad: str = TWO_NEW_LINES) -> str:
+    return message + pad
+
+
+def _start_and_end_pad(message: str, pad: str = TWO_NEW_LINES) -> str:
+    return _start_pad(_end_pad(message, pad), pad)
+
+
+def _handle_quit(user_input: str, pad: str = TWO_NEW_LINES) -> str:
     if user_input.lower() in ["q", "quit"]:
-        logger.train("\n\nYou chose to quit. Goodbye!\n\n")
+        message = _start_pad("You chose to quit. Goodbye!", pad)
+        message = _end_pad(message, pad)
+        logger.train(message)
         exit()
     return user_input
 
 
-def _format_yellow_notification(prompt: str) -> str:
-    return YELLOW_COLOR + prompt + STANDARD_COLOR
+def _reset_color_with_end_pad(
+    message: str, standard_color: str = STANDARD_COLOR
+) -> str:
+    return _end_pad(message + standard_color)
+
+
+def _reset_color_with_both_side_padding(message: str) -> str:
+    message = _start_pad(message)
+    return _reset_color_with_end_pad(message)
 
 
 def _format_yellow_prompt(prompt: str) -> str:
-    return _format_yellow_notification(prompt) + ": "
+    return _format_yellow_notification(prompt) + ":"
 
 
-def input_with_escape_hatch_with_quit_prompt(message: str) -> str:
-    quit_at_any_time = (
-        "*" * 80 + "\n('q' or 'quit' at any time to quit)\n" + "*" * 80 + "\n\n"
-    )
+def input_with_escape_hatch_with_quit_prompt(
+    message: str, visual_break: str = VISUAL_BREAK
+) -> str:
+    quit_message = "Press 'q' or 'quit' to quit"
+    padded_message = _start_and_end_pad(quit_message)
+    quit_at_any_time = _end_pad(visual_break + padded_message + visual_break)
     user_input = _flexible_input(quit_at_any_time + message + "\n> ")
     return _handle_quit(user_input)
 
@@ -55,12 +86,14 @@ def _input_with_escape_hatch_without_quit_prompt(message: str) -> str:
     return _handle_quit(user_input)
 
 
-def _correct_guess():
-    logger.train("\n\n" + BLUE_COLOR + "Correct!" + STANDARD_COLOR + "\n\n")
+def _correct_guess(correct_color: str = BLUE_COLOR) -> None:
+    message = _reset_color_with_both_side_padding(correct_color + "Correct!")
+    logger.train(message)
 
 
-def _wrong_guess():
-    logger.train(f"\n\n" + RED_COLOR + "WRONG!" + STANDARD_COLOR + "\n\n")
+def _wrong_guess(incorrect_color: str = RED_COLOR) -> None:
+    message = _reset_color_with_both_side_padding(incorrect_color + "WRONG!")
+    logger.train(message)
 
 
 def _guess_and_check_common(
@@ -103,6 +136,7 @@ def _typical_guess_and_check(
 
 
 def guess_pot_size(hand: Hand) -> None:
+    
     _first_guess_and_check("Guess pot size", str(hand.pot_size), hand.show_pot_size)
 
 

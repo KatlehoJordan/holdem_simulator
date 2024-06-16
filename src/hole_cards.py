@@ -253,7 +253,7 @@ def _assign_name(
     lo_card_message = f"{whose_cards} lo card is: {lo_card.name}"
     name = f"{hi_card_message}\n{lo_card_message}"
     if whose_cards == default_whose_cards:
-        logger.train("%s\n", name)
+        logger.info("%s\n", name)
     else:
         logger.debug("%s\n", name)
     return name

@@ -42,6 +42,7 @@ class Hand:
             self.winning_hole_cards_flavors,
             self.losing_hole_cards_flavors,
             self.name,
+            self.n_players_in_the_hand,
         ) = _assign_hand_attributes(
             n_players_ahead_of_you=n_players_ahead_of_you,
             small_blind=small_blind,
@@ -363,6 +364,7 @@ def _assign_hand_attributes(
     List[str],
     List[str],
     str,
+    int,
 ]:
     (
         n_players_in_the_hand,
@@ -414,4 +416,5 @@ def _assign_hand_attributes(
         winning_hole_cards_flavors,
         losing_hole_cards_flavors,
         name,
+        n_players_in_the_hand,
     )
