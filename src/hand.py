@@ -43,6 +43,7 @@ class Hand:
             self.losing_hole_cards_flavors,
             self.name,
             self.n_players_in_the_hand,
+            self.bets,
         ) = _assign_hand_attributes(
             n_players_ahead_of_you=n_players_ahead_of_you,
             small_blind=small_blind,
@@ -52,16 +53,21 @@ class Hand:
     def __str__(self):
         return f"\n{self.name}"
 
+    def show_max_bet(self):
+        logger.train("Max bet: %s\n", self.max_bet)
+
     def show_pot_size(self):
-        logger.train("Pot size:")
-        logger.train("%s", self.pot_size)
+        logger.train("Pot size: %s\n", self.pot_size)
+
+    def show_info_for_finding_pot_odds(self):
+        self.show_max_bet()
+        self.show_pot_size()
 
     def show_pot_odds(self):
-        logger.train("Max bet:")
-        logger.train("%s", self.max_bet)
-        logger.train("Pot size:")
-        logger.train("%s", self.pot_size)
+        logger.train("Max bet: %s\n", self.max_bet)
+        logger.train("Pot size: %s\n", self.pot_size)
         logger.train("Pot odds:")
+        # TODO: self.max_bet is not getting populated correctly, though pot odds might be. To see, simulate a hand where there are many raises.
         logger.train(
             "%s >= %s / (%s + %s)",
             self.pot_odds,
@@ -69,6 +75,12 @@ class Hand:
             self.max_bet,
             self.pot_size,
         )
+
+    def show_n_players_in_the_hand(self):
+        logger.train("N players in the hand: %s\n", self.n_players_in_the_hand)
+
+    def show_bets(self):
+        logger.train("All bets are: %s\n", self.bets)
 
 
 def _init_n_players_and_small_blind(
@@ -128,28 +140,33 @@ def _calculate_pot_odds(max_bet: int, pot_size: int) -> str:
 
 def _simulate_bets_for_players_ahead_of_you(
     n_players: PlayersAheadOfYou,
-    max_bet: int,
+    big_blind: int,
     pot_size: int,
     pot_odds: str,
     n_players_in_blinds: int = N_PLAYERS_IN_BLINDS,
-) -> Tuple[int, str]:
+) -> Tuple[int, str, List[int]]:
     prob_double_max_bet = 1 / n_players.n
     prob_triple_max_bet = prob_double_max_bet / n_players.n
     prob_call = 1 - prob_double_max_bet - prob_triple_max_bet
     choices = ["double", "triple", "call"]
     probabilities = [prob_double_max_bet, prob_triple_max_bet, prob_call]
+    big_blind = big_blind
+    small_blind = int(big_blind / 2)
+    bets = [small_blind, big_blind]
     for _ in range(n_players_in_blinds, n_players.n):
         n_player = _ + 1
         choice = random.choices(choices, probabilities, k=1)[0]
         if choice == "double":
-            max_bet *= 2
+            big_blind *= 2
         elif choice == "triple":
-            max_bet *= 3
-        ActivePlayer(bet=Bet(max_bet))
-        logger.train("Player %s bets %s\n", n_player, max_bet)
-        pot_size += max_bet
-        pot_odds = _calculate_pot_odds(max_bet, pot_size)
-    return pot_size, pot_odds
+            big_blind *= 3
+        bets.append(big_blind)
+        ActivePlayer(bet=Bet(big_blind))
+        logger.info("Player %s bets %s\n", n_player, big_blind)
+        pot_size += big_blind
+        pot_odds = _calculate_pot_odds(big_blind, pot_size)
+
+    return pot_size, pot_odds, bets
 
 
 def _simulate_hole_cards_for_players_ahead_of_you(
@@ -275,17 +292,19 @@ def determine_winners_and_losers(
 def _init_cards_and_bets(
     n_players_ahead_of_you: Union[PlayersAheadOfYou, None] = None,
     small_blind: Union[SmallBlind, None] = None,
-) -> Tuple[int, int, HoleCards, int, str, CommunityCards, Dict[str, HoleCards]]:
+) -> Tuple[
+    int, int, HoleCards, int, str, CommunityCards, Dict[str, HoleCards], List[int]
+]:
     n_players_ahead_of_you, small_blind = _init_n_players_and_small_blind(
         n_players_ahead_of_you, small_blind
     )
-    max_bet = BigBlind(small_blind).amount
+    big_blind = BigBlind(small_blind).amount
     deck = Deck()
     your_hole_cards = HoleCards(deck=deck)
-    pot_size = small_blind.amount + max_bet
-    pot_odds = _calculate_pot_odds(max_bet, pot_size)
-    pot_size, pot_odds = _simulate_bets_for_players_ahead_of_you(
-        n_players_ahead_of_you, max_bet, pot_size, pot_odds
+    pot_size = small_blind.amount + big_blind
+    pot_odds = _calculate_pot_odds(big_blind, pot_size)
+    pot_size, pot_odds, bets = _simulate_bets_for_players_ahead_of_you(
+        n_players_ahead_of_you, big_blind, pot_size, pot_odds
     )
     community_cards = CommunityCards(deck=deck)
     hole_cards_for_players_ahead_of_you = _simulate_hole_cards_for_players_ahead_of_you(
@@ -302,12 +321,13 @@ def _init_cards_and_bets(
 
     return (
         n_players_in_the_hand,
-        max_bet,
+        big_blind,
         your_hole_cards,
         pot_size,
         pot_odds,
         community_cards,
         hole_cards_for_players_ahead_of_you,
+        bets,
     )
 
 
@@ -365,6 +385,7 @@ def _assign_hand_attributes(
     List[str],
     str,
     int,
+    List[int],
 ]:
     (
         n_players_in_the_hand,
@@ -374,6 +395,7 @@ def _assign_hand_attributes(
         pot_odds,
         community_cards,
         hole_cards_for_players_ahead_of_you,
+        bets,
     ) = _init_cards_and_bets(
         n_players_ahead_of_you=n_players_ahead_of_you, small_blind=small_blind
     )
@@ -417,4 +439,5 @@ def _assign_hand_attributes(
         losing_hole_cards_flavors,
         name,
         n_players_in_the_hand,
+        bets,
     )

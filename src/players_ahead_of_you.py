@@ -23,7 +23,7 @@ class PlayersAheadOfYou:
                 f"{n_players_string}_ahead_of_you must be between {min_players_ahead_of_you} and {max_players_ahead_of_you} and an integer."
             )
         self.n = n_players_ahead_of_you
-        logger.train("%s\n", self)
+        logger.info("%s\n", self)
 
     def __str__(self):
         return f"Players ahead of you: {self.n}"

@@ -74,11 +74,16 @@ def _format_yellow_prompt(prompt: str) -> str:
 def input_with_escape_hatch_with_quit_prompt(
     message: str, visual_break: str = VISUAL_BREAK
 ) -> str:
+    quit_at_any_time = _get_quit_message(visual_break)
+    user_input = _flexible_input(quit_at_any_time + message + "\n> ")
+    return _handle_quit(user_input)
+
+
+def _get_quit_message(visual_break: str = VISUAL_BREAK):
     quit_message = "Press 'q' or 'quit' to quit"
     padded_message = _start_and_end_pad(quit_message)
     quit_at_any_time = _end_pad(visual_break + padded_message + visual_break)
-    user_input = _flexible_input(quit_at_any_time + message + "\n> ")
-    return _handle_quit(user_input)
+    return quit_at_any_time
 
 
 def _input_with_escape_hatch_without_quit_prompt(message: str) -> str:
@@ -96,105 +101,91 @@ def _wrong_guess(incorrect_color: str = RED_COLOR) -> None:
     logger.train(message)
 
 
-def _guess_and_check_common(
+def _guess_and_check(
+    show_info_function: Callable[[], None],
     guess_prompt: str,
     actual_value: str,
-    show_value_func: Callable[[], None],
-    first_guess: bool,
+    show_answer_function: Callable[[], None],
 ):
-    if first_guess:
-        user_input = _input_with_escape_hatch_without_quit_prompt(
-            _format_yellow_prompt(guess_prompt)
-        )
-    else:
-        user_input = input_with_escape_hatch_with_quit_prompt(
-            _format_yellow_prompt(guess_prompt)
-        )
+    logger.train(_get_quit_message())
+    show_info_function()
+    user_input = _input_with_escape_hatch_without_quit_prompt(guess_prompt)
     if str(user_input) == str(actual_value):
         _correct_guess()
     else:
         _wrong_guess()
-    show_value_func()
+    show_answer_function()
     _input_with_escape_hatch_without_quit_prompt("\nPress enter/return to proceed")
     clear_console()
 
 
-def _first_guess_and_check(
-    guess_prompt: str, actual_value: str, show_value_func: Callable[[], None]
-):
-    _guess_and_check_common(
-        guess_prompt, actual_value, show_value_func, first_guess=True
-    )
-
-
-def _typical_guess_and_check(
-    guess_prompt: str, actual_value: str, show_value_func: Callable[[], None]
-):
-    _guess_and_check_common(
-        guess_prompt, actual_value, show_value_func, first_guess=False
-    )
-
-
 def guess_pot_size(hand: Hand) -> None:
-    
-    _first_guess_and_check("Guess pot size", str(hand.pot_size), hand.show_pot_size)
+    _guess_and_check(
+        hand.show_bets, "Guess pot size", str(hand.pot_size), hand.show_pot_size
+    )
 
 
 def guess_pot_odds(hand: Hand) -> None:
-    _typical_guess_and_check("Guess pot odds", hand.pot_odds, hand.show_pot_odds)
-
-
-def guess_hole_cards_summed_value(hole_cards: HoleCards) -> None:
-    _typical_guess_and_check(
-        "Guess hole cards' summed value",
-        str(hole_cards.summed_value),
-        hole_cards.show_summed_value,
+    _guess_and_check(
+        hand.show_info_for_finding_pot_odds,
+        "Guess pot odds",
+        hand.pot_odds,
+        hand.show_pot_odds,
     )
 
 
-def guess_hole_cards_hi_card_value(hole_cards: HoleCards) -> None:
-    _typical_guess_and_check(
-        "Guess hole cards' hi card value",
-        str(hole_cards.hi_card.value),
-        hole_cards.show_hi_card_value,
-    )
+# TODO: Likely deprecate all below
+# def guess_hole_cards_summed_value(hole_cards: HoleCards) -> None:
+#     _guess_and_check(
+#         "Guess hole cards' summed value",
+#         str(hole_cards.summed_value),
+#         hole_cards.show_summed_value,
+#     )
 
 
-def guess_hole_cards_lo_card_value(hole_cards: HoleCards) -> None:
-    _typical_guess_and_check(
-        "Guess hole cards' lo card value",
-        str(hole_cards.lo_card.value),
-        hole_cards.show_lo_card_value,
-    )
+# def guess_hole_cards_hi_card_value(hole_cards: HoleCards) -> None:
+#     _guess_and_check(
+#         "Guess hole cards' hi card value",
+#         str(hole_cards.hi_card.value),
+#         hole_cards.show_hi_card_value,
+#     )
 
 
-def guess_hole_cards_base_strength(hole_cards: HoleCards) -> None:
-    _typical_guess_and_check(
-        "Guess hole cards' base strength",
-        str(hole_cards.base_strength),
-        hole_cards.show_base_strength,
-    )
+# def guess_hole_cards_lo_card_value(hole_cards: HoleCards) -> None:
+#     _guess_and_check(
+#         "Guess hole cards' lo card value",
+#         str(hole_cards.lo_card.value),
+#         hole_cards.show_lo_card_value,
+#     )
 
 
-def guess_hole_cards_pair_bonus(hole_cards: HoleCards) -> None:
-    _typical_guess_and_check(
-        "Guess hole cards' pair bonus",
-        str(hole_cards.pocket_pair_bonus),
-        hole_cards.show_pair_bonus,
-    )
+# def guess_hole_cards_base_strength(hole_cards: HoleCards) -> None:
+#     _guess_and_check(
+#         "Guess hole cards' base strength",
+#         str(hole_cards.base_strength),
+#         hole_cards.show_base_strength,
+#     )
 
 
-def guess_hole_cards_flush_potential_bonus(hole_cards: HoleCards) -> None:
-    _typical_guess_and_check(
-        "Guess hole cards' flush potential bonus",
-        str(hole_cards.flush_potential_bonus),
-        hole_cards.show_flush_potential_bonus,
-    )
+# def guess_hole_cards_pair_bonus(hole_cards: HoleCards) -> None:
+#     _guess_and_check(
+#         "Guess hole cards' pair bonus",
+#         str(hole_cards.pocket_pair_bonus),
+#         hole_cards.show_pair_bonus,
+#     )
 
 
-def guess_hole_cards_straight_potential_bonus(hole_cards: HoleCards) -> None:
-    _typical_guess_and_check(
-        "Guess hole cards' straight potential bonus",
-        str(hole_cards.straight_potential_bonus),
-        hole_cards.show_straight_potential_bonus,
-    )
+# def guess_hole_cards_flush_potential_bonus(hole_cards: HoleCards) -> None:
+#     _guess_and_check(
+#         "Guess hole cards' flush potential bonus",
+#         str(hole_cards.flush_potential_bonus),
+#         hole_cards.show_flush_potential_bonus,
+#     )
+
+
+# def guess_hole_cards_straight_potential_bonus(hole_cards: HoleCards) -> None:
+#     _guess_and_check(
+#         "Guess hole cards' straight potential bonus",
+#         str(hole_cards.straight_potential_bonus),
+#         hole_cards.show_straight_potential_bonus,
+#     )
