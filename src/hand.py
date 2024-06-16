@@ -22,6 +22,7 @@ from src.small_blind import SmallBlind
 N_PLAYERS_IN_BLINDS = 2
 HAND_WINNER_FLAVOR = "Single winner"
 HAND_TIE_FLAVOR = "Tie"
+BASELINE_PROBABILITY_OF_HOLE_CARDS = "<5%"
 
 
 class Hand:
@@ -31,7 +32,7 @@ class Hand:
         small_blind: Union[SmallBlind, None] = None,
     ):
         (
-            self.pot_odds,
+            self.prob_needed_to_call,
             self.max_bet,
             self.pot_size,
             self.all_cards_in_the_hand,
@@ -44,6 +45,8 @@ class Hand:
             self.name,
             self.n_players_in_the_hand,
             self.bets,
+            self.deck,
+            self.your_hole_cards,
         ) = _assign_hand_attributes(
             n_players_ahead_of_you=n_players_ahead_of_you,
             small_blind=small_blind,
@@ -59,18 +62,14 @@ class Hand:
     def show_pot_size(self):
         logger.train("Pot size: %s\n", self.pot_size)
 
-    def show_info_for_finding_pot_odds(self):
+    def show_info_for_finding_prob_needed_to_call(self):
         self.show_max_bet()
         self.show_pot_size()
 
-    def show_pot_odds(self):
-        logger.train("Max bet: %s\n", self.max_bet)
-        logger.train("Pot size: %s\n", self.pot_size)
-        logger.train("Pot odds:")
-        # TODO: self.max_bet is not getting populated correctly, though pot odds might be. To see, simulate a hand where there are many raises.
+    def show_prob_needed_to_call(self):
         logger.train(
-            "%s >= %s / (%s + %s)",
-            self.pot_odds,
+            "Win probability needed to call:\n\n\t%s >= %s / (%s + %s)",
+            self.prob_needed_to_call,
             self.max_bet,
             self.max_bet,
             self.pot_size,
@@ -81,6 +80,9 @@ class Hand:
 
     def show_bets(self):
         logger.train("All bets are: %s\n", self.bets)
+
+    def show_your_hole_cards(self):
+        logger.train("%s\n", self.your_hole_cards.name)
 
 
 def _init_n_players_and_small_blind(
@@ -126,6 +128,7 @@ def _ensure_cards_in_hand_are_unique(
         raise ValueError("There are non-unique cards in the hand.")
 
 
+# TODO: See if using this or have duplicated code when creating saved data after having run all my simulations
 def _round_up_to_nearest_5_percent(x: float) -> str:
     if x * 20 % 1 == 0:
         rounded = x
@@ -134,16 +137,16 @@ def _round_up_to_nearest_5_percent(x: float) -> str:
     return "{:.0f}%".format(rounded * 100)
 
 
-def _calculate_pot_odds(max_bet: int, pot_size: int) -> str:
-    return _round_up_to_nearest_5_percent(max_bet / (pot_size + max_bet))
+def _calc_prob_needed_to_call(max_bet: int, pot_size: int) -> str:
+    return _round_up_to_nearest_5_percent(max_bet / (max_bet + pot_size))
 
 
 def _simulate_bets_for_players_ahead_of_you(
     n_players: PlayersAheadOfYou,
     big_blind: int,
     pot_size: int,
-    pot_odds: str,
     n_players_in_blinds: int = N_PLAYERS_IN_BLINDS,
+    baseline_prob_of_hole_cards: str = BASELINE_PROBABILITY_OF_HOLE_CARDS,
 ) -> Tuple[int, str, List[int]]:
     prob_double_max_bet = 1 / n_players.n
     prob_triple_max_bet = prob_double_max_bet / n_players.n
@@ -153,6 +156,7 @@ def _simulate_bets_for_players_ahead_of_you(
     big_blind = big_blind
     small_blind = int(big_blind / 2)
     bets = [small_blind, big_blind]
+    prob_needed_to_call = baseline_prob_of_hole_cards
     for _ in range(n_players_in_blinds, n_players.n):
         n_player = _ + 1
         choice = random.choices(choices, probabilities, k=1)[0]
@@ -164,9 +168,14 @@ def _simulate_bets_for_players_ahead_of_you(
         ActivePlayer(bet=Bet(big_blind))
         logger.info("Player %s bets %s\n", n_player, big_blind)
         pot_size += big_blind
-        pot_odds = _calculate_pot_odds(big_blind, pot_size)
+        prob_needed_to_call = _calc_prob_needed_to_call(big_blind, pot_size)
 
-    return pot_size, pot_odds, bets
+    if prob_needed_to_call == baseline_prob_of_hole_cards:
+        raise ValueError(
+            f"Probability needed to call cannot be {baseline_prob_of_hole_cards}"
+        )
+
+    return pot_size, prob_needed_to_call, bets
 
 
 def _simulate_hole_cards_for_players_ahead_of_you(
@@ -293,7 +302,7 @@ def _init_cards_and_bets(
     n_players_ahead_of_you: Union[PlayersAheadOfYou, None] = None,
     small_blind: Union[SmallBlind, None] = None,
 ) -> Tuple[
-    int, int, HoleCards, int, str, CommunityCards, Dict[str, HoleCards], List[int]
+    int, int, HoleCards, int, str, CommunityCards, Dict[str, HoleCards], List[int], Deck
 ]:
     n_players_ahead_of_you, small_blind = _init_n_players_and_small_blind(
         n_players_ahead_of_you, small_blind
@@ -302,9 +311,11 @@ def _init_cards_and_bets(
     deck = Deck()
     your_hole_cards = HoleCards(deck=deck)
     pot_size = small_blind.amount + big_blind
-    pot_odds = _calculate_pot_odds(big_blind, pot_size)
-    pot_size, pot_odds, bets = _simulate_bets_for_players_ahead_of_you(
-        n_players_ahead_of_you, big_blind, pot_size, pot_odds
+    prob_needed_to_call = _calc_prob_needed_to_call(big_blind, pot_size)
+    pot_size, prob_needed_to_call, bets = _simulate_bets_for_players_ahead_of_you(
+        n_players_ahead_of_you,
+        big_blind,
+        pot_size,
     )
     community_cards = CommunityCards(deck=deck)
     hole_cards_for_players_ahead_of_you = _simulate_hole_cards_for_players_ahead_of_you(
@@ -319,15 +330,18 @@ def _init_cards_and_bets(
         community_cards=community_cards,
     )
 
+    max_bet = bets[-1]
+
     return (
         n_players_in_the_hand,
-        big_blind,
+        max_bet,
         your_hole_cards,
         pot_size,
-        pot_odds,
+        prob_needed_to_call,
         community_cards,
         hole_cards_for_players_ahead_of_you,
         bets,
+        deck,
     )
 
 
@@ -386,16 +400,19 @@ def _assign_hand_attributes(
     str,
     int,
     List[int],
+    Deck,
+    HoleCards,
 ]:
     (
         n_players_in_the_hand,
         max_bet,
         your_hole_cards,
         pot_size,
-        pot_odds,
+        prob_needed_to_call,
         community_cards,
         hole_cards_for_players_ahead_of_you,
         bets,
+        deck,
     ) = _init_cards_and_bets(
         n_players_ahead_of_you=n_players_ahead_of_you, small_blind=small_blind
     )
@@ -427,7 +444,7 @@ def _assign_hand_attributes(
     )
 
     return (
-        pot_odds,
+        prob_needed_to_call,
         max_bet,
         pot_size,
         all_cards_in_the_hand,
@@ -440,4 +457,6 @@ def _assign_hand_attributes(
         name,
         n_players_in_the_hand,
         bets,
+        deck,
+        your_hole_cards,
     )

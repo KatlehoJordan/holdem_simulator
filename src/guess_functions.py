@@ -125,22 +125,22 @@ def guess_pot_size(hand: Hand) -> None:
     )
 
 
-def guess_pot_odds(hand: Hand) -> None:
+def guess_prob_needed_to_call(hand: Hand) -> None:
     _guess_and_check(
-        hand.show_info_for_finding_pot_odds,
-        "Guess pot odds",
-        hand.pot_odds,
-        hand.show_pot_odds,
+        hand.show_info_for_finding_prob_needed_to_call,
+        "Guess win probability needed to call",
+        hand.prob_needed_to_call,
+        hand.show_prob_needed_to_call,
     )
 
 
 # TODO: Update this to actually show probabilities
-def guess_hole_cards_win_probability(hole_cards: HoleCards) -> None:
+def guess_hole_cards_win_probability(hand: Hand) -> None:
     _guess_and_check(
-        hole_cards.show_hole_cards,
+        hand.show_your_hole_cards,
         "Guess hole cards' win probability",
-        str(hole_cards.summed_value),
-        hole_cards.show_summed_value,
+        hand.prob_needed_to_call,
+        hand.show_prob_needed_to_call,
     )
 
 
