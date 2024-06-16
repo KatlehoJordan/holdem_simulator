@@ -37,5 +37,6 @@ class PlayersAheadOfYou:
         players = range(min_players_ahead_of_you, max_players_ahead_of_you + 1)
         probabilities = [1 / (i**0.75) for i in players]
         probabilities = [p / sum(probabilities) for p in probabilities]
+        probabilities = probabilities[::-1]
         n_players = np.random.choice(players, p=probabilities)
         return cls(n_players)

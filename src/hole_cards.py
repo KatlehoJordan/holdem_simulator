@@ -63,6 +63,9 @@ class HoleCards:
     def __str__(self):
         return f"\n{self.name}"
 
+    def show_hole_cards(self):
+        logger.train(self.name)
+
     def show_base_strength(self):
         logger.info("Base strength:")
         logger.info("%s", self.base_strength)

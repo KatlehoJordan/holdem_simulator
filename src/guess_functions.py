@@ -134,6 +134,16 @@ def guess_pot_odds(hand: Hand) -> None:
     )
 
 
+# TODO: Update this to actually show probabilities
+def guess_hole_cards_win_probability(hole_cards: HoleCards) -> None:
+    _guess_and_check(
+        hole_cards.show_hole_cards,
+        "Guess hole cards' win probability",
+        str(hole_cards.summed_value),
+        hole_cards.show_summed_value,
+    )
+
+
 # TODO: Likely deprecate all below
 # def guess_hole_cards_summed_value(hole_cards: HoleCards) -> None:
 #     _guess_and_check(
