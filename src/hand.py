@@ -7,7 +7,12 @@ from src.bet import Bet
 from src.big_blind import BigBlind
 from src.card import Card
 from src.community_cards import CommunityCards
-from src.config import N_PLAYERS_STRING, logger
+from src.config import (
+    HAND_WINNER_FLAVOR,
+    HOLE_CARDS_FLAVOR_STRING,
+    N_PLAYERS_STRING,
+    logger,
+)
 from src.deck import Deck
 from src.hole_cards import HoleCards
 from src.player_hand import (
@@ -20,7 +25,6 @@ from src.players_ahead_of_you import PlayersAheadOfYou
 from src.small_blind import SmallBlind
 
 N_PLAYERS_IN_BLINDS = 2
-HAND_WINNER_FLAVOR = "Single winner"
 HAND_TIE_FLAVOR = "Tie"
 BASELINE_PROBABILITY_OF_HOLE_CARDS = "<5%"
 
@@ -83,6 +87,7 @@ class Hand:
         logger.train("All bets are: %s\n", self.bets)
 
     def show_your_hole_cards(self):
+        self.show_n_players_in_the_hand()
         logger.train("%s\n", self.your_hole_cards.name)
 
     def show_prob_to_win(self):
@@ -92,20 +97,11 @@ class Hand:
 def _init_n_players_and_small_blind(
     n_players_ahead_of_you: Union[PlayersAheadOfYou, None],
     small_blind: Union[SmallBlind, None],
-    n_players_string: str = N_PLAYERS_STRING,
 ) -> Tuple[PlayersAheadOfYou, SmallBlind]:
     if n_players_ahead_of_you is None:
         n_players_ahead_of_you = PlayersAheadOfYou.select_n_players()
     if small_blind is None:
         small_blind = SmallBlind.select_random_small_blind()
-    if not isinstance(n_players_ahead_of_you, PlayersAheadOfYou):
-        raise ValueError(
-            f"{n_players_string} must be a PlayersAheadOfYou type, not {type(n_players_ahead_of_you)}"
-        )
-    if not isinstance(small_blind, SmallBlind):
-        raise ValueError(
-            f"small_blind must be a SmallBlind type, not {type(small_blind)}"
-        )
 
     return n_players_ahead_of_you, small_blind
 
@@ -159,7 +155,7 @@ def _simulate_bets_for_players_ahead_of_you(
     small_blind = int(big_blind / 2)
     bets = [small_blind, big_blind]
     prob_needed_to_call = baseline_prob_of_hole_cards
-    if n_players_in_blinds == 2:
+    if n_players.n <= 2:
         prob_needed_to_call = _calc_prob_needed_to_call(big_blind, pot_size)
     else:
         for _ in range(n_players_in_blinds, n_players.n):
@@ -249,7 +245,7 @@ def _ensure_player_hands_are_valid(player_hands_in_the_hand: list[PlayerHand]) -
         raise ValueError("There must be at least 2 player's hands in the hand.")
 
 
-def determine_winners_and_losers(
+def _determine_winners_and_losers(
     player_hands_in_the_hand: list[PlayerHand],
     second_player_wins_string: str = SECOND_PLAYER_WINS_STRING,
     players_tie_string: str = PLAYERS_TIE_STRING,
@@ -391,6 +387,8 @@ def _make_list_of_all_cards_and_determine_player_hands(
 def _assign_hand_attributes(
     n_players_ahead_of_you: Union[PlayersAheadOfYou, None] = None,
     small_blind: Union[SmallBlind, None] = None,
+    hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
+    n_players_string: str = N_PLAYERS_STRING,
 ) -> Tuple[
     str,
     int,
@@ -420,7 +418,7 @@ def _assign_hand_attributes(
         bets,
         deck,
     ) = _init_cards_and_bets(
-        n_players_ahead_of_you=n_players_ahead_of_you, small_blind=small_blind
+        n_players_ahead_of_you=n_players_ahead_of_you, small_blind=small_blind,
     )
 
     all_cards_in_the_hand, player_hands_in_the_hand = (
@@ -437,7 +435,7 @@ def _assign_hand_attributes(
         losing_hands,
         winning_hole_cards_flavors,
         losing_hole_cards_flavors,
-    ) = determine_winners_and_losers(
+    ) = _determine_winners_and_losers(
         player_hands_in_the_hand,
     )
 
@@ -449,8 +447,18 @@ def _assign_hand_attributes(
         losing_hands,
     )
 
-    # TODO: Fix this to use actual probabilities instead of this placeholder.
-    hole_cards_prob_to_win = "2%"
+    # TODO: Move this import to top, and then untie the circular dependency it creates
+    from src.get_rounded_win_prob_for_hole_cards_and_players import (
+        get_rounded_win_prob_for_hole_cards_and_players,
+    )
+
+    df = get_rounded_win_prob_for_hole_cards_and_players()
+    filtered_df = df[(df[n_players_string] == n_players_in_the_hand) &
+        (df[hole_cards_flavor_string] == your_hole_cards.hole_cards_flavor)
+        ]
+
+    hole_cards_prob_to_win = f"{filtered_df.iloc[0]["win ratio rounded down to nearest 5%"] * 100:.0f}%"
+
 
     return (
         prob_needed_to_call,

@@ -8,6 +8,7 @@ import pandas as pd
 from src.card import VALID_CARDS_DICT
 from src.config import (
     FILE_SAVE_TYPE,
+    HOLE_CARDS_FLAVOR_STRING,
     N_PLAYERS_PATH_PREFIX,
     N_PLAYERS_TO_SIM_AGG_OR_PLOT,
     PATH_TO_ARCHIVED_SIMULATIONS,
@@ -29,7 +30,6 @@ TMP_FILE_NAME = f"temp_all_simulations_results{FILE_SAVE_TYPE}"
 WINS_BY_PLAYER_STRING = "wins by player"
 APPEARANCES_STRING = "appearances"
 APPEARANCES_OF_CARDS_STRING = f"{APPEARANCES_STRING} of cards"
-HOLE_CARDS_FLAVOR_STRING = "hole cards flavor"
 WINS_BY_HOLE_CARDS_FLAVOR_STRING = f"wins by {HOLE_CARDS_FLAVOR_STRING}"
 WIN_RATIO_STRING = "win ratio"
 WIN_RATIO_ROUNDED_DOWN_STRING = f"{WIN_RATIO_STRING} rounded down to nearest 5%"

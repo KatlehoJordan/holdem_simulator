@@ -1,7 +1,7 @@
 from tkinter import FIRST
 
 from src.config import logger
-from src.hand import HAND_TIE_FLAVOR, determine_winners_and_losers
+from src.hand import HAND_TIE_FLAVOR, _determine_winners_and_losers
 from src.player_hand import (
     FIRST_PLAYER_WINS_STRING,
     PLAYERS_TIE_STRING,
@@ -245,7 +245,7 @@ def test_case_005():
         losing_hands,
         winning_hole_cards_flavors,
         losing_hole_cards_flavors,
-    ) = determine_winners_and_losers(
+    ) = _determine_winners_and_losers(
         player_hands_in_the_hand,
     )
     assert winning_type == HAND_TIE_FLAVOR

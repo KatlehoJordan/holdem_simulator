@@ -9,6 +9,7 @@ from src.card import VALID_CARDS_DICT
 from src.community_cards import N_CARDS_IN_COMMUNITY_CARDS
 from src.config import (
     FILE_SAVE_TYPE,
+    HAND_WINNER_FLAVOR,
     N_PLAYERS_PATH_PREFIX,
     N_PLAYERS_STRING,
     N_PLAYERS_TO_SIM_AGG_OR_PLOT,
@@ -16,7 +17,7 @@ from src.config import (
     PATH_TO_SIMULATIONS,
     logger,
 )
-from src.hand import HAND_WINNER_FLAVOR, Hand
+from src.hand import Hand
 from src.hole_cards import N_HOLE_CARDS_PER_PLAYER, VALID_HOLE_CARDS_FLAVORS_LIST
 from src.make_dir_if_does_not_exist import make_dir_if_not_exist
 from src.players_ahead_of_you import PlayersAheadOfYou

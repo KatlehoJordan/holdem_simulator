@@ -121,26 +121,29 @@ def _guess_and_check(
 
 def guess_pot_size(hand: Hand) -> None:
     _guess_and_check(
-        hand.show_bets, "Guess pot size", str(hand.pot_size), hand.show_pot_size
+        hand.show_bets,
+        "Guess pot size",
+        str(hand.pot_size),
+        hand.show_pot_size,
     )
 
 
-def guess_prob_needed_to_call(hand: Hand) -> None:
-    _guess_and_check(
-        hand.show_info_for_finding_prob_needed_to_call,
-        "Guess win probability needed to call",
-        hand.prob_needed_to_call,
-        hand.show_prob_needed_to_call,
-    )
-
-
-# TODO: Update this to actually show probabilities
 def guess_hole_cards_win_probability(hand: Hand) -> None:
     _guess_and_check(
         hand.show_your_hole_cards,
         "Guess hole cards' win probability",
         hand.hole_cards_prob_to_win,
         hand.show_prob_to_win,
+    )
+
+
+# TODO: Modify this function to be more appropriate for heads-up situations as big blind and small blind
+def guess_prob_needed_to_call(hand: Hand) -> None:
+    _guess_and_check(
+        hand.show_info_for_finding_prob_needed_to_call,
+        "Guess win probability needed to call",
+        hand.prob_needed_to_call,
+        hand.show_prob_needed_to_call,
     )
 
 
