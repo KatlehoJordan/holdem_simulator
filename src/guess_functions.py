@@ -139,8 +139,8 @@ def guess_hole_cards_win_probability(hand: Hand) -> None:
     _guess_and_check(
         hand.show_your_hole_cards,
         "Guess hole cards' win probability",
-        hand.prob_needed_to_call,
-        hand.show_prob_needed_to_call,
+        hand.hole_cards_prob_to_win,
+        hand.show_prob_to_win,
     )
 
 

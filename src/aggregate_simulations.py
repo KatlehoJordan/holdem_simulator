@@ -279,7 +279,7 @@ def _calculate_hole_card_results(
         lambda x: x.count(hole_cards_flavor)
     ).sum()
     win_ratio = this_hole_cards_flavor_wins / this_hole_cards_flavor_appears
-    win_ratio_rounded_down_to_nearest_5_percent = win_ratio // 0.05 * 0.05
+    win_ratio_rounded_down_to_nearest_5_percent = math.floor(win_ratio / 0.05) * 0.05
     fewer_than_expected_appearances = (
         this_hole_cards_flavor_appears < min_n_appearances_expected_of_each_flavor
     )

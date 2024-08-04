@@ -1,6 +1,6 @@
 import math
 import random
-from typing import Dict, List, Tuple, Union
+from typing import Dict, Tuple, Union
 
 from src.active_player import ActivePlayer
 from src.bet import Bet
@@ -47,6 +47,7 @@ class Hand:
             self.bets,
             self.deck,
             self.your_hole_cards,
+            self.hole_cards_prob_to_win,
         ) = _assign_hand_attributes(
             n_players_ahead_of_you=n_players_ahead_of_you,
             small_blind=small_blind,
@@ -83,6 +84,9 @@ class Hand:
 
     def show_your_hole_cards(self):
         logger.train("%s\n", self.your_hole_cards.name)
+
+    def show_prob_to_win(self):
+        logger.train("Probability to win: %s\n", self.hole_cards_prob_to_win)
 
 
 def _init_n_players_and_small_blind(
@@ -128,13 +132,11 @@ def _ensure_cards_in_hand_are_unique(
         raise ValueError("There are non-unique cards in the hand.")
 
 
-# TODO: See if using this or have duplicated code when creating saved data after having run all my simulations
 def _round_up_to_nearest_5_percent(x: float) -> str:
-    if x * 20 % 1 == 0:
-        rounded = x
-    else:
-        rounded = math.ceil(x * 20) / 20
-    return "{:.0f}%".format(rounded * 100)
+    scaled_value = x * 20
+    rounded_scaled_value = math.ceil(scaled_value)
+    value_rounded_up_to_nearest_5 = rounded_scaled_value / 20
+    return "{:.0f}%".format(value_rounded_up_to_nearest_5 * 100)
 
 
 def _calc_prob_needed_to_call(max_bet: int, pot_size: int) -> str:
@@ -147,7 +149,7 @@ def _simulate_bets_for_players_ahead_of_you(
     pot_size: int,
     n_players_in_blinds: int = N_PLAYERS_IN_BLINDS,
     baseline_prob_of_hole_cards: str = BASELINE_PROBABILITY_OF_HOLE_CARDS,
-) -> Tuple[int, str, List[int]]:
+) -> Tuple[int, str, list[int]]:
     prob_double_max_bet = 1 / n_players.n
     prob_triple_max_bet = prob_double_max_bet / n_players.n
     prob_call = 1 - prob_double_max_bet - prob_triple_max_bet
@@ -157,22 +159,25 @@ def _simulate_bets_for_players_ahead_of_you(
     small_blind = int(big_blind / 2)
     bets = [small_blind, big_blind]
     prob_needed_to_call = baseline_prob_of_hole_cards
-    for _ in range(n_players_in_blinds, n_players.n):
-        n_player = _ + 1
-        choice = random.choices(choices, probabilities, k=1)[0]
-        if choice == "double":
-            big_blind *= 2
-        elif choice == "triple":
-            big_blind *= 3
-        bets.append(big_blind)
-        ActivePlayer(bet=Bet(big_blind))
-        logger.info("Player %s bets %s\n", n_player, big_blind)
-        pot_size += big_blind
+    if n_players_in_blinds == 2:
         prob_needed_to_call = _calc_prob_needed_to_call(big_blind, pot_size)
+    else:
+        for _ in range(n_players_in_blinds, n_players.n):
+            n_player = _ + 1
+            choice = random.choices(choices, probabilities, k=1)[0]
+            if choice == "double":
+                big_blind *= 2
+            elif choice == "triple":
+                big_blind *= 3
+            bets.append(big_blind)
+            ActivePlayer(bet=Bet(big_blind))
+            logger.info("Player %s bets %s\n", n_player, big_blind)
+            pot_size += big_blind
+            prob_needed_to_call = _calc_prob_needed_to_call(big_blind, pot_size)
 
     if prob_needed_to_call == baseline_prob_of_hole_cards:
         raise ValueError(
-            f"Probability needed to call cannot be {baseline_prob_of_hole_cards}"
+            f"Probability needed to call cannot be {baseline_prob_of_hole_cards}. Bets were {bets} and pot size was {pot_size}. Calculated prob_needed_to_call was {_calc_prob_needed_to_call(big_blind, pot_size)}. n_players_in_blinds was {n_players_in_blinds}. n_players was {n_players.n}."
         )
 
     return pot_size, prob_needed_to_call, bets
@@ -245,12 +250,12 @@ def _ensure_player_hands_are_valid(player_hands_in_the_hand: list[PlayerHand]) -
 
 
 def determine_winners_and_losers(
-    player_hands_in_the_hand: List[PlayerHand],
+    player_hands_in_the_hand: list[PlayerHand],
     second_player_wins_string: str = SECOND_PLAYER_WINS_STRING,
     players_tie_string: str = PLAYERS_TIE_STRING,
     hand_winner_flavor: str = HAND_WINNER_FLAVOR,
     hand_tie_flavor: str = HAND_TIE_FLAVOR,
-) -> Tuple[str, List[PlayerHand], List[PlayerHand], List[str], List[str]]:
+) -> Tuple[str, list[PlayerHand], list[PlayerHand], list[str], list[str]]:
     winning_type = ""
     current_best_hand = player_hands_in_the_hand[0]
     winning_hands = [current_best_hand]
@@ -302,7 +307,7 @@ def _init_cards_and_bets(
     n_players_ahead_of_you: Union[PlayersAheadOfYou, None] = None,
     small_blind: Union[SmallBlind, None] = None,
 ) -> Tuple[
-    int, int, HoleCards, int, str, CommunityCards, Dict[str, HoleCards], List[int], Deck
+    int, int, HoleCards, int, str, CommunityCards, Dict[str, HoleCards], list[int], Deck
 ]:
     n_players_ahead_of_you, small_blind = _init_n_players_and_small_blind(
         n_players_ahead_of_you, small_blind
@@ -349,7 +354,7 @@ def _make_list_of_all_cards_and_determine_player_hands(
     your_hole_cards: HoleCards,
     community_cards: CommunityCards,
     hole_cards_for_players_ahead_of_you: Dict[str, HoleCards],
-) -> Tuple[List[Card], List[PlayerHand]]:
+) -> Tuple[list[Card], list[PlayerHand]]:
     all_cards_in_the_hand = (
         [your_hole_cards.hi_card]
         + [your_hole_cards.lo_card]
@@ -390,18 +395,19 @@ def _assign_hand_attributes(
     str,
     int,
     int,
-    List[Card],
-    List[PlayerHand],
+    list[Card],
+    list[PlayerHand],
     str,
-    List[PlayerHand],
-    List[PlayerHand],
-    List[str],
-    List[str],
+    list[PlayerHand],
+    list[PlayerHand],
+    list[str],
+    list[str],
     str,
     int,
-    List[int],
+    list[int],
     Deck,
     HoleCards,
+    str,
 ]:
     (
         n_players_in_the_hand,
@@ -443,6 +449,9 @@ def _assign_hand_attributes(
         losing_hands,
     )
 
+    # TODO: Fix this to use actual probabilities instead of this placeholder.
+    hole_cards_prob_to_win = "2%"
+
     return (
         prob_needed_to_call,
         max_bet,
@@ -459,4 +468,5 @@ def _assign_hand_attributes(
         bets,
         deck,
         your_hole_cards,
+        hole_cards_prob_to_win,
     )
