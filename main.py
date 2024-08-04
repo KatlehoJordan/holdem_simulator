@@ -14,7 +14,6 @@ def main(
         for n_players in [*range(10, 11)]:
             simulate_and_aggregate(n_players_per_simulation=n_players)
     if purpose == "Training":
-        # TODO: Fix train function --- currently printing basically everything!
         train()
     if purpose == "Plot":
         plot_data(show_plot=True)
