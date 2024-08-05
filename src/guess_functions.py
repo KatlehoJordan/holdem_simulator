@@ -124,6 +124,7 @@ def _guess_and_check(
     return guess_result
 
 
+# TODO: Fix when have 3 players, hole cards are 10, 6 off, and it tells you that you should call when you should not (it is calculating that you only need 25% ptw, but you should need 40%)
 def guess_if_should_call_bet(
     hand: Hand,
     should_call_string: str = SHOULD_CALL_STRING,
