@@ -67,21 +67,37 @@ class Hand:
     def show_max_bet(self):
         logger.train("Max bet: %s\n", self.max_bet)
 
+    def show_small_blind(self):
+        logger.train("Small blind: %s\n", self.bets[0])
+
     def show_pot_size(self):
         logger.train("Pot size: %s\n", self.pot_size)
 
     def show_info_for_finding_prob_needed_to_call(self):
-        self.show_max_bet()
-        self.show_pot_size()
+        if self.n_players_in_the_hand > 2:
+            self.show_max_bet()
+            self.show_pot_size()
+        else:
+            self.show_small_blind()
+            self.show_pot_size()
 
     def show_prob_needed_to_call(self):
-        logger.train(
-            "Win probability needed to call:\n\n\t%s >= %s / (%s + %s)",
-            self.prob_needed_to_call,
-            self.max_bet,
-            self.max_bet,
-            self.pot_size,
-        )
+        if self.n_players_in_the_hand > 2:
+            logger.train(
+                "Win probability needed to call:\n\n\t%s >= %s / (%s + %s)",
+                self.prob_needed_to_call,
+                self.max_bet,
+                self.max_bet,
+                self.pot_size,
+            )
+        else:
+            logger.train(
+                "Win probability needed to call:\n\n\t%s >= %s / (%s + %s)",
+                self.prob_needed_to_call,
+                self.bets[0],
+                self.bets[0],
+                self.pot_size,
+            )
 
     def show_n_players_in_the_hand(self):
         logger.train("N players in the hand: %s\n", self.n_players_in_the_hand)
@@ -168,7 +184,7 @@ def _simulate_bets_for_players_ahead_of_you(
     bets = [small_blind, big_blind]
     prob_needed_to_call = baseline_prob_of_hole_cards
     if n_players.n <= 2:
-        prob_needed_to_call = _calc_prob_needed_to_call(big_blind, pot_size)
+        prob_needed_to_call = _calc_prob_needed_to_call(small_blind, pot_size)
     else:
         for _ in range(n_players_in_blinds, n_players.n):
             n_player = _ + 1

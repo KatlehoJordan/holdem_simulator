@@ -1,3 +1,5 @@
+from typing import Union
+
 from src.config import logger
 from src.deck import Deck
 
@@ -13,6 +15,7 @@ from src.guess_functions import (  # guess_hole_cards_base_strength,; guess_hole
 from src.guess_result import GuessResult
 from src.hand import Hand
 from src.hole_cards import HoleCards
+from src.players_ahead_of_you import PlayersAheadOfYou
 
 COMMON_PROMPT = """
 'y' or enter for yes
@@ -34,6 +37,7 @@ Do you want to train again?
 # TODO: Use deck, hole_cards, and n_players to distribute hole_cards to n_players.
 # TODO: (Maybe deprecated) Validate math and corrections implemented by src.scaling_constants and used in the HoleCards class
 def train(
+    n_players_ahead_of_you: Union[int, None] = None,
     starting_prompt: str = STARTING_PROMPT,
     continuation_prompt: str = CONTINUATION_PROMPT,
 ):
@@ -48,12 +52,22 @@ def train(
     else:
         while user_input.lower() in ["y", ""]:
             clear_console()
-            hand = Hand()
+            if n_players_ahead_of_you is None:
+                hand = Hand()
+            else:
+                hand = Hand(
+                    n_players_ahead_of_you=PlayersAheadOfYou(
+                        n_players_ahead_of_you=n_players_ahead_of_you
+                    )
+                )
             hand_guess_result = guess_if_should_call_bet(hand)
             if hand_guess_result == GuessResult.INCORRECT:
                 guess_pot_size(hand)
                 guess_hole_cards_win_probability(hand)
                 guess_prob_needed_to_call(hand)
+                logger.train("\nYou guessed incorrectly the first time.\n")
+                logger.train("\nNow you've seen the breakdown, so try again.\n")
+                guess_if_should_call_bet(hand)
             # TODO: (Maybe deprecated) Determine how to re-implement the following functions
             # cutoffs = make_cutoffs_based_on_n_players_df()
             # guess_n_players_beat(p_hand, cutoffs)

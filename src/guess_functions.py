@@ -155,7 +155,6 @@ def guess_hole_cards_win_probability(hand: Hand) -> None:
     )
 
 
-# TODO: Modify this function to be more appropriate for heads-up situations as big blind and small blind
 def guess_prob_needed_to_call(hand: Hand) -> None:
     _guess_and_check(
         hand.show_info_for_finding_prob_needed_to_call,
