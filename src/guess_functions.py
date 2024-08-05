@@ -5,7 +5,8 @@ from typing import Callable
 from click import clear
 
 from src.config import logger
-from src.hand import Hand
+from src.guess_result import GuessResult
+from src.hand import SHOULD_CALL_STRING, SHOULD_NOT_CALL_STRING, Hand
 from src.hole_cards import HoleCards
 
 STANDARD_COLOR = "\033[0m"
@@ -106,17 +107,34 @@ def _guess_and_check(
     guess_prompt: str,
     actual_value: str,
     show_answer_function: Callable[[], None],
-):
+) -> GuessResult:
     logger.train(_get_quit_message())
     show_info_function()
     user_input = _input_with_escape_hatch_without_quit_prompt(guess_prompt)
+    logger.train(f"User input was: {user_input}")
     if str(user_input) == str(actual_value):
         _correct_guess()
+        guess_result = GuessResult.CORRECT
     else:
         _wrong_guess()
+        guess_result = GuessResult.INCORRECT
     show_answer_function()
     _input_with_escape_hatch_without_quit_prompt("\nPress enter/return to proceed")
     clear_console()
+    return guess_result
+
+
+def guess_if_should_call_bet(
+    hand: Hand,
+    should_call_string: str = SHOULD_CALL_STRING,
+    should_not_call_string: str = SHOULD_NOT_CALL_STRING,
+) -> GuessResult:
+    return _guess_and_check(
+        hand.show_info_for_finding_if_should_call,
+        f"Should you call the bet? '{should_call_string}' for true, '{should_not_call_string}' for false",
+        hand.should_call,
+        hand.show_if_should_call,
+    )
 
 
 def guess_pot_size(hand: Hand) -> None:

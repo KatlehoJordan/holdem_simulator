@@ -27,6 +27,8 @@ from src.small_blind import SmallBlind
 N_PLAYERS_IN_BLINDS = 2
 HAND_TIE_FLAVOR = "Tie"
 BASELINE_PROBABILITY_OF_HOLE_CARDS = "<5%"
+SHOULD_CALL_STRING = 't'
+SHOULD_NOT_CALL_STRING = 'f'
 
 
 class Hand:
@@ -52,6 +54,7 @@ class Hand:
             self.deck,
             self.your_hole_cards,
             self.hole_cards_prob_to_win,
+            self.should_call,
         ) = _assign_hand_attributes(
             n_players_ahead_of_you=n_players_ahead_of_you,
             small_blind=small_blind,
@@ -93,6 +96,15 @@ class Hand:
     def show_prob_to_win(self):
         logger.train("Probability to win: %s\n", self.hole_cards_prob_to_win)
 
+    def show_info_for_finding_if_should_call(self):
+        self.show_bets()
+        self.show_your_hole_cards()
+
+    def show_if_should_call(self, should_call_string: str = SHOULD_CALL_STRING):
+        if self.should_call == should_call_string:
+            logger.train("You should call the bet")
+        else:
+            logger.train("You should not call the bet")
 
 def _init_n_players_and_small_blind(
     n_players_ahead_of_you: Union[PlayersAheadOfYou, None],
@@ -389,6 +401,8 @@ def _assign_hand_attributes(
     small_blind: Union[SmallBlind, None] = None,
     hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
     n_players_string: str = N_PLAYERS_STRING,
+    should_call_string: str = SHOULD_CALL_STRING,
+    should_not_call_string: str = SHOULD_NOT_CALL_STRING,
 ) -> Tuple[
     str,
     int,
@@ -405,6 +419,7 @@ def _assign_hand_attributes(
     list[int],
     Deck,
     HoleCards,
+    str,
     str,
 ]:
     (
@@ -447,18 +462,12 @@ def _assign_hand_attributes(
         losing_hands,
     )
 
-    # TODO: Move this import to top, and then untie the circular dependency it creates
-    from src.get_rounded_win_prob_for_hole_cards_and_players import (
-        get_rounded_win_prob_for_hole_cards_and_players,
-    )
+    hole_cards_prob_to_win = _extract_hole_cards_prob_to_win(hole_cards_flavor_string, n_players_string, n_players_in_the_hand, your_hole_cards)
 
-    df = get_rounded_win_prob_for_hole_cards_and_players()
-    filtered_df = df[(df[n_players_string] == n_players_in_the_hand) &
-        (df[hole_cards_flavor_string] == your_hole_cards.hole_cards_flavor)
-        ]
+    hole_cards_prob_to_win_float = float(hole_cards_prob_to_win.strip('%')) / 100
+    prob_needed_to_call_float = float(prob_needed_to_call.strip('%')) / 100
 
-    hole_cards_prob_to_win = f"{filtered_df.iloc[0]["win ratio rounded down to nearest 5%"] * 100:.0f}%"
-
+    should_call = should_call_string if hole_cards_prob_to_win_float >= prob_needed_to_call_float else should_not_call_string
 
     return (
         prob_needed_to_call,
@@ -477,4 +486,19 @@ def _assign_hand_attributes(
         deck,
         your_hole_cards,
         hole_cards_prob_to_win,
+        should_call,
     )
+
+def _extract_hole_cards_prob_to_win(hole_cards_flavor_string, n_players_string, n_players_in_the_hand, your_hole_cards):
+    # TODO: Move this import to top, and then untie the circular dependency it creates
+    from src.get_rounded_win_prob_for_hole_cards_and_players import (
+        get_rounded_win_prob_for_hole_cards_and_players,
+    )
+
+    df = get_rounded_win_prob_for_hole_cards_and_players()
+    filtered_df = df[(df[n_players_string] == n_players_in_the_hand) &
+        (df[hole_cards_flavor_string] == your_hole_cards.hole_cards_flavor)
+        ]
+
+    hole_cards_prob_to_win = f"{filtered_df.iloc[0]["win ratio rounded down to nearest 5%"] * 100:.0f}%"
+    return hole_cards_prob_to_win

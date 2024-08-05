@@ -5,10 +5,12 @@ from src.deck import Deck
 from src.guess_functions import (  # guess_hole_cards_base_strength,; guess_hole_cards_flush_potential_bonus,; guess_hole_cards_hi_card_value,; guess_hole_cards_lo_card_value,; guess_hole_cards_pair_bonus,; guess_hole_cards_straight_potential_bonus,; guess_hole_cards_summed_value,
     clear_console,
     guess_hole_cards_win_probability,
+    guess_if_should_call_bet,
     guess_pot_size,
     guess_prob_needed_to_call,
     input_with_escape_hatch_with_quit_prompt,
 )
+from src.guess_result import GuessResult
 from src.hand import Hand
 from src.hole_cards import HoleCards
 
@@ -47,9 +49,11 @@ def train(
         while user_input.lower() in ["y", ""]:
             clear_console()
             hand = Hand()
-            guess_pot_size(hand)
-            guess_hole_cards_win_probability(hand)
-            guess_prob_needed_to_call(hand)
+            hand_guess_result = guess_if_should_call_bet(hand)
+            if hand_guess_result == GuessResult.INCORRECT:
+                guess_pot_size(hand)
+                guess_hole_cards_win_probability(hand)
+                guess_prob_needed_to_call(hand)
             # TODO: (Maybe deprecated) Determine how to re-implement the following functions
             # cutoffs = make_cutoffs_based_on_n_players_df()
             # guess_n_players_beat(p_hand, cutoffs)
