@@ -15,7 +15,7 @@ def main(
             simulate_and_aggregate(n_players_per_simulation=n_players)
     if purpose == "Training":
         # TODO: remove next line when done troubleshooting specific n-players
-        # train(n_players_ahead_of_you=1)
+        # train(n_players_ahead_of_you=9)
         train()
     if purpose == "Plot":
         plot_data(show_plot=True)

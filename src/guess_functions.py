@@ -111,7 +111,6 @@ def _guess_and_check(
     logger.train(_get_quit_message())
     show_info_function()
     user_input = _input_with_escape_hatch_without_quit_prompt(guess_prompt)
-    logger.train(f"User input was: {user_input}")
     if str(user_input) == str(actual_value):
         _correct_guess()
         guess_result = GuessResult.CORRECT
@@ -124,7 +123,6 @@ def _guess_and_check(
     return guess_result
 
 
-# TODO: Fix when have 3 players, hole cards are 10, 6 off, and it tells you that you should call when you should not (it is calculating that you only need 25% ptw, but you should need 40%)
 def guess_if_should_call_bet(
     hand: Hand,
     should_call_string: str = SHOULD_CALL_STRING,

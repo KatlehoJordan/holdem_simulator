@@ -3,6 +3,7 @@ import random
 from src.bet import Bet
 from src.config import MIN_SMALL_BLIND, logger
 
+# TODO: Modify this and big blind in order to train/simulate 10/10 games or 25/50 games, as they exist at Casino Cosmopol
 SMALL_BLIND_INCREMENT = 5
 MAX_SMALL_BLIND = 100
 

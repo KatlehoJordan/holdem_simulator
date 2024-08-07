@@ -29,6 +29,7 @@ HAND_TIE_FLAVOR = "Tie"
 BASELINE_PROBABILITY_OF_HOLE_CARDS = "<5%"
 SHOULD_CALL_STRING = 't'
 SHOULD_NOT_CALL_STRING = 'f'
+N_OTHER_PLAYERS_DURING_HEADS_UP = 1
 
 
 class Hand:
@@ -168,40 +169,49 @@ def _calc_prob_needed_to_call(max_bet: int, pot_size: int) -> str:
 
 
 def _simulate_bets_for_players_ahead_of_you(
-    n_players: PlayersAheadOfYou,
+    players_ahead_of_you: PlayersAheadOfYou,
     big_blind: int,
     pot_size: int,
     n_players_in_blinds: int = N_PLAYERS_IN_BLINDS,
     baseline_prob_of_hole_cards: str = BASELINE_PROBABILITY_OF_HOLE_CARDS,
+    n_other_players_during_heads_up: int = N_OTHER_PLAYERS_DURING_HEADS_UP,
 ) -> Tuple[int, str, list[int]]:
-    prob_double_max_bet = 1 / n_players.n
-    prob_triple_max_bet = prob_double_max_bet / n_players.n
+    prob_double_max_bet = 1 / players_ahead_of_you.n
+    prob_triple_max_bet = prob_double_max_bet / players_ahead_of_you.n
     prob_call = 1 - prob_double_max_bet - prob_triple_max_bet
-    choices = ["double", "triple", "call"]
-    probabilities = [prob_double_max_bet, prob_triple_max_bet, prob_call]
     big_blind = big_blind
     small_blind = int(big_blind / 2)
     bets = [small_blind, big_blind]
     prob_needed_to_call = baseline_prob_of_hole_cards
-    if n_players.n <= 2:
+    if players_ahead_of_you.n == n_other_players_during_heads_up:
         prob_needed_to_call = _calc_prob_needed_to_call(small_blind, pot_size)
+    elif players_ahead_of_you.n == n_players_in_blinds:
+        prob_needed_to_call = _calc_prob_needed_to_call(big_blind, pot_size)
     else:
-        for _ in range(n_players_in_blinds, n_players.n):
-            n_player = _ + 1
+        n_player = n_other_players_during_heads_up + 1
+        choices = ["double", "triple", "call"]
+        probabilities = [prob_double_max_bet, prob_triple_max_bet, prob_call]
+        max_bet = big_blind
+        for _ in range(n_players_in_blinds, players_ahead_of_you.n):
+            n_player += 1
             choice = random.choices(choices, probabilities, k=1)[0]
-            if choice == "double":
-                big_blind *= 2
-            elif choice == "triple":
-                big_blind *= 3
-            bets.append(big_blind)
-            ActivePlayer(bet=Bet(big_blind))
-            logger.info("Player %s bets %s\n", n_player, big_blind)
-            pot_size += big_blind
-            prob_needed_to_call = _calc_prob_needed_to_call(big_blind, pot_size)
+            if choice == "call":
+                action_string = "calls"
+            else:
+                action_string = "bets"
+                if choice == "double":
+                    max_bet *= 2
+                elif choice == "triple":
+                    max_bet *= 3
+            bets.append(max_bet)
+            ActivePlayer(bet=Bet(max_bet))
+            logger.info("Player %s %s %s\n", n_player, action_string, max_bet)
+            pot_size += max_bet
+            prob_needed_to_call = _calc_prob_needed_to_call(max_bet, pot_size)
 
     if prob_needed_to_call == baseline_prob_of_hole_cards:
         raise ValueError(
-            f"Probability needed to call cannot be {baseline_prob_of_hole_cards}. Bets were {bets} and pot size was {pot_size}. Calculated prob_needed_to_call was {_calc_prob_needed_to_call(big_blind, pot_size)}. n_players_in_blinds was {n_players_in_blinds}. n_players was {n_players.n}."
+            f"Probability needed to call cannot be {baseline_prob_of_hole_cards}. Bets were {bets} and pot size was {pot_size}. Calculated prob_needed_to_call was {_calc_prob_needed_to_call(big_blind, pot_size)}. n_players_in_blinds was {n_players_in_blinds}. n_players was {players_ahead_of_you.n}."
         )
 
     return pot_size, prob_needed_to_call, bets
@@ -340,7 +350,6 @@ def _init_cards_and_bets(
     deck = Deck()
     your_hole_cards = HoleCards(deck=deck)
     pot_size = small_blind.amount + big_blind
-    prob_needed_to_call = _calc_prob_needed_to_call(big_blind, pot_size)
     pot_size, prob_needed_to_call, bets = _simulate_bets_for_players_ahead_of_you(
         n_players_ahead_of_you,
         big_blind,
