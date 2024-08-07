@@ -33,7 +33,6 @@ Do you want to train again?
 """
 
 
-# TODO: When training, tally how many times a simulation is run for each of x players, how many times you should call, the fraction of the total, the number and fraction of times you guess correctly when you should call, the number and fraction of times you guess incorrectly
 def train(
     n_players_ahead_of_you: Union[int, None] = None,
     starting_prompt: str = STARTING_PROMPT,
@@ -65,7 +64,7 @@ def train(
                 guess_prob_needed_to_call(hand)
                 logger.train("\nYou guessed incorrectly the first time.\n")
                 logger.train("\nNow you've seen the breakdown, so try again.\n")
-                guess_if_should_call_bet(hand)
+                guess_if_should_call_bet(hand, record_results=False)
             # TODO: (Maybe deprecated) Determine how to re-implement the following functions
             # cutoffs = make_cutoffs_based_on_n_players_df()
             # guess_n_players_beat(p_hand, cutoffs)

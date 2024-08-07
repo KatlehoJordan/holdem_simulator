@@ -11,6 +11,8 @@ from src.config import (
     HAND_WINNER_FLAVOR,
     HOLE_CARDS_FLAVOR_STRING,
     N_PLAYERS_STRING,
+    SHOULD_CALL_STRING,
+    SHOULD_NOT_CALL_STRING,
     logger,
 )
 from src.deck import Deck
@@ -27,8 +29,6 @@ from src.small_blind import SmallBlind
 N_PLAYERS_IN_BLINDS = 2
 HAND_TIE_FLAVOR = "Tie"
 BASELINE_PROBABILITY_OF_HOLE_CARDS = "<5%"
-SHOULD_CALL_STRING = 't'
-SHOULD_NOT_CALL_STRING = 'f'
 N_OTHER_PLAYERS_DURING_HEADS_UP = 1
 
 

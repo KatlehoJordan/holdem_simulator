@@ -4,10 +4,11 @@ from typing import Callable
 
 from click import clear
 
-from src.config import logger
+from src.config import SHOULD_CALL_STRING, SHOULD_NOT_CALL_STRING, logger
 from src.guess_result import GuessResult
-from src.hand import SHOULD_CALL_STRING, SHOULD_NOT_CALL_STRING, Hand
+from src.hand import SHOULD_NOT_CALL_STRING, Hand
 from src.hole_cards import HoleCards
+from src.save_train_results import save_train_results
 
 STANDARD_COLOR = "\033[0m"
 BLUE_COLOR = "\033[94m"
@@ -19,6 +20,50 @@ VISUAL_BREAK = "*" * 80
 
 def clear_console() -> None:
     print("\033c", end="", flush=True)
+
+
+def guess_if_should_call_bet(
+    hand: Hand,
+    should_call_string: str = SHOULD_CALL_STRING,
+    should_not_call_string: str = SHOULD_NOT_CALL_STRING,
+    record_results: bool = True,
+) -> GuessResult:
+    hand_guess_result = _guess_and_check(
+        hand.show_info_for_finding_if_should_call,
+        f"Should you call the bet? '{should_call_string}' for true, '{should_not_call_string}' for false",
+        hand.should_call,
+        hand.show_if_should_call,
+    )
+    if record_results:
+        save_train_results(hand=hand, hand_guess_result=hand_guess_result)
+    return hand_guess_result
+
+
+def guess_pot_size(hand: Hand) -> None:
+    _guess_and_check(
+        hand.show_bets,
+        "Guess pot size",
+        str(hand.pot_size),
+        hand.show_pot_size,
+    )
+
+
+def guess_hole_cards_win_probability(hand: Hand) -> None:
+    _guess_and_check(
+        hand.show_your_hole_cards,
+        "Guess hole cards' win probability",
+        hand.hole_cards_prob_to_win,
+        hand.show_prob_to_win,
+    )
+
+
+def guess_prob_needed_to_call(hand: Hand) -> None:
+    _guess_and_check(
+        hand.show_info_for_finding_prob_needed_to_call,
+        "Guess win probability needed to call",
+        hand.prob_needed_to_call,
+        hand.show_prob_needed_to_call,
+    )
 
 
 def _flexible_input(message: str) -> str:
@@ -121,46 +166,6 @@ def _guess_and_check(
     _input_with_escape_hatch_without_quit_prompt("\nPress enter/return to proceed")
     clear_console()
     return guess_result
-
-
-def guess_if_should_call_bet(
-    hand: Hand,
-    should_call_string: str = SHOULD_CALL_STRING,
-    should_not_call_string: str = SHOULD_NOT_CALL_STRING,
-) -> GuessResult:
-    return _guess_and_check(
-        hand.show_info_for_finding_if_should_call,
-        f"Should you call the bet? '{should_call_string}' for true, '{should_not_call_string}' for false",
-        hand.should_call,
-        hand.show_if_should_call,
-    )
-
-
-def guess_pot_size(hand: Hand) -> None:
-    _guess_and_check(
-        hand.show_bets,
-        "Guess pot size",
-        str(hand.pot_size),
-        hand.show_pot_size,
-    )
-
-
-def guess_hole_cards_win_probability(hand: Hand) -> None:
-    _guess_and_check(
-        hand.show_your_hole_cards,
-        "Guess hole cards' win probability",
-        hand.hole_cards_prob_to_win,
-        hand.show_prob_to_win,
-    )
-
-
-def guess_prob_needed_to_call(hand: Hand) -> None:
-    _guess_and_check(
-        hand.show_info_for_finding_prob_needed_to_call,
-        "Guess win probability needed to call",
-        hand.prob_needed_to_call,
-        hand.show_prob_needed_to_call,
-    )
 
 
 # TODO: Likely deprecate all below

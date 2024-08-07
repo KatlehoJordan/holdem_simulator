@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "Andale",
+        "astype",
         "autohint",
         "autolayout",
         "axisbelow",
@@ -38,6 +39,7 @@
         "fcfdbf",
         "fece",
         "figsize",
+        "fillna",
         "fillstyle",
         "flierprops",
         "fontconfig",
