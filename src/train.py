@@ -1,9 +1,10 @@
 from typing import Union
 
 from src.config import logger
-from src.deck import Deck
 
 # TODO: Likely deprecate many imports
+# from src.hole_cards import HoleCards
+# from src.deck import Deck
 from src.guess_functions import (  # guess_hole_cards_base_strength,; guess_hole_cards_flush_potential_bonus,; guess_hole_cards_hi_card_value,; guess_hole_cards_lo_card_value,; guess_hole_cards_pair_bonus,; guess_hole_cards_straight_potential_bonus,; guess_hole_cards_summed_value,
     clear_console,
     guess_hole_cards_win_probability,
@@ -14,7 +15,6 @@ from src.guess_functions import (  # guess_hole_cards_base_strength,; guess_hole
 )
 from src.guess_result import GuessResult
 from src.hand import Hand
-from src.hole_cards import HoleCards
 from src.players_ahead_of_you import PlayersAheadOfYou
 
 COMMON_PROMPT = """
@@ -33,9 +33,7 @@ Do you want to train again?
 """
 
 
-# TODO: Improve upon weightings so that the expected relative hand strengths are better (use the pytest tests). Actually, I think a better way is to simulate 1000s of games with random hands and then figure out the proportion of hands won with any given hold'em cards. Then, use that proportion to determine the relative strength of the hands. This is a Monte Carlo simulation.
-# TODO: Use deck, hole_cards, and n_players to distribute hole_cards to n_players.
-# TODO: (Maybe deprecated) Validate math and corrections implemented by src.scaling_constants and used in the HoleCards class
+# TODO: When training, tally how many times a simulation is run for each of x players, how many times you should call, the fraction of the total, the number and fraction of times you guess correctly when you should call, the number and fraction of times you guess incorrectly
 def train(
     n_players_ahead_of_you: Union[int, None] = None,
     starting_prompt: str = STARTING_PROMPT,
@@ -73,7 +71,7 @@ def train(
             # guess_n_players_beat(p_hand, cutoffs)
             # deck = Deck()
             # hole_cards = HoleCards(deck=deck)
-            # TODO: Likely deprecate many of these guessing functions
+            # TODO: (Maybe deprecated) many of these guessing functions
             # guess_hole_cards_summed_value(hole_cards)
             # guess_hole_cards_hi_card_value(hole_cards)
             # guess_hole_cards_lo_card_value(hole_cards)
