@@ -1,0 +1,11 @@
+N Players,N Hands,N Correct,N to Call,N to Call Correct,N to Fold,N to Fold Correct,% Hands Correct,% to Call Correct,% to Fold Correct,Play style
+2,29,29,29,29,0,0,100.00%,100.00%,nan%,Inaccurate in All Ways
+3,30,28,15,15,15,13,93.33%,100.00%,86.67%,Inaccurate in All Ways
+4,22,19,7,5,15,14,86.36%,71.43%,93.33%,Inaccurate in All Ways
+5,17,16,7,7,10,9,94.12%,100.00%,90.00%,Inaccurate in All Ways
+6,16,13,3,2,13,11,81.25%,66.67%,84.62%,Inaccurate in All Ways
+7,27,25,7,6,20,19,92.59%,85.71%,95.00%,Inaccurate in All Ways
+8,36,35,8,8,28,27,97.22%,100.00%,96.43%,Great Play
+9,43,38,6,6,37,32,88.37%,100.00%,86.49%,Inaccurate in All Ways
+10,68,64,18,15,50,49,94.12%,83.33%,98.00%,Inaccurate in All Ways
+All,288,267,100,93,188,174,92.71%,93.00%,92.55%,Inaccurate in All Ways

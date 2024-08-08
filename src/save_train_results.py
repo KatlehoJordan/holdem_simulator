@@ -56,7 +56,7 @@ PLAY_STYLE_STRING = "Play style"
 
 THRESHOLD_FOR_GREAT_PLAY = 0.95
 
-WORSE_PLAY_STYLE = "Inaccurate in All Ways"
+WORSE_PLAY_STYLE = "Generally Inaccurate"
 TIGHT_PLAY_STYLE = "Too Tight"
 LOOSE_PLAY_STYLE = "Too Loose"
 GREAT_PLAY_STYLE = "Great Play"

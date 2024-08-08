@@ -2,7 +2,9 @@ import numpy as np
 
 from src.config import N_PLAYERS_STRING, logger
 
-MIN_PLAYERS_AHEAD_OF_YOU = 1
+# MIN_PLAYERS_AHEAD_OF_YOU = 1
+# TODO: If not training (e.g., if simulating more hands for aggregating data), then set MIN_PLAYERS_AHEAD_OF_YOU to 1
+MIN_PLAYERS_AHEAD_OF_YOU = 2
 MAX_PLAYERS_AHEAD_OF_YOU = 9
 
 
