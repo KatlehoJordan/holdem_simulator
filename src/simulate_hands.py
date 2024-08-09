@@ -341,6 +341,10 @@ def make_folder_for_unaggregated_simulations(
     path_to_unaggregated_directory: Path = PATH_TO_UNAGGREGATED_DATA,
     n_players_path_prefix: str = N_PLAYERS_PATH_PREFIX,
 ) -> Path:
+    logger.info(
+        "Making folder for unaggregated simulations for %s players",
+        n_players_per_simulation,
+    )
     base_path_for_n_players = Path(f"{n_players_path_prefix}{n_players_per_simulation}")
     path_to_unaggregated_directory = (
         path_to_simulations / base_path_for_n_players / path_to_unaggregated_directory

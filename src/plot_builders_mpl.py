@@ -6,13 +6,10 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from pandas import DataFrame
 
-from src.aggregate_simulations import (
-    APPEARANCES_STRING,
-    HOLE_CARDS_FLAVOR_STRING,
-    WIN_RATIO_ROUNDED_DOWN_STRING,
-)
+from src.aggregate_simulations import APPEARANCES_STRING, HOLE_CARDS_FLAVOR_STRING
 from src.config import PLOT_FILE_NAME, PLOTS_PATH, logger
 from src.make_dir_if_does_not_exist import make_dir_if_not_exist
+from src.make_win_ratio_rounded_down_string import make_win_ratio_rounded_down_string
 
 STYLES_PATH = Path("styles")
 STYLES_FILE = "dgl_stylesheet.mpltstyle"
@@ -37,11 +34,10 @@ def _make_mpl_fig_and_ax_objects(
     dataframe: DataFrame,
     n_cols_to_show: Union[int, None] = None,
     hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
-    win_ratio_rounded_down_string: str = WIN_RATIO_ROUNDED_DOWN_STRING,
     appearances_string: str = APPEARANCES_STRING,
 ) -> Tuple[Figure, Axes, Axes]:
     x_var = hole_cards_flavor_string
-    y1_var = win_ratio_rounded_down_string
+    y1_var = make_win_ratio_rounded_down_string()
     y2_var = appearances_string
     logger.info("Sorting data frame descending by %s", y1_var)
     dataframe = dataframe.sort_values(by=y1_var, ascending=False)

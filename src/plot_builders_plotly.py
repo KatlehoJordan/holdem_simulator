@@ -9,7 +9,6 @@ from plotly.graph_objects import Figure
 from src.aggregate_simulations import (
     APPEARANCES_STRING,
     HOLE_CARDS_FLAVOR_STRING,
-    WIN_RATIO_ROUNDED_DOWN_STRING,
     WIN_RATIO_STRING,
 )
 from src.config import (
@@ -20,6 +19,7 @@ from src.config import (
     logger,
 )
 from src.make_dir_if_does_not_exist import make_dir_if_not_exist
+from src.make_win_ratio_rounded_down_string import make_win_ratio_rounded_down_string
 
 MINOR_FONT_SIZE = 12
 MAJOR_FONT_SIZE = MINOR_FONT_SIZE + 2
@@ -143,13 +143,12 @@ def _prepare_df_and_vars(
     n_players_string: str = N_PLAYERS_STRING,
     hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
     win_ratio_string: str = WIN_RATIO_STRING,
-    win_ratio_rounded_down_string: str = WIN_RATIO_ROUNDED_DOWN_STRING,
     appearances_string: str = APPEARANCES_STRING,
     plot_all_players_string: str = PLOT_ALL_PLAYERS_STRING,
 ):
     x1_var = hole_cards_flavor_string
     x2_var = n_players_string
-    y1_var = win_ratio_rounded_down_string
+    y1_var = make_win_ratio_rounded_down_string()
     y2_var = appearances_string
     y3_var = win_ratio_string
     if n_players_to_plot != plot_all_players_string:

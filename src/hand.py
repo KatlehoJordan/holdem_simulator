@@ -11,6 +11,7 @@ from src.config import (
     HAND_WINNER_FLAVOR,
     HOLE_CARDS_FLAVOR_STRING,
     N_PLAYERS_STRING,
+    ROUND_TO_PERCENT,
     SHOULD_CALL_STRING,
     SHOULD_NOT_CALL_STRING,
     logger,
@@ -28,7 +29,7 @@ from src.small_blind import SmallBlind
 
 N_PLAYERS_IN_BLINDS = 2
 HAND_TIE_FLAVOR = "Tie"
-BASELINE_PROBABILITY_OF_HOLE_CARDS = "<5%"
+BASELINE_PROBABILITY_OF_HOLE_CARDS = "<0%"
 N_OTHER_PLAYERS_DURING_HEADS_UP = 1
 
 
@@ -157,16 +158,6 @@ def _ensure_cards_in_hand_are_unique(
         raise ValueError("There are non-unique cards in the hand.")
 
 
-def _round_up_to_nearest_5_percent(x: float) -> str:
-    scaled_value = x * 20
-    rounded_scaled_value = math.ceil(scaled_value)
-    value_rounded_up_to_nearest_5 = rounded_scaled_value / 20
-    return "{:.0f}%".format(value_rounded_up_to_nearest_5 * 100)
-
-
-def _calc_prob_needed_to_call(max_bet: int, pot_size: int) -> str:
-    return _round_up_to_nearest_5_percent(max_bet / (max_bet + pot_size))
-
 
 def _simulate_bets_for_players_ahead_of_you(
     players_ahead_of_you: PlayersAheadOfYou,
@@ -217,6 +208,28 @@ def _simulate_bets_for_players_ahead_of_you(
         )
 
     return pot_size, prob_needed_to_call, bets
+
+
+def _calc_prob_needed_to_call(cost_to_call: int, pot_size: int) -> str:
+    pot_odds = _calculate_pot_odds(cost_to_call, pot_size)
+    return _round_up_to_nearest_x_percent(value=pot_odds)
+
+
+def _calculate_pot_odds(max_bet, pot_size):
+    pot_odds = max_bet / (max_bet + pot_size)
+    return pot_odds
+
+
+def _round_up_to_nearest_x_percent(value: float) -> str:
+    x = _convert_round_to_percent_to_int()
+    scaled_value = value * (100 / x)
+    rounded_scaled_value = math.ceil(scaled_value)
+    value_rounded_up_to_nearest_x = rounded_scaled_value * x
+    return "{:.0f}%".format(value_rounded_up_to_nearest_x)
+
+
+def _convert_round_to_percent_to_int(input_float=ROUND_TO_PERCENT) -> int:
+    return int(input_float * 100)
 
 
 def _simulate_hole_cards_for_players_ahead_of_you(
@@ -528,5 +541,5 @@ def _extract_hole_cards_prob_to_win(hole_cards_flavor_string, n_players_string, 
         (df[hole_cards_flavor_string] == your_hole_cards.hole_cards_flavor)
         ]
 
-    hole_cards_prob_to_win = f"{filtered_df.iloc[0]["win ratio rounded down to nearest 5%"] * 100:.0f}%"
+    hole_cards_prob_to_win = f"{filtered_df.iloc[0]["win ratio rounded down to nearest 10%"] * 100:.0f}%"
     return hole_cards_prob_to_win

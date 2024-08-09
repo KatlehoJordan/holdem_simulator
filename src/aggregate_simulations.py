@@ -13,11 +13,14 @@ from src.config import (
     N_PLAYERS_TO_SIM_AGG_OR_PLOT,
     PATH_TO_ARCHIVED_SIMULATIONS,
     PATH_TO_SIMULATIONS,
+    ROUND_TO_PERCENT,
+    WIN_RATIO_STRING,
     logger,
 )
 from src.get_path_for_n_players_aggregated import get_path_for_n_players_aggregated
 from src.hole_cards import VALID_HOLE_CARDS_FLAVORS_LIST
 from src.make_dir_if_does_not_exist import make_dir_if_not_exist
+from src.make_win_ratio_rounded_down_string import make_win_ratio_rounded_down_string
 from src.simulate_hands import (
     N_CARDS_IN_HAND_STRING,
     make_folder_for_unaggregated_simulations,
@@ -31,8 +34,7 @@ WINS_BY_PLAYER_STRING = "wins by player"
 APPEARANCES_STRING = "appearances"
 APPEARANCES_OF_CARDS_STRING = f"{APPEARANCES_STRING} of cards"
 WINS_BY_HOLE_CARDS_FLAVOR_STRING = f"wins by {HOLE_CARDS_FLAVOR_STRING}"
-WIN_RATIO_STRING = "win ratio"
-WIN_RATIO_ROUNDED_DOWN_STRING = f"{WIN_RATIO_STRING} rounded down to nearest 5%"
+ROUNDED_DOWN_TO_NEAREST_STRING = " rounded down to nearest "
 
 
 def aggregate_simulations(
@@ -43,16 +45,20 @@ def aggregate_simulations(
     appearances_of_cards_string: str = APPEARANCES_OF_CARDS_STRING,
     wins_by_hole_cards_flavor_string: str = WINS_BY_HOLE_CARDS_FLAVOR_STRING,
 ):
+    logger.info("Aggregating results for %s players.", n_players_to_sim_or_aggregate)
     unaggregated_results_folder = make_folder_for_unaggregated_simulations(
         n_players_per_simulation=n_players_to_sim_or_aggregate
     )
     tmp_file_path = unaggregated_results_folder / tmp_file_name
+    logger.info("Made a temp file at %s", tmp_file_path)
 
     counter = 0
     for file in unaggregated_results_folder.iterdir():
         if file.suffix == file_save_type:
+            logger.info("Reading %s", file)
             df = pd.read_csv(file)
             read_header = counter == 0
+            logger.info("Writing to %s", tmp_file_path)
             df.to_csv(tmp_file_path, mode="a", index=False, header=read_header)
             counter += 1
 
@@ -272,23 +278,29 @@ def _calculate_hole_card_results(
     hole_cards_flavor_string: str = HOLE_CARDS_FLAVOR_STRING,
     appearances_string: str = APPEARANCES_STRING,
     win_ratio_string: str = WIN_RATIO_STRING,
-    win_ratio_rounded_down_string: str = WIN_RATIO_ROUNDED_DOWN_STRING,
+    round_to_percent: float = ROUND_TO_PERCENT,
 ) -> dict:
+    logger.info("Calculating results for %s.", hole_cards_flavor)
     this_hole_cards_flavor_appears = sum(data_frame[hole_cards_flavor])
     this_hole_cards_flavor_wins = data_frame.winning_hole_cards_flavors.apply(
         lambda x: x.count(hole_cards_flavor)
     ).sum()
     win_ratio = this_hole_cards_flavor_wins / this_hole_cards_flavor_appears
-    win_ratio_rounded_down_to_nearest_5_percent = math.floor(win_ratio / 0.05) * 0.05
+    win_ratio_rounded_down_to_nearest_x_percent = (
+        math.floor(win_ratio / round_to_percent) * round_to_percent
+    )
     fewer_than_expected_appearances = (
         this_hole_cards_flavor_appears < min_n_appearances_expected_of_each_flavor
     )
+
+    win_ratio_rounded_down_string = make_win_ratio_rounded_down_string()
+
     return {
         hole_cards_flavor_string: hole_cards_flavor,
         appearances_string: this_hole_cards_flavor_appears,
         "wins": this_hole_cards_flavor_wins,
         win_ratio_string: win_ratio,
-        win_ratio_rounded_down_string: win_ratio_rounded_down_to_nearest_5_percent,
+        win_ratio_rounded_down_string: win_ratio_rounded_down_to_nearest_x_percent,
         "fewer than expected appearances": fewer_than_expected_appearances,
     }
 
@@ -312,6 +324,7 @@ def _make_aggregated_file(
     path_to_archive: Path = PATH_TO_ARCHIVED_SIMULATIONS,
     file_save_type: str = FILE_SAVE_TYPE,
 ) -> None:
+    logger.info("Making aggregated file for %s.", file_name_string_root)
     file_name_string_root = file_name_string_root
     file_name = f"{file_name_string_root}{file_save_type}"
     path_for_n_players = get_path_for_n_players_aggregated(

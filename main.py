@@ -22,4 +22,6 @@ def main(
 
 
 if __name__ == "__main__":
+    # TODO: Remove older uses of main()
+    # main(purpose="Sim and Agg")
     main(purpose="Training")
